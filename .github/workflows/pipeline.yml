@@ -1,0 +1,68 @@
+name: EAS Build & Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install
+      - run: npm install -g eas-cli
+
+      # ✅ Run backend unit tests
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: |
+          npm install
+          npm test
+
+      # ✅ Login to Expo
+      - name: Login to Expo
+        run: eas login --token ${{ secrets.EXPO_TOKEN }}
+
+      # ✅ Build for Android and iOS
+      - name: EAS Build
+        run: |
+          eas build --platform android --non-interactive --json > android.json
+          eas build --platform ios --non-interactive --json > ios.json
+
+      # ✅ Extract download URLs
+      - name: Extract APK & IPA URLs
+        run: |
+          echo "ANDROID_URL=$(jq -r '.artifacts.buildUrl' android.json)" >> $GITHUB_ENV
+          echo "IOS_URL=$(jq -r '.artifacts.buildUrl' ios.json)" >> $GITHUB_ENV
+
+      # ✅ Generate index.html with download links
+      - name: Generate Public Dashboard
+        run: |
+          mkdir -p public
+          cat <<EOF > public/index.html
+          <html>
+          <head><title>🏀 Social Sports App Downloads</title></head>
+          <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
+            <h1>🏀 Download Our App</h1>
+            <p><a href="$ANDROID_URL">📱 Download Android APK</a></p>
+            <p><a href="$IOS_URL">🍏 Download iOS IPA</a></p>
+          </body>
+          </html>
+          EOF
+
+      # ✅ Deploy to Vercel
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          alias-domains: your-vercel-subdomain.vercel.app
