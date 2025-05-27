@@ -45,8 +45,7 @@ jobs:
       # ✅ Generate index.html with download links
       - name: Generate Public Dashboard
         run: |
-          mkdir -p public
-          cat <<EOF > public/index.html
+          cat <<EOF > website/index.html
           <html>
           <head><title>🏀 Social Sports App Downloads</title></head>
           <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
