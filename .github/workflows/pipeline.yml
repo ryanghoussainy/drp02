@@ -38,7 +38,8 @@ jobs:
       - name: Install jq & extract APK URL
         id: extract
         run: |
-          brew install jq
+          sudo apt-get update -y
+          sudo apt-get install -y jq
           echo "apk=$(jq -r '.artifacts.buildUrl' android.json)" >> "$GITHUB_OUTPUT"
         working-directory: ${{ env.APP_DIR }}
 
