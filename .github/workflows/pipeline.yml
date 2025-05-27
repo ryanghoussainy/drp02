@@ -41,11 +41,11 @@ jobs:
         run: |
           cat <<EOF > index.html
           <html>
-          <head><title>🏀 Social Sports App Downloads</title></head>
+          <head><title>Social Sports App Downloads</title></head>
           <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
-            <h1>🏀 Download Our App</h1>
-            <p><a href="$ANDROID_URL">📱 Download Android APK</a></p>
-            <p><a href="$IOS_URL">🍏 Download iOS IPA</a></p>
+            <h1>Download Our App</h1>
+            <p><a href="$ANDROID_URL">Download Android APK</a></p>
+            <p><a href="$IOS_URL">Download iOS IPA</a></p>
           </body>
           </html>
           EOF
