@@ -11,7 +11,7 @@ env:
 
 jobs:
   android-build:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     outputs:
       apk_url: ${{ steps.extract.outputs.apk }}
@@ -43,7 +43,7 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
   ios-build:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     outputs:
       ipa_url: ${{ steps.extract.outputs.ipa }}
