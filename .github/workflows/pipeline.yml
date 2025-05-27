@@ -36,8 +36,8 @@ jobs:
       # ✅ Build for Android and iOS
       - name: EAS Build
         run: |
-          eas build --platform android --non-interactive --json > android.json
-          eas build --platform ios --non-interactive --json > ios.json
+          eas build -p android --json > android.json
+          eas build -p ios --json > ios.json
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         working-directory: team-up-london
