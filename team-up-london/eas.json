@@ -1,4 +1,5 @@
 {
+  "owner": "ryzaman",
   "cli": {
     "version": ">= 14.2.0",
     "appVersionSource": "remote"
