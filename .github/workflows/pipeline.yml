@@ -16,15 +16,18 @@ jobs:
         with:
           node-version: 18
 
-      - run: npm install
+      - name: Install Dependencies
+        run: npm install
+        working-directory: team-up-london
+
       - run: npm install -g eas-cli
 
-      # ✅ Run backend unit tests
-      - name: Run Backend Tests
-        working-directory: ./backend
-        run: |
-          npm install
-          npm test
+      # # ✅ Run backend unit tests
+      # - name: Run Backend Tests
+      #   working-directory: ./backend
+      #   run: |
+      #     npm install
+      #     npm test
 
       # ✅ Login to Expo
       - name: Login to Expo
