@@ -23,9 +23,6 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Verify Expo config being used
-        run: expo config --type public
-
       - name: EAS Build (Android & iOS)
         run: |
           eas build --local -p android --profile preview --non-interactive --json > android.json
