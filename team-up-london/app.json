@@ -24,6 +24,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6e26b843-3289-4f78-adb6-9f8f3b5fc71b"
+      }
+    },
+    "owner": "ryzaman"
   }
 }
