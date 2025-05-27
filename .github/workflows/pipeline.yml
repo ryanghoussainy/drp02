@@ -1,4 +1,4 @@
-name: EAS Build & Deploy to Vercel
+name: CI/CD Pipeline
 
 on:
   push:
@@ -20,20 +20,9 @@ jobs:
         run: npm install
         working-directory: team-up-london
 
-      - run: npm install -g eas-cli
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
 
-      # # ✅ Run backend unit tests
-      # - name: Run Backend Tests
-      #   working-directory: ./backend
-      #   run: |
-      #     npm install
-      #     npm test
-
-      # # ✅ Login to Expo
-      # - name: Login to Expo
-      #   run: eas login --token ${{ secrets.EXPO_TOKEN }}
-
-      # ✅ Build for Android and iOS
       - name: EAS Build (Android & iOS)
         run: |
           eas build -p android --profile preview --non-interactive --json > android.json
@@ -42,16 +31,15 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         working-directory: team-up-london
 
-      # ✅ Extract download URLs
-      - name: Extract APK & IPA URLs
+      - name: Extract APK & IPA Download URLs
         run: |
           echo "ANDROID_URL=$(jq -r '.artifacts.buildUrl' android.json)" >> $GITHUB_ENV
           echo "IOS_URL=$(jq -r '.artifacts.buildUrl' ios.json)" >> $GITHUB_ENV
+        working-directory: team-up-london
 
-      # ✅ Generate index.html with download links
-      - name: Generate Public Dashboard
+      - name: Generate Public Dashboard to Download Links
         run: |
-          cat <<EOF > website/index.html
+          cat <<EOF > index.html
           <html>
           <head><title>🏀 Social Sports App Downloads</title></head>
           <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
@@ -61,13 +49,13 @@ jobs:
           </body>
           </html>
           EOF
+        working-directory: website
 
-      # ✅ Deploy to Vercel
-      - name: Deploy to Vercel
+      - name: Deploy Website to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-          alias-domains: your-vercel-subdomain.vercel.app
+          working-directory: website
+          alias-domains: drp02.vercel.app
