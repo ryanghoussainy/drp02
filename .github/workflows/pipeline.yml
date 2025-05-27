@@ -29,15 +29,17 @@ jobs:
       #     npm install
       #     npm test
 
-      # ✅ Login to Expo
-      - name: Login to Expo
-        run: eas login --token ${{ secrets.EXPO_TOKEN }}
+      # # ✅ Login to Expo
+      # - name: Login to Expo
+      #   run: eas login --token ${{ secrets.EXPO_TOKEN }}
 
       # ✅ Build for Android and iOS
       - name: EAS Build
         run: |
           eas build --platform android --non-interactive --json > android.json
           eas build --platform ios --non-interactive --json > ios.json
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       # ✅ Extract download URLs
       - name: Extract APK & IPA URLs
