@@ -40,6 +40,7 @@ jobs:
           eas build --platform ios --non-interactive --json > ios.json
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        working-directory: team-up-london
 
       # ✅ Extract download URLs
       - name: Extract APK & IPA URLs
