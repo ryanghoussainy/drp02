@@ -34,10 +34,10 @@ jobs:
       #   run: eas login --token ${{ secrets.EXPO_TOKEN }}
 
       # ✅ Build for Android and iOS
-      - name: EAS Build
+      - name: EAS Build (Android & iOS)
         run: |
-          eas build -p android --profile preview --json > android.json
-          eas build -p ios --profile preview --json > ios.json
+          eas build -p android --profile preview --non-interactive --json > android.json
+          eas build -p ios --profile preview --non-interactive --json > ios.json
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         working-directory: team-up-london
