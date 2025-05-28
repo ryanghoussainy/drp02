@@ -1,7 +1,3 @@
-# Setup Expo included from: https://github.com/thomasread99/expo-workflows
-# Author: Thomas Read
-# License: MIT
-
 name: CI/CD Pipeline
 
 on:
@@ -39,20 +35,17 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
       - name: Local Android build
-        run: eas build --local -p android --profile preview --non-interactive --output android.apk
+        run: eas build --local -p android --profile preview --non-interactive --output team-up-london.apk
         working-directory: ${{ env.APP_DIR }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: ${{ env.APP_DIR }}/android.apk
+          name: team-up-london-apk
+          path: ${{ env.APP_DIR }}/team-up-london.apk
 
   # ios-build:
   #   runs-on: macos-latest
-
-  #   outputs:
-  #     ipa_url: ${{ steps.extract.outputs.ipa }}
 
   #   steps:
   #     - uses: actions/checkout@v4
@@ -71,15 +64,14 @@ jobs:
   #       run: sudo xcode-select -switch /Applications/Xcode_15.3.app
 
   #     - name: Local iOS build
-  #       run: eas build --local -p ios --profile preview --non-interactive --json > ios.json
+  #       run: eas build --local -p ios --profile preview --non-interactive --output ios.ipa
   #       working-directory: ${{ env.APP_DIR }}
 
-  #     - name: Install jq & extract IPA URL
-  #       id: extract
-  #       run: |
-  #         brew install jq
-  #         echo "ipa=$(jq -r '.artifacts.buildUrl' ios.json)" >> "$GITHUB_OUTPUT"
-  #       working-directory: ${{ env.APP_DIR }}
+  #     - name: Upload IPA artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: team-up-london-ipa
+  #         path: ${{ env.APP_DIR }}/team-up-london.ipa
 
   vercel-deploy:
     # needs: [ android-build, ios-build ]
@@ -93,33 +85,12 @@ jobs:
       - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
-          name: android-apk
+          name: team-up-london-apk
           path: ${{ env.WEBSITE_DIR }}
 
       - name: List website contents (debug)
         run: ls -R ${{ env.WEBSITE_DIR }}
 
-      # - name: Build download page
-      #   run: |
-      #     mkdir -p ${{ env.WEBSITE_DIR }}
-      #     cat > ${{ env.WEBSITE_DIR }}/index.html <<EOF
-      #     <!DOCTYPE html>
-      #     <html lang="en">
-      #       <head>
-      #         <meta charset="utf-8" />
-      #         <title>Social Sports App Downloads</title>
-      #         <style>
-      #           body{font-family:sans-serif;text-align:center;margin-top:4rem}
-      #           a{font-size:1.1rem}
-      #         </style>
-      #       </head>
-      #       <body>
-      #         <h1>Download the latest builds</h1>
-      #         <p><a href="${{ needs.android-build.outputs.apk_url }}">Download Android APK</a></p>
-      #         <p><a href="${{ needs.ios-build.outputs.ipa_url }}">Download iOS IPA</a></p>
-      #       </body>
-      #     </html>
-      #     EOF
       - name: Build download page
         run: |
           mkdir -p ${{ env.WEBSITE_DIR }}
@@ -136,7 +107,8 @@ jobs:
             </head>
             <body>
               <h1>Download the latest builds</h1>
-              <p><a href="android.apk">Download Android APK</a></p>
+              <p><a href="team-up-london.apk">Download Android APK</a></p>
+              <p><a href="">Download iOS IPA</a></p>
             </body>
           </html>
           EOF
