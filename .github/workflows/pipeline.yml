@@ -18,11 +18,15 @@ jobs:
   android-build:
     runs-on: ubuntu-latest
 
-    outputs:
-      apk_url: ${{ steps.extract.outputs.apk }}
-
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        id: setup-java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
       - uses: actions/setup-node@v3
         with: 
@@ -35,20 +39,15 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
       - name: Local Android build
-        run: eas build --local -p android --profile preview --non-interactive --json > android.json
+        run: eas build --local -p android --profile preview --non-interactive --output android.apk
         working-directory: ${{ env.APP_DIR }}
 
-      - name: Install jq & extract APK URL
-        id: extract
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y jq
-
-          cat android.json
-          jq '.' android.json
-          
-          echo "apk=$(jq -r '.artifacts.buildUrl' android.json)" >> "$GITHUB_OUTPUT"
-        working-directory: ${{ env.APP_DIR }}
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android.apk
+          working-directory: ${{ env.APP_DIR }}
 
   # ios-build:
   #   runs-on: macos-latest
@@ -92,6 +91,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: ${{ env.WEBSITE_DIR }}
+
+      - name: Move APK to root of website
+        run: |
+          mv ${{ env.WEBSITE_DIR }}/android-apk/android.apk ${{ env.WEBSITE_DIR }}/android.apk
+          rm -rf ${{ env.WEBSITE_DIR }}/android-apk
+
+      - name: List website contents (debug)
+        run: ls -R ${{ env.WEBSITE_DIR }}
+
       # - name: Build download page
       #   run: |
       #     mkdir -p ${{ env.WEBSITE_DIR }}
@@ -129,7 +142,7 @@ jobs:
             </head>
             <body>
               <h1>Download the latest builds</h1>
-              <p><a href="${{ needs.android-build.outputs.apk_url }}">Download Android APK</a></p>
+              <p><a href="android.apk">Download Android APK</a></p>
             </body>
           </html>
           EOF
