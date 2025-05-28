@@ -35,7 +35,7 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
       - name: Local Android build
-        run: eas build -p android --profile preview --non-interactive --json > android.json
+        run: eas build --local -p android --profile preview --non-interactive --json > android.json
         working-directory: ${{ env.APP_DIR }}
 
       - name: Install jq & extract APK URL
