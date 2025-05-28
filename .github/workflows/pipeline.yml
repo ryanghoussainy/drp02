@@ -46,8 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: android.apk
-          working-directory: ${{ env.APP_DIR }}
+          path: ${{ env.APP_DIR }}/android.apk
 
   # ios-build:
   #   runs-on: macos-latest
