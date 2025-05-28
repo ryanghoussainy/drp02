@@ -5,6 +5,7 @@ on:
     branches: [master]
 
 env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
   JAVA_VERSION: 17
   NODE_VERSION: 18
   APP_DIR: team-up-london        # Expo project root
