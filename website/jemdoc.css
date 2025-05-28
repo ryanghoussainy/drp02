@@ -1,0 +1,72 @@
+:root {
+    --primary-color: #3498db;
+    --gradient-color-1: #6452ee;
+    --gradient-color-2: #b73ce7;
+    --gradient-color-3: #1e91bb;
+    --gradient-color-4: #32b395;
+    --background-color: #ffffff;
+    --text-color: #333333;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(
+        -45deg, 
+        var(--gradient-color-1), 
+        var(--gradient-color-2), 
+        var(--gradient-color-3), 
+        var(--gradient-color-4)
+        );
+    background-size: 300% 300%;
+    animation: gradient 15s ease infinite;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: var(--text-color);
+}
+
+.container {
+    background-color: var(--background-color);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 960px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 2;
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+h1 {
+    font-size: 165%;
+}
+
+h2 {
+    font-size: 125%;
+    padding-top: 0.8em;
+}
+
+h3 {
+    font-size: 110%;
+    border-bottom: none;
+}
+
+h2 + h3 {
+    padding-top: 0.2em;
+}
+
+@keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}

@@ -88,31 +88,6 @@ jobs:
           name: team-up-london-apk
           path: ${{ env.WEBSITE_DIR }}
 
-      - name: List website contents (debug)
-        run: ls -R ${{ env.WEBSITE_DIR }}
-
-      - name: Build download page
-        run: |
-          mkdir -p ${{ env.WEBSITE_DIR }}
-          cat > ${{ env.WEBSITE_DIR }}/index.html <<EOF
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8" />
-              <title>Social Sports App Downloads</title>
-              <style>
-                body{font-family:sans-serif;text-align:center;margin-top:4rem}
-                a{font-size:1.1rem}
-              </style>
-            </head>
-            <body>
-              <h1>Download the latest builds</h1>
-              <p><a href="team-up-london.apk">Download Android APK</a></p>
-              <p><a href="">Download iOS IPA</a></p>
-            </body>
-          </html>
-          EOF
-
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
