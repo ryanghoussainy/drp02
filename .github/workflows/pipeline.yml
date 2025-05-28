@@ -43,6 +43,10 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y jq
+
+          cat android.json
+          jq '.' android.json
+          
           echo "apk=$(jq -r '.artifacts.buildUrl' android.json)" >> "$GITHUB_OUTPUT"
         working-directory: ${{ env.APP_DIR }}
 
