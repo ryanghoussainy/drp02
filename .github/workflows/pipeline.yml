@@ -1,73 +1,140 @@
-name: EAS Build & Deploy to Vercel
+# Setup Expo included from: https://github.com/thomasread99/expo-workflows
+# Author: Thomas Read
+# License: MIT
+
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [master]
 
+env:
+  NODE_VERSION: 18
+  APP_DIR: team-up-london        # Expo project root
+  WEBSITE_DIR: website           # static site to publish
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
 jobs:
-  build-and-deploy:
+  android-build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      apk_url: ${{ steps.extract.outputs.apk }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with: 
+          node-version: ${{ env.NODE_VERSION }} 
+
+      - name: Install deps & EAS
+        run: |
+          npm ci
+          npm i -g eas-cli
+        working-directory: ${{ env.APP_DIR }}
+
+      - name: Local Android build
+        run: eas build --local -p android --profile preview --non-interactive --json > android.json
+        working-directory: ${{ env.APP_DIR }}
+
+      - name: Install jq & extract APK URL
+        id: extract
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          echo "apk=$(jq -r '.artifacts.buildUrl' android.json)" >> "$GITHUB_OUTPUT"
+        working-directory: ${{ env.APP_DIR }}
+
+  # ios-build:
+  #   runs-on: macos-latest
+
+  #   outputs:
+  #     ipa_url: ${{ steps.extract.outputs.ipa }}
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - uses: actions/setup-node@v4.0.2
+  #       with: 
+  #         node-version: ${{ env.NODE_VERSION }}
+      
+  #     - name: Install deps & EAS
+  #       run: |
+  #         npm ci
+  #         npm i -g eas-cli
+  #       working-directory: ${{ env.APP_DIR }}
+
+  #     - name: Select Xcode 15.3
+  #       run: sudo xcode-select -switch /Applications/Xcode_15.3.app
+
+  #     - name: Local iOS build
+  #       run: eas build --local -p ios --profile preview --non-interactive --json > ios.json
+  #       working-directory: ${{ env.APP_DIR }}
+
+  #     - name: Install jq & extract IPA URL
+  #       id: extract
+  #       run: |
+  #         brew install jq
+  #         echo "ipa=$(jq -r '.artifacts.buildUrl' ios.json)" >> "$GITHUB_OUTPUT"
+  #       working-directory: ${{ env.APP_DIR }}
+
+  vercel-deploy:
+    # needs: [ android-build, ios-build ]
+    needs: [ android-build ]
+
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm install
-        working-directory: team-up-london
-
-      - run: npm install -g eas-cli
-
-      # # ✅ Run backend unit tests
-      # - name: Run Backend Tests
-      #   working-directory: ./backend
+      # - name: Build download page
       #   run: |
-      #     npm install
-      #     npm test
-
-      # # ✅ Login to Expo
-      # - name: Login to Expo
-      #   run: eas login --token ${{ secrets.EXPO_TOKEN }}
-
-      # ✅ Build for Android and iOS
-      - name: EAS Build
+      #     mkdir -p ${{ env.WEBSITE_DIR }}
+      #     cat > ${{ env.WEBSITE_DIR }}/index.html <<EOF
+      #     <!DOCTYPE html>
+      #     <html lang="en">
+      #       <head>
+      #         <meta charset="utf-8" />
+      #         <title>Social Sports App Downloads</title>
+      #         <style>
+      #           body{font-family:sans-serif;text-align:center;margin-top:4rem}
+      #           a{font-size:1.1rem}
+      #         </style>
+      #       </head>
+      #       <body>
+      #         <h1>Download the latest builds</h1>
+      #         <p><a href="${{ needs.android-build.outputs.apk_url }}">Download Android APK</a></p>
+      #         <p><a href="${{ needs.ios-build.outputs.ipa_url }}">Download iOS IPA</a></p>
+      #       </body>
+      #     </html>
+      #     EOF
+      - name: Build download page
         run: |
-          eas build -p android --json > android.json
-          eas build -p ios --json > ios.json
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        working-directory: team-up-london
-
-      # ✅ Extract download URLs
-      - name: Extract APK & IPA URLs
-        run: |
-          echo "ANDROID_URL=$(jq -r '.artifacts.buildUrl' android.json)" >> $GITHUB_ENV
-          echo "IOS_URL=$(jq -r '.artifacts.buildUrl' ios.json)" >> $GITHUB_ENV
-
-      # ✅ Generate index.html with download links
-      - name: Generate Public Dashboard
-        run: |
-          cat <<EOF > website/index.html
-          <html>
-          <head><title>🏀 Social Sports App Downloads</title></head>
-          <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
-            <h1>🏀 Download Our App</h1>
-            <p><a href="$ANDROID_URL">📱 Download Android APK</a></p>
-            <p><a href="$IOS_URL">🍏 Download iOS IPA</a></p>
-          </body>
+          mkdir -p ${{ env.WEBSITE_DIR }}
+          cat > ${{ env.WEBSITE_DIR }}/index.html <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Social Sports App Downloads</title>
+              <style>
+                body{font-family:sans-serif;text-align:center;margin-top:4rem}
+                a{font-size:1.1rem}
+              </style>
+            </head>
+            <body>
+              <h1>Download the latest builds</h1>
+              <p><a href="${{ needs.android-build.outputs.apk_url }}">Download Android APK</a></p>
+            </body>
           </html>
           EOF
 
-      # ✅ Deploy to Vercel
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-          alias-domains: your-vercel-subdomain.vercel.app
+          working-directory: ${{ env.WEBSITE_DIR }}
+          alias-domains: drp02.vercel.app
