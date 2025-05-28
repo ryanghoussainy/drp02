@@ -1,3 +1,7 @@
+# Setup Expo included from: https://github.com/thomasread99/expo-workflows
+# Author: Thomas Read
+# License: MIT
+
 name: CI/CD Pipeline
 
 on:
@@ -8,6 +12,7 @@ env:
   NODE_VERSION: 18
   APP_DIR: team-up-london        # Expo project root
   WEBSITE_DIR: website           # static site to publish
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
 jobs:
   android-build:
@@ -31,8 +36,6 @@ jobs:
 
       - name: Local Android build
         run: eas build --local -p android --profile preview --non-interactive --json > android.json
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         working-directory: ${{ env.APP_DIR }}
 
       - name: Install jq & extract APK URL
@@ -44,31 +47,36 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
   ios-build:
-    runs-on: macos-14
+    runs-on: macos-latest
 
     outputs:
       ipa_url: ${{ steps.extract.outputs.ipa }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4.0.2
         with: 
           node-version: ${{ env.NODE_VERSION }}
       
-      - name: Install deps & EAS
-        run: |
-          npm ci
-          npm i -g eas-cli
-        working-directory: ${{ env.APP_DIR }}
+      # - name: Install deps & EAS
+      #   run: |
+      #     npm ci
+      #     npm i -g eas-cli
+      #   working-directory: ${{ env.APP_DIR }}
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Select Xcode 15.3
         run: sudo xcode-select -switch /Applications/Xcode_15.3.app
 
       - name: Local iOS build
         run: eas build --local -p ios --profile preview --non-interactive --json > ios.json
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         working-directory: ${{ env.APP_DIR }}
 
       - name: Install jq & extract IPA URL
