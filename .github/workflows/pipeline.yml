@@ -46,7 +46,7 @@ jobs:
           path: ${{ env.APP_DIR }}/team-up-london.apk
 
   ios-build:
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - uses: actions/checkout@v4
@@ -61,8 +61,10 @@ jobs:
           npm i -g eas-cli
         working-directory: ${{ env.APP_DIR }}
 
-      - name: Select Xcode 16.3
-        run: sudo xcode-select -switch /Applications/Xcode_16.3.app
+      - name: Setup Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'
 
       - name: Local iOS build
         run: eas build --local -p ios --profile preview --non-interactive --output team-up-london.ipa
