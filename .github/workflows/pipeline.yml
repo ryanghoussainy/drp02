@@ -5,10 +5,10 @@ on:
     branches: [master]
 
 env:
+  JAVA_VERSION: 17
   NODE_VERSION: 18
   APP_DIR: team-up-london        # Expo project root
   WEBSITE_DIR: website           # static site to publish
-  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
 jobs:
   android-build:
@@ -17,12 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ env.JAVA_VERSION }}
 
       - uses: actions/setup-node@v3
         with: 
@@ -91,8 +91,8 @@ jobs:
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
-          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ${{ env.WEBSITE_DIR }}
           alias-domains: drp02.vercel.app
