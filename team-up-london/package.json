@@ -9,13 +9,13 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@rneui/themed": "^4.0.0-rc.8",
+    "@supabase/supabase-js": "^2.49.8",
     "expo": "~53.0.9",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
     "react-native": "0.79.2",
-    "react-dom": "19.0.0",
-    "react-native-web": "^0.20.0",
-    "@expo/metro-runtime": "~5.0.4"
+    "react-native-dotenv": "^3.4.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
