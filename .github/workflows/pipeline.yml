@@ -96,11 +96,6 @@ jobs:
           name: android-apk
           path: ${{ env.WEBSITE_DIR }}
 
-      - name: Move APK to root of website
-        run: |
-          mv ${{ env.WEBSITE_DIR }}/android-apk/android.apk ${{ env.WEBSITE_DIR }}/android.apk
-          rm -rf ${{ env.WEBSITE_DIR }}/android-apk
-
       - name: List website contents (debug)
         run: ls -R ${{ env.WEBSITE_DIR }}
 
