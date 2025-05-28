@@ -137,4 +137,5 @@ jobs:
           vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ${{ env.WEBSITE_DIR }}
+          prod: true
           alias-domains: drp02.vercel.app
