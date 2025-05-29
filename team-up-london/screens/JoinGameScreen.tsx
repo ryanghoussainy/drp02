@@ -3,7 +3,7 @@ import { Button, Icon, Text } from '@rneui/themed';
 import { StyleSheet, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 export default function JoinGameScreen() {
@@ -114,6 +114,7 @@ export default function JoinGameScreen() {
 
             {/* Map */}
             <MapView
+                provider={PROVIDER_GOOGLE}
                 style={{ height: 200, marginBottom: 20 }}
                 initialRegion={{
                     latitude: 51.506249205590926,
