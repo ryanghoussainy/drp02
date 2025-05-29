@@ -109,7 +109,7 @@ export default function JoinGameScreen() {
             </View>
         </View>
 
-        {/* <MapView
+        <MapView
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             initialRegion={{
@@ -126,7 +126,7 @@ export default function JoinGameScreen() {
             title="Game"
             description="Hyde Park"
             />
-        </MapView> */}
+        </MapView>
 
         <View style={styles.sideBySide}>
             <View style={styles.playerSection}>
