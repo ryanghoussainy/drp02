@@ -1,4 +1,4 @@
-{
+export default {
   "expo": {
     "name": "team-up-london",
     "slug": "team-up-london",
@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.drp02.teamuplondon",
       "config": {
-        "googleMapsApiKey":  "process.env.GOOGLE_MAPS_API_KEY"
+        "googleMapsApiKey":  process.env.GOOGLE_MAPS_API_KEY
       }
     },
     "android": {
@@ -28,7 +28,7 @@
       "package": "com.drp02.teamuplondon",
       "config": {
         "googleMaps": {
-          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+          "apiKey": process.env.GOOGLE_MAPS_API_KEY
         }
       }
     },
