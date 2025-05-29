@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { Player } from '../operations/Games';
+import { useRef } from 'react';
+
+const gameLocation = {
+    latitude: 51.506249,
+    longitude: -0.176205,
+};
 
 export default function JoinGameScreen() {
     // Location
@@ -22,14 +29,25 @@ export default function JoinGameScreen() {
         })();
     }, []);
 
+    // Distance of the player to the game location
+    
 
     // State for players. For now a list of string names.
-    const [players, setPlayers] = useState<string[]>([]);
+    const [players, setPlayers] = useState<Player[]>([]);
     
     // Refresh players
     const refreshPlayers = async () => {
             const fetchedPlayers = await getPlayers();
-            setPlayers(fetchedPlayers);
+            // Host should be first in the list, I should be second if joined
+            setPlayers(fetchedPlayers.sort((a, b) => {
+                // Host should be first
+                if (a.host && !b.host) return -1;
+                if (!a.host && b.host) return 1;
+                // "You" should be second (after host)
+                if (a.name === "You" && b.name !== "You") return -1;
+                if (a.name !== "You" && b.name === "You") return 1;
+                return 0;
+            }));
         };
 
     useEffect(() => {
@@ -37,17 +55,24 @@ export default function JoinGameScreen() {
     }, [])
 
     // Player pressed join button
-    const handleJoin = () => {
+    const handleJoin = async () => {
+        // Check if already joined
+        if (players.some(player => player.name === 'You')) {
+            return;
+        }
+
         // Join the game
-        joinGame("You");
-        refreshPlayers();
+        await joinGame("You");
+
+        await refreshPlayers();
     };
 
     // User pressed leave button
-    const handleLeave = () => {
+    const handleLeave = async () => {
         // Leave the game
-        leaveGame("You");
-        refreshPlayers();
+        await leaveGame("You");
+
+        await refreshPlayers();
     };
 
     // Render the join button
@@ -57,7 +82,8 @@ export default function JoinGameScreen() {
                 title="Join!"
                 onPress={handleJoin}
                 color="green"
-                buttonStyle={styles.joinButton}/>
+                titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                buttonStyle={styles.button}/>
         );
     }
 
@@ -68,24 +94,32 @@ export default function JoinGameScreen() {
                 title="Leave"
                 onPress={handleLeave}
                 color="red"
-                buttonStyle={styles.leaveButton}/>
+                titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                buttonStyle={styles.button}/>
         );
     }
 
     // Render the list of players
     const renderPlayerList = () => {
         return players.map((player, index) => (
-            <View key={index} style={styles.playerCard}>
+            <View
+                key={index}
+                style={[
+                    styles.playerCard,
+                    player.name === "You" ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 2, borderColor: '#eee' }
+                ]}
+            >
                 <Icon
                     name="person"
                     type="material"
                     size={24}
                     color="black"
                 />
-                <Text style={styles.playerName}>{player}</Text>
-                <Text>Age: 25</Text>
-                <Text>Male</Text>
-                <Text><Text style={{ color: "purple", fontSize: 16 }}>★</Text>4.3</Text>
+                <Text style={styles.playerName}>{player.name}</Text>
+                <Text style={styles.playerRole}>{player.host ? <Text style={styles.hostRole}>Host</Text> : "Player"}</Text>
+                <Text>Age: {player.age}</Text>
+                <Text>{player.gender ? "Male" : "Female"}</Text>
+                <Text><Text style={{ color: "purple", fontSize: 16 }}>★</Text>{player.skill_level}</Text>
             </View>
         ));
     };
@@ -93,19 +127,23 @@ export default function JoinGameScreen() {
     return (
     <View style={styles.container}>
         <Text style={styles.title}>TeamUp LDN</Text>
-        <Text style={styles.gameTitle}>- Joe's Football Game</Text>
+        <Text style={styles.gameTitle}>— Joe's Football Game</Text>
 
         <View style={styles.gameDetails}>
             <View style={styles.detailBlock}>
-            <Text style={styles.detailText}>14:00 - 16:00</Text>
-            <Text style={styles.detailText}>Open Play</Text>
-            <Text style={styles.detailText}>
-                Average Skill: <Text style={styles.highlight}>★ 4.3</Text>
-            </Text>
+                <Text style={[styles.detailText, styles.timeText]}>14:00 - 16:00</Text>
+                <Text style={styles.detailText}>
+                    <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>★ {
+                        players.length > 0
+                            ? (players.reduce((sum, player) => sum + player.skill_level, 0) / players.length).toFixed(1)
+                            : "-"
+                    }</Text>
+                </Text>
             </View>
-            <View style={styles.detailBlock}>
-            <Text style={styles.detailText}>Hyde Park</Text>
-            <Text style={styles.detailText}>Free to Play</Text>
+            <View style={[styles.detailBlock, styles.rightAligned]}>
+                <Text style={styles.detailText}><Text style={styles.tagText}>Location: </Text>Hyde Park</Text>
+                <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>Park</Text>
+                <Text style={styles.detailText}><Text style={styles.tagText}>Cost: </Text>Free</Text>
             </View>
         </View>
 
@@ -113,18 +151,28 @@ export default function JoinGameScreen() {
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             initialRegion={{
-            latitude: 51.506249,
-            longitude: -0.176205,
-            latitudeDelta: 0.001,
-            longitudeDelta: 0.001,
+                latitude: location?.latitude ?? gameLocation.latitude,
+                longitude: location?.longitude ?? gameLocation.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
             }}
+            region={
+                location ? {
+                    latitude: (location.latitude + gameLocation.latitude) / 2,
+                    longitude: (location.longitude + gameLocation.longitude) / 2,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                } : undefined
+            }
             showsUserLocation
             followsUserLocation
+            shouldRasterizeIOS
+            showsMyLocationButton
         >
             <Marker
-            coordinate={{ latitude: 51.506249, longitude: -0.176205 }}
-            title="Game"
-            description="Hyde Park"
+                coordinate={gameLocation}
+                title="Game"
+                description="Hyde Park"
             />
         </MapView>
 
@@ -133,24 +181,15 @@ export default function JoinGameScreen() {
                 <Text style={styles.sectionTitle}>
                     Players ({players.length}/10, min 6)
                 </Text>
-                <View style={styles.sideBySide}>
+                <View>
                     <ScrollView
                         horizontal
-                        showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.playerList}
-                        
                     >
                         {renderPlayerList()}
                     </ScrollView>
 
-                    <View style={styles.scrollHint}>
-                        <Icon
-                            name="arrow-forward"
-                            type="material"
-                            size={24}
-                            color="black"
-                        />
-                    </View>
+                    <Text style={styles.scrollHint}>Scroll for more players</Text>
                 </View>
             </View>
 
@@ -162,7 +201,7 @@ export default function JoinGameScreen() {
             </View>
         </View>
 
-      {players.includes('You') ? renderLeaveButton() : renderJoinButton()}
+      {players.some(player => player.name === 'You') ? renderLeaveButton() : renderJoinButton()}
     </View>
   );
 }
@@ -182,7 +221,7 @@ const styles = StyleSheet.create({
     },
     gameTitle: {
         fontSize: 22,
-        fontWeight: '600',
+        fontWeight: 'bold',
         fontFamily: Fonts.main,
         marginBottom: 16,
     },
@@ -200,6 +239,12 @@ const styles = StyleSheet.create({
     detailText: {
         fontSize: 14,
         marginBottom: 4,
+    },
+    timeText: {
+        fontSize: 18,
+    },
+    tagText: {
+        fontWeight: 'bold',
     },
     highlight: {
         color: 'purple',
@@ -225,7 +270,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: 'bold',
         marginBottom: 8,
     },
     playerList: {
@@ -252,9 +297,17 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginBottom: 2,
     },
-    playerMeta: {
-        fontSize: 12,
-        color: '#555',
+    playerRole: {
+        fontSize: 14,
+        color: '#888',
+        marginBottom: 4,
+        fontStyle: 'italic',
+    },
+    hostRole: {
+        fontWeight: 'bold',
+    },
+    rightAligned: {
+        alignItems: 'flex-end',
     },
     notesBox: {
         backgroundColor: '#f8f8f8',
@@ -263,19 +316,16 @@ const styles = StyleSheet.create({
         height: 100,
         borderWidth: 0.1
     },
-    joinButton: {
-        backgroundColor: 'green',
+    button: {
         borderRadius: 6,
-        padding: 12,
-        marginHorizontal: 40,
-    },
-    leaveButton: {
-        backgroundColor: 'red',
-        borderRadius: 6,
-        padding: 12,
-        marginHorizontal: 40,
+        padding: 25,
+        marginVertical: 18,
     },
     scrollHint: {
-        justifyContent: 'center',
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 8,
+        fontStyle: 'italic',
     },
 });
