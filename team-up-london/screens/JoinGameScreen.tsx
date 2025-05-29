@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -57,7 +57,7 @@ export default function JoinGameScreen() {
                 title="Join!"
                 onPress={handleJoin}
                 color="green"
-                style={styles.joinButton}/>
+                buttonStyle={styles.joinButton}/>
         );
     }
 
@@ -68,7 +68,7 @@ export default function JoinGameScreen() {
                 title="Leave"
                 onPress={handleLeave}
                 color="red"
-                style={styles.leaveButton}/>
+                buttonStyle={styles.leaveButton}/>
         );
     }
 
@@ -91,132 +91,191 @@ export default function JoinGameScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            {/* App name */}
-            <Text style={styles.title}>TeamUp LDN</Text>
-            
-            {/* Game name */}
-            <Text style={styles.header}>- Joe's Football Game</Text>
+    <View style={styles.container}>
+        <Text style={styles.title}>TeamUp LDN</Text>
+        <Text style={styles.gameTitle}>- Joe's Football Game</Text>
 
-            {/* Game details */}
-            <View style={styles.gameDetails}>
-                <View>
-                    <Text>14:00-16:00</Text>
-                    <Text>Open Play</Text>
-                    <Text>Average Skill Level: <Text style={{ color: "purple", fontSize: 16 }}>★</Text>4.3</Text>
-                </View>
-
-                <View>
-                    <Text>Hyde Park</Text>
-                    <Text>Free to Play</Text>
-                </View>
+        <View style={styles.gameDetails}>
+            <View style={styles.detailBlock}>
+            <Text style={styles.detailText}>14:00 - 16:00</Text>
+            <Text style={styles.detailText}>Open Play</Text>
+            <Text style={styles.detailText}>
+                Average Skill: <Text style={styles.highlight}>★ 4.3</Text>
+            </Text>
             </View>
-
-            {/* Map */}
-            <MapView
-                provider={PROVIDER_GOOGLE}
-                style={{ height: 200, marginBottom: 20 }}
-                initialRegion={{
-                    latitude: 51.506249205590926,
-                    longitude: -0.17620473623021551,
-                    latitudeDelta: 0.001,
-                    longitudeDelta: 0.001,
-                }}
-                showsUserLocation={true}
-                followsUserLocation={true}>
-                <Marker
-                    coordinate={{ latitude: 51.506249205590926, longitude: -0.17620473623021551 }}
-                    title="Game"
-                    description="Hyde Park"
-                />
-            </MapView>
-
-            <View style={styles.sideBySide}>
-                {/* Player list */}
-                <View>
-                    <Text>Players in Game (3/10) min: 6</Text>
-                    <View style={{ flexDirection: 'row' }}>
-                        {renderPlayerList()}
-                    </View>
-                </View>
-
-                {/* Notes from host */}
-                <View style={{ flex: 1, marginLeft: 20 }}>
-                    <Text>Notes from Host</Text>
-                    <View style={styles.notesBox}>
-                        <Text>Everyone bring boots please!</Text>
-                    </View>
-                </View>
+            <View style={styles.detailBlock}>
+            <Text style={styles.detailText}>Hyde Park</Text>
+            <Text style={styles.detailText}>Free to Play</Text>
             </View>
-
-            {/* Join/Leave button */}
-            {players.includes("You") ? renderLeaveButton() : renderJoinButton()}
         </View>
-    );
+
+        <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={{
+            latitude: 51.506249,
+            longitude: -0.176205,
+            latitudeDelta: 0.001,
+            longitudeDelta: 0.001,
+            }}
+            showsUserLocation
+            followsUserLocation
+        >
+            <Marker
+            coordinate={{ latitude: 51.506249, longitude: -0.176205 }}
+            title="Game"
+            description="Hyde Park"
+            />
+        </MapView>
+
+        <View style={styles.sideBySide}>
+            <View style={styles.playerSection}>
+                <Text style={styles.sectionTitle}>
+                    Players ({players.length}/10, min 6)
+                </Text>
+                <View style={styles.sideBySide}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.playerList}
+                        
+                    >
+                        {renderPlayerList()}
+                    </ScrollView>
+
+                    <View style={styles.scrollHint}>
+                        <Icon
+                            name="arrow-forward"
+                            type="material"
+                            size={24}
+                            color="black"
+                        />
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.notesSection}>
+                <Text style={styles.sectionTitle}>Notes from Host</Text>
+                <View style={styles.notesBox}>
+                    <Text>Everyone bring boots please!</Text>
+                </View>
+            </View>
+        </View>
+
+      {players.includes('You') ? renderLeaveButton() : renderJoinButton()}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        padding: 10,
+        padding: 16,
     },
     title: {
-        fontSize: 30,
+        fontSize: 28,
         fontWeight: 'bold',
-        margin: 30,
         fontFamily: Fonts.main,
-        alignSelf: "center",
+        textAlign: 'center',
+        marginVertical: 12,
     },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+    gameTitle: {
+        fontSize: 22,
+        fontWeight: '600',
         fontFamily: Fonts.main,
-    },
-    joinButton: {
-        borderRadius: 5,
-        padding: 10,
-        margin: 10,
-    },
-    leaveButton: {
-        borderRadius: 5,
-        padding: 10,
-        margin: 10,
-    },
-    playerName: {
-        fontSize: 14,
-        marginVertical: 5,
+        marginBottom: 16,
     },
     gameDetails: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        backgroundColor: '#f8f8f8',
+        padding: 12,
         marginBottom: 20,
-        padding: 10,
-        backgroundColor: '#f0f0f0',
         borderLeftWidth: 2,
+    },
+    detailBlock: {
+        flex: 1,
+    },
+    detailText: {
+        fontSize: 14,
+        marginBottom: 4,
+    },
+    highlight: {
+        color: 'purple',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    map: {
+        height: 200,
+        borderRadius: 8,
+        marginBottom: 20,
     },
     sideBySide: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 20,
     },
+    playerSection: {
+        flex: 1.5,
+    },
+    notesSection: {
+        flex: 1,
+        marginLeft: 16,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+    playerList: {
+        paddingVertical: 4,
+    },
     playerCard: {
         backgroundColor: '#f0f0f0',
-        borderWidth: 3,
-        margin: 1,
-        borderRadius: 5,
-        padding: 2,
+        borderRadius: 8,
+        padding: 8,
         alignItems: 'center',
-        width: 65,
+        marginRight: 8,
+        minWidth: 80,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    playerIcon: {
+        marginBottom: 4,
+    },
+    playerName: {
+        fontSize: 14,
+        fontWeight: '500',
+        marginBottom: 2,
+    },
+    playerMeta: {
+        fontSize: 12,
+        color: '#555',
     },
     notesBox: {
-        backgroundColor: '#f0f0f0',
-        borderWidth: 2,
-        padding: 10,
-        borderRadius: 5,
-        marginTop: 10,
-        width: 120,
+        backgroundColor: '#f8f8f8',
+        borderRadius: 8,
+        padding: 12,
         height: 100,
+        borderWidth: 0.1
+    },
+    joinButton: {
+        backgroundColor: 'green',
+        borderRadius: 6,
+        padding: 12,
+        marginHorizontal: 40,
+    },
+    leaveButton: {
+        backgroundColor: 'red',
+        borderRadius: 6,
+        padding: 12,
+        marginHorizontal: 40,
+    },
+    scrollHint: {
+        justifyContent: 'center',
     },
 });
