@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Player } from '../operations/Games';
 import { useRef } from 'react';
@@ -30,7 +30,32 @@ export default function JoinGameScreen() {
     }, []);
 
     // Distance of the player to the game location
-    
+    const [distance, setDistance] = useState<{ km: number, miles: number } | null>(null);
+
+    useEffect(() => {
+        if (location) {
+            const toRad = (val: number) => val * Math.PI / 180;
+
+            const lat1 = location.latitude;
+            const lon1 = location.longitude;
+            const lat2 = 51.506249;
+            const lon2 = -0.176205;
+
+            const R = 6371; // km
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const km = R * c;
+            const miles = km * 0.621371;
+
+            setDistance({ km, miles });
+        }
+    }, [location]);
+
 
     // State for players. For now a list of string names.
     const [players, setPlayers] = useState<Player[]>([]);
@@ -124,13 +149,24 @@ export default function JoinGameScreen() {
         ));
     };
 
+    const markerRef = useRef<any>(null);
+
+    useEffect(() => {
+        // Show the callout when the map is rendered
+        if (markerRef.current) {
+            setTimeout(() => {
+                markerRef.current.showCallout();
+            }, 500); // Delay helps on some devices
+        }
+    }, [markerRef.current]);
+
     return (
     <View style={styles.container}>
         <Text style={styles.title}>TeamUp LDN</Text>
         <Text style={styles.gameTitle}>— Joe's Football Game</Text>
 
         <View style={styles.gameDetails}>
-            <View style={styles.detailBlock}>
+            <View style={[styles.detailBlock, { flex: 1.3 }]}>
                 <Text style={[styles.detailText, styles.timeText]}>14:00 - 16:00</Text>
                 <Text style={styles.detailText}>
                     <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>★ {
@@ -147,34 +183,36 @@ export default function JoinGameScreen() {
             </View>
         </View>
 
-        <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={{
-                latitude: location?.latitude ?? gameLocation.latitude,
-                longitude: location?.longitude ?? gameLocation.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            }}
-            region={
-                location ? {
-                    latitude: (location.latitude + gameLocation.latitude) / 2,
-                    longitude: (location.longitude + gameLocation.longitude) / 2,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                } : undefined
-            }
-            showsUserLocation
-            followsUserLocation
-            shouldRasterizeIOS
-            showsMyLocationButton
-        >
-            <Marker
-                coordinate={gameLocation}
-                title="Game"
-                description="Hyde Park"
-            />
-        </MapView>
+        <View>
+            <MapView
+                provider={PROVIDER_GOOGLE}
+                style={styles.map}
+                initialRegion={{
+                    latitude: gameLocation.latitude,
+                    longitude: gameLocation.longitude,
+                    latitudeDelta: 0.03,
+                    longitudeDelta: 0.03,
+                }}
+                showsUserLocation
+                followsUserLocation
+                shouldRasterizeIOS
+                showsMyLocationButton
+            >
+                <Marker
+                    ref={markerRef}
+                    coordinate={gameLocation}
+                    title="Game"
+                    description="Hyde Park"
+                />
+            </MapView>
+            {distance && (
+                <Text style={styles.distanceText}>
+                    <Text style={styles.tagText}>Distance to you: </Text>
+                    {distance.km.toFixed(2)} km / {distance.miles.toFixed(2)} mi
+                </Text>
+            )}
+        </View>
+
 
         <View style={styles.sideBySide}>
             <View style={styles.playerSection}>
@@ -289,9 +327,6 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
     },
-    playerIcon: {
-        marginBottom: 4,
-    },
     playerName: {
         fontSize: 14,
         fontWeight: '500',
@@ -327,5 +362,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 8,
         fontStyle: 'italic',
+    },
+    distanceText: {
+        position: 'absolute',
+        right: -1,
+        bottom: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        width: 229,
+        height: 20,
+        margin: 1,
+        borderRadius: 8,
+
+        // add small shadow
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
     },
 });
