@@ -3,7 +3,7 @@ import { Button, Icon, Text } from '@rneui/themed';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
-import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Player } from '../operations/Games';
 import { useRef } from 'react';
@@ -104,7 +104,7 @@ export default function JoinGameScreen() {
     const renderJoinButton = () => {
         return (
             <Button
-                title="Join!"
+                title="Join"
                 onPress={handleJoin}
                 color="green"
                 titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
@@ -168,6 +168,7 @@ export default function JoinGameScreen() {
         <View style={styles.gameDetails}>
             <View style={[styles.detailBlock, { flex: 1.3 }]}>
                 <Text style={[styles.detailText, styles.timeText]}>14:00 - 16:00</Text>
+                <Text style={styles.detailText}><Text style={styles.tagText}>Date: </Text>Today</Text>
                 <Text style={styles.detailText}>
                     <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>★ {
                         players.length > 0
@@ -183,7 +184,7 @@ export default function JoinGameScreen() {
             </View>
         </View>
 
-        <View>
+        <View style={{ flex: 1 }}>
             <MapView
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
@@ -217,12 +218,15 @@ export default function JoinGameScreen() {
         <View style={styles.sideBySide}>
             <View style={styles.playerSection}>
                 <Text style={styles.sectionTitle}>
-                    Players ({players.length}/10, min 6)
+                    Players ({players.length}/10)
                 </Text>
                 <View>
                     <ScrollView
                         horizontal
-                        contentContainerStyle={styles.playerList}
+                        contentContainerStyle={[styles.playerList, { paddingHorizontal: 16 }]}
+                        showsHorizontalScrollIndicator={false}
+                        snapToInterval={88}      // card width + horizontal margin
+                        decelerationRate="fast"
                     >
                         {renderPlayerList()}
                     </ScrollView>
@@ -239,7 +243,9 @@ export default function JoinGameScreen() {
             </View>
         </View>
 
-      {players.some(player => player.name === 'You') ? renderLeaveButton() : renderJoinButton()}
+        <Text style={styles.requiredPlayersSection}>{6 - players.length} more players required to start</Text>
+
+        {players.some(player => player.name === 'You') ? renderLeaveButton() : renderJoinButton()}
     </View>
   );
 }
@@ -290,8 +296,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     map: {
+        flex: 1,
         height: 200,
-        borderRadius: 8,
+        borderRadius: 15,
         marginBottom: 20,
     },
     sideBySide: {
@@ -312,15 +319,16 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     playerList: {
-        paddingVertical: 4,
+        paddingVertical: 8,
+        alignItems: "center",
     },
     playerCard: {
         backgroundColor: '#f0f0f0',
-        borderRadius: 8,
+        borderRadius: 15,
         padding: 8,
         alignItems: 'center',
-        marginRight: 8,
-        minWidth: 80,
+        marginHorizontal: 4,
+        width: 80,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
@@ -346,15 +354,16 @@ const styles = StyleSheet.create({
     },
     notesBox: {
         backgroundColor: '#f8f8f8',
-        borderRadius: 8,
+        borderRadius: 15,
         padding: 12,
         height: 100,
         borderWidth: 0.1
     },
     button: {
-        borderRadius: 6,
+        borderRadius: 15,
         padding: 25,
-        marginVertical: 18,
+        marginVertical: 5,
+        marginBottom: 16,
     },
     scrollHint: {
         fontSize: 14,
@@ -377,5 +386,12 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
+    },
+    requiredPlayersSection: {
+        fontSize: 14,
+        color: '#888',
+        marginTop: 8,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
