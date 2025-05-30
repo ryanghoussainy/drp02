@@ -164,7 +164,7 @@ export default function JoinGameScreen() {
 
     return (
     <View style={styles.container}>
-        <Text style={styles.title}>TeamUp LDN</Text>
+        <Text style={styles.title}>TeamUp LDN TEST</Text>
         <Text style={styles.gameTitle}>— Joe's Football Game</Text>
 
         <View style={styles.gameDetails}>
