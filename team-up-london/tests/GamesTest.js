@@ -1,4 +1,3 @@
-// scripts/gameTest.ts
 import { db } from '../lib/supabase.js';
 
 const PLAYER_NAME = 'You';

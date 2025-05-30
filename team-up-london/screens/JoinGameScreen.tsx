@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -56,6 +56,8 @@ export default function JoinGameScreen() {
         }
     }, [location]);
 
+    // Satellite mode state
+    const [satelliteMode, setSatelliteMode] = useState(false);
 
     // State for players. For now a list of string names.
     const [players, setPlayers] = useState<Player[]>([]);
@@ -198,6 +200,7 @@ export default function JoinGameScreen() {
                 followsUserLocation
                 shouldRasterizeIOS
                 showsMyLocationButton
+                mapType={satelliteMode ? 'hybrid' : 'standard'}
             >
                 <Marker
                     ref={markerRef}
@@ -206,12 +209,24 @@ export default function JoinGameScreen() {
                     description="Hyde Park"
                 />
             </MapView>
+
+            {/* Show distance */}
             {distance && (
                 <Text style={styles.distanceText}>
                     <Text style={styles.tagText}>Distance to you: </Text>
                     {distance.km.toFixed(2)} km / {distance.miles.toFixed(2)} mi
                 </Text>
             )}
+
+            {/* Satellite toggle button */}
+            <TouchableOpacity style={styles.toggleMap} onPress={() => setSatelliteMode(!satelliteMode)}>
+                <Icon 
+                    name={satelliteMode ? 'map' : 'satellite'}
+                    type="material"
+                    size={25}
+                    color="black"
+                />
+            </TouchableOpacity>
         </View>
 
 
@@ -394,4 +409,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    toggleMap: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        padding: 8,
+        borderRadius: 50,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+    }
 });
