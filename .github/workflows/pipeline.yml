@@ -6,6 +6,8 @@ on:
 
 env:
   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
   JAVA_VERSION: 17
   NODE_VERSION: 18
   APP_DIR: team-up-london        # Expo project root
@@ -15,10 +17,6 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
     steps:
       - uses: actions/checkout@v4
