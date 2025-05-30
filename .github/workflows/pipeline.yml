@@ -22,10 +22,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run tests
-        working-directory: ${{ env.APP_DIR }}
         run: |
           npm ci
-          npx ts-node ./tests/GamesTest.js
+          npm test
+        working-directory: ${{ env.APP_DIR }}
 
   android-build:
     needs: tests
