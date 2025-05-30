@@ -3,7 +3,7 @@ import { Button, Icon, Text } from '@rneui/themed';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Player } from '../operations/Games';
 import { useRef } from 'react';
@@ -16,6 +16,7 @@ const gameLocation = {
 export default function JoinGameScreen() {
     // Location
     const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+    const [mapRegion, setMapRegion] = useState<Region | null>(null);
     useEffect(() => {
         (async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -53,6 +54,19 @@ export default function JoinGameScreen() {
             const miles = km * 0.621371;
 
             setDistance({ km, miles });
+
+            const midLatitude = (location.latitude + gameLocation.latitude) / 2;
+            const midLongitude = (location.longitude + gameLocation.longitude) / 2;
+
+            const latitudeDelta = Math.abs(location.latitude - gameLocation.latitude) * 2 || 0.05;
+            const longitudeDelta = Math.abs(location.longitude - gameLocation.longitude) * 2 || 0.05;
+
+            setMapRegion({
+                latitude: midLatitude,
+                longitude: midLongitude,
+                latitudeDelta,
+                longitudeDelta,
+            });
         }
     }, [location]);
 
@@ -164,7 +178,7 @@ export default function JoinGameScreen() {
 
     return (
     <View style={styles.container}>
-        <Text style={styles.title}>TeamUp LDN TEST</Text>
+        <Text style={styles.title}>Team Up London</Text>
         <Text style={styles.gameTitle}>— Joe's Football Game</Text>
 
         <View style={styles.gameDetails}>
@@ -187,28 +201,25 @@ export default function JoinGameScreen() {
         </View>
 
         <View style={{ flex: 1 }}>
-            <MapView
-                provider={PROVIDER_GOOGLE}
-                style={styles.map}
-                initialRegion={{
-                    latitude: gameLocation.latitude,
-                    longitude: gameLocation.longitude,
-                    latitudeDelta: 0.03,
-                    longitudeDelta: 0.03,
-                }}
-                showsUserLocation
-                followsUserLocation
-                shouldRasterizeIOS
-                showsMyLocationButton
-                mapType={satelliteMode ? 'hybrid' : 'standard'}
-            >
-                <Marker
-                    ref={markerRef}
-                    coordinate={gameLocation}
-                    title="Game"
-                    description="Hyde Park"
-                />
-            </MapView>
+            {mapRegion && (
+                <MapView
+                    provider={PROVIDER_GOOGLE}
+                    style={styles.map}
+                    region={mapRegion}
+                    showsUserLocation
+                    followsUserLocation
+                    shouldRasterizeIOS
+                    showsMyLocationButton
+                    mapType={satelliteMode ? 'hybrid' : 'standard'}
+                >
+                    <Marker
+                        ref={markerRef}
+                        coordinate={gameLocation}
+                        title="Game"
+                        description="Hyde Park"
+                    />
+                </MapView>
+            )}
 
             {/* Show distance */}
             {distance && (
@@ -229,7 +240,6 @@ export default function JoinGameScreen() {
             </TouchableOpacity>
         </View>
 
-
         <View style={styles.sideBySide}>
             <View style={styles.playerSection}>
                 <Text style={styles.sectionTitle}>
@@ -239,7 +249,7 @@ export default function JoinGameScreen() {
                     <ScrollView
                         horizontal
                         contentContainerStyle={[styles.playerList, { paddingHorizontal: 16 }]}
-                        showsHorizontalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={true}
                         snapToInterval={88}      // card width + horizontal margin
                         decelerationRate="fast"
                     >

@@ -10,7 +10,6 @@ export interface Player {
     skill_level: number;
 }
 
-
 // User joins a game
 export async function joinGame(playerName: string) {
     const { error } = await db
