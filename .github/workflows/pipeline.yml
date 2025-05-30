@@ -12,7 +12,26 @@ env:
   WEBSITE_DIR: website           # static site to publish
 
 jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+    
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          npm ci
+          npx ts-node ./tests/GamesTest.js
+
   android-build:
+    needs: tests
+
     runs-on: ubuntu-latest
 
     steps:
@@ -46,6 +65,8 @@ jobs:
           path: ${{ env.APP_DIR }}/team-up-london.apk
 
   ios-build:
+    needs: tests
+
     runs-on: macos-15
 
     steps:
@@ -77,7 +98,7 @@ jobs:
           path: ${{ env.APP_DIR }}/team-up-london.ipa
 
   vercel-deploy:
-    needs: [ android-build, ios-build ]
+    needs: [ tests, android-build, ios-build ]
 
     runs-on: ubuntu-latest
 
