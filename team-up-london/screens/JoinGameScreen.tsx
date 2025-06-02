@@ -1,16 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { getPlayers, joinGame, leaveGame } from '../operations/Games';
 import Fonts from '../config/Fonts';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Player } from '../operations/Games';
 import { useRef } from 'react';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const gameLocation = {
     latitude: 51.506249,
     longitude: -0.176205,
+};
+
+// Skill levels mapping
+const skillMapping: Record<number, string> = {
+  1: 'Beginner',
+  2: 'Intermediate',
+  3: 'Advanced',
+  4: 'Expert',
 };
 
 export default function JoinGameScreen() {
@@ -120,29 +129,78 @@ export default function JoinGameScreen() {
     const renderJoinButton = () => {
         return (
             <Button
-                title="Join"
-                onPress={handleJoin}
-                color="green"
-                titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                buttonStyle={styles.button}/>
+                    title="Join"
+                    onPress={handleJoin}
+                    color="green"
+                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                    buttonStyle={styles.button}/>
+        );
+    }
+
+    // Modal for confirmation when leaving
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+
+    // Handle leave icon press
+    const handleLeaveIconPress = () => {
+        // Show confirmation modal
+        setShowLeaveModal(true);
+    };
+
+    // Confirmation modal for leaving
+    const leaveConfirmationModal = () => {
+        return (
+            <Modal
+                transparent={true}
+                visible={showLeaveModal}
+                onRequestClose={() => setShowLeaveModal(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Leave Game</Text>
+                        <Text style={styles.modalMessage}>Are you sure you want to leave the game?</Text>
+                        <View style={styles.modalButtons}>
+                            <Button title="Cancel" onPress={() => setShowLeaveModal(false)} />
+                            <Button color="red" title="Leave" onPress={() => {
+                                handleLeave();
+                                setShowLeaveModal(false);
+                            }} />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         );
     }
 
     // Render the leave button
     const renderLeaveButton = () => {
         return (
-            <Button
-                title="Leave"
-                onPress={handleLeave}
-                color="red"
-                titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                buttonStyle={styles.button}/>
+            <View style={styles.sideBySide}>
+                <Button
+                    containerStyle={{ flex: 1 }}
+                    title="Joined"
+                    disabled
+                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                    buttonStyle={styles.button}/>
+
+                {/* exit icon */}
+                <View style={styles.leaveIconContainer}>
+                    <MaterialCommunityIcons
+                        name="exit-run"
+                        size={30}
+                        color="black"
+                        onPress={handleLeaveIconPress}
+                    />
+                </View>
+            </View>
         );
     }
 
     // Render the list of players
     const renderPlayerList = () => {
-        return players.map((player, index) => (
+        return players.map((player, index) => {
+            const skill = skillMapping[player.skill_level] || "";
+            return (
+
             <View
                 key={index}
                 style={[
@@ -160,9 +218,12 @@ export default function JoinGameScreen() {
                 <Text style={styles.playerRole}>{player.host ? <Text style={styles.hostRole}>Host</Text> : "Player"}</Text>
                 <Text>Age: {player.age}</Text>
                 <Text>{player.gender ? "Male" : "Female"}</Text>
-                <Text><Text style={{ color: "purple", fontSize: 16 }}>★</Text>{player.skill_level}</Text>
+                <View style={styles.skillContainer}>
+                    <Text style={styles.skillText}>{skill}</Text>
+                </View>
             </View>
-        ));
+            )
+        });
     };
 
     const markerRef = useRef<any>(null);
@@ -176,21 +237,35 @@ export default function JoinGameScreen() {
         }
     }, [markerRef.current]);
 
+    // Calculate average skill level by rounding to nearest whole number
+    const averageSkillLevel = (players: Player[]) => {
+        if (players.length === 0) return 0;
+        const total = players.reduce((sum, player) => sum + player.skill_level, 0);
+        return skillMapping[Math.round(total / players.length)];
+    };
+
     return (
     <View style={styles.container}>
         <Text style={styles.title}>Team Up London</Text>
-        <Text style={styles.gameTitle}>— Joe's Football Game</Text>
+        <View style={styles.sideBySide}>
+            <Text style={styles.gameTitle}>— Joe's Football Game </Text>
+
+            <Icon
+                name="soccer-ball-o"
+                type="font-awesome"
+                size={30}
+                color="black"
+            />
+        </View>
 
         <View style={styles.gameDetails}>
             <View style={[styles.detailBlock, { flex: 1.3 }]}>
                 <Text style={[styles.detailText, styles.timeText]}>14:00 - 16:00</Text>
                 <Text style={styles.detailText}><Text style={styles.tagText}>Date: </Text>Today</Text>
                 <Text style={styles.detailText}>
-                    <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>★ {
-                        players.length > 0
-                            ? (players.reduce((sum, player) => sum + player.skill_level, 0) / players.length).toFixed(1)
-                            : "-"
-                    }</Text>
+                    <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>
+                        {averageSkillLevel(players)}
+                    </Text>
                 </Text>
             </View>
             <View style={[styles.detailBlock, styles.rightAligned]}>
@@ -250,13 +325,13 @@ export default function JoinGameScreen() {
                         horizontal
                         contentContainerStyle={[styles.playerList, { paddingHorizontal: 16 }]}
                         showsHorizontalScrollIndicator={true}
-                        snapToInterval={88}      // card width + horizontal margin
+                        snapToInterval={98}      // card width + horizontal margin
                         decelerationRate="fast"
                     >
                         {renderPlayerList()}
                     </ScrollView>
 
-                    <Text style={styles.scrollHint}>Scroll for more players</Text>
+                    <Text style={styles.scrollHint}>Swipe for more players</Text>
                 </View>
             </View>
 
@@ -271,6 +346,9 @@ export default function JoinGameScreen() {
         <Text style={styles.requiredPlayersSection}>{6 - players.length} more players required to start</Text>
 
         {players.some(player => player.name === 'You') ? renderLeaveButton() : renderJoinButton()}
+
+        {/* Confirmation modal for leaving */}
+        {showLeaveModal && leaveConfirmationModal()}
     </View>
   );
 }
@@ -318,7 +396,7 @@ const styles = StyleSheet.create({
     highlight: {
         color: 'purple',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 'regular',
     },
     map: {
         flex: 1,
@@ -329,7 +407,6 @@ const styles = StyleSheet.create({
     sideBySide: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
     },
     playerSection: {
         flex: 1.5,
@@ -350,10 +427,10 @@ const styles = StyleSheet.create({
     playerCard: {
         backgroundColor: '#f0f0f0',
         borderRadius: 15,
-        padding: 8,
+        paddingVertical: 4,
         alignItems: 'center',
         marginHorizontal: 4,
-        width: 80,
+        width: 90,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
@@ -415,7 +492,7 @@ const styles = StyleSheet.create({
     requiredPlayersSection: {
         fontSize: 14,
         color: '#888',
-        marginTop: 8,
+        marginTop: 12,
         fontWeight: 'bold',
         textAlign: 'center',
     },
@@ -429,5 +506,59 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
-    }
+    },
+    skillContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    skillText: {
+        color: 'purple',
+        fontSize: 14,
+        marginLeft: 4,
+    },
+    leaveIconContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 8,
+        marginBottom: 16,
+        marginTop: 5,
+        borderRadius: 10,
+        padding: 5,
+        marginRight: 2,
+        backgroundColor: "red",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalMessage: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
 });
