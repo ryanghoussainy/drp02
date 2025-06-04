@@ -8,7 +8,7 @@ interface Distance {
   miles: number;
 }
 
-export default function useDistanceAndRegion() {
+export default function useDistanceAndRegion({ gameId }: { gameId: string }) {
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [distance, setDistance] = useState<Distance | null>(null);
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
@@ -30,7 +30,7 @@ export default function useDistanceAndRegion() {
 
     const toRad = (val: number) => (val * Math.PI) / 180;
     const { latitude: lat1, longitude: lon1 } = location;
-    const { latitude: lat2, longitude: lon2 } = GAME_LOCATION;
+    const { latitude: lat2, longitude: lon2 } = GAME_LOCATION[gameId];
 
     // Haversine calculation
     const R = 6371; // Radius in km
@@ -45,10 +45,10 @@ export default function useDistanceAndRegion() {
     setDistance({ km, miles });
 
     // Compute mid‐point and deltas for map region
-    const midLatitude = (lat1 + GAME_LOCATION.latitude) / 2;
-    const midLongitude = (lon1 + GAME_LOCATION.longitude) / 2;
-    const latitudeDelta = Math.abs(lat1 - GAME_LOCATION.latitude) * 2 || 0.05;
-    const longitudeDelta = Math.abs(lon1 - GAME_LOCATION.longitude) * 2 || 0.05;
+    const midLatitude = (lat1 + GAME_LOCATION[gameId].latitude) / 2;
+    const midLongitude = (lon1 + GAME_LOCATION[gameId].longitude) / 2;
+    const latitudeDelta = Math.abs(lat1 - GAME_LOCATION[gameId].latitude) * 2 || 0.05;
+    const longitudeDelta = Math.abs(lon1 - GAME_LOCATION[gameId].longitude) * 2 || 0.05;
     setMapRegion({
       latitude: midLatitude,
       longitude: midLongitude,

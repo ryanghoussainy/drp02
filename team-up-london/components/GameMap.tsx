@@ -7,9 +7,11 @@ import { GAME_LOCATION } from '../constants/maps';
 interface GameMapProps {
   mapRegion: Region | null;
   distance: { km: number; miles: number } | null;
+  gameId: string;
+  location: string;
 }
 
-export default function GameMap({ mapRegion, distance }: GameMapProps) {
+export default function GameMap({ mapRegion, distance, gameId, location }: GameMapProps) {
   const [satelliteMode, setSatelliteMode] = useState(false);
   const markerRef = useRef<any>(null);
 
@@ -36,9 +38,9 @@ export default function GameMap({ mapRegion, distance }: GameMapProps) {
         >
           <Marker
             ref={markerRef}
-            coordinate={GAME_LOCATION}
+            coordinate={GAME_LOCATION[gameId]}
             title="Game"
-            description="Hyde Park"
+            description={location}
           />
         </MapView>
       )}

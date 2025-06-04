@@ -1,140 +1,146 @@
 import { useState } from 'react';
 import { Button, Icon, Text } from '@rneui/themed';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import Fonts from '../config/Fonts';
-import { Player } from '../operations/Games';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { SKILL_MAPPING } from '../constants/skills';
 import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 import PlayerCard from '../components/PlayerCard';
 import GameMap from '../components/GameMap';
 import useGamePlayers from '../hooks/useGamePlayers';
 import ConfirmationModal from '../components/ConfirmationModal';
+import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
+import { YOU_PLAYER_ID } from '../constants/youPlayerId';
+import useGame from '../hooks/useGame';
+import CustomIcon from '../components/CustomIcon';
+import { ICON_FAMILIES } from '../constants/iconFamilies';
+import { formatDate } from 'date-fns';
 
-export default function JoinGameScreen() {
-    const { distance, mapRegion } = useDistanceAndRegion();
+export default function JoinGameScreen({ gameId }: { gameId: string }) {
+    const { distance, mapRegion } = useDistanceAndRegion({ gameId });
 
-    const { players, handleJoin, handleLeave } = useGamePlayers();
+    const { players, handleJoin, handleLeave, hostId } = useGamePlayers(gameId);
+
+    const { game, sport } = useGame(gameId);
 
     // Modal for confirmation when leaving
     const [showLeaveModal, setShowLeaveModal] = useState(false);
-    
-    // Calculate average skill level by rounding to nearest whole number
-    const averageSkillLevel = (players: Player[]) => {
-        if (players.length === 0) return 0;
-        const total = players.reduce((sum, player) => sum + player.skill_level, 0);
-        return SKILL_MAPPING[Math.round(total / players.length)];
-    };
 
     return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Team Up London</Text>
-        <View style={styles.sideBySide}>
-            <Text style={styles.gameTitle}>— Joe's Football Game </Text>
-
-            <Icon
-                name="soccer-ball-o"
-                type="font-awesome"
-                size={30}
-                color="black"
-            />
-        </View>
-
-        <View style={styles.gameDetails}>
-            <View style={[styles.detailBlock, { flex: 1.3 }]}>
-                <Text style={[styles.detailText, styles.timeText]}>14:00 - 16:00</Text>
-                <Text style={styles.detailText}><Text style={styles.tagText}>Date: </Text>Today</Text>
-                <Text style={styles.detailText}>
-                    <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>
-                        {averageSkillLevel(players)}
-                    </Text>
-                </Text>
-            </View>
-            <View style={[styles.detailBlock, styles.rightAligned]}>
-                <Text style={styles.detailText}><Text style={styles.tagText}>Location: </Text>Hyde Park</Text>
-                <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>Park</Text>
-                <Text style={styles.detailText}><Text style={styles.tagText}>Cost: </Text>Free</Text>
-            </View>
-        </View>
-
-        <GameMap mapRegion={mapRegion} distance={distance} />
-
-        <View style={styles.sideBySide}>
-            <View style={styles.playerSection}>
-                <Text style={styles.sectionTitle}>
-                    Players ({players.length}/10)
-                </Text>
-                <View>
-                    <ScrollView
-                        horizontal
-                        contentContainerStyle={[styles.playerList, { paddingHorizontal: 16 }]}
-                        showsHorizontalScrollIndicator={true}
-                        snapToInterval={98}      // card width + horizontal margin
-                        decelerationRate="fast"
-                    >
-                        {players.map((player, idx) => (
-                            <PlayerCard key={idx} player={player} highlightYou={player.name === 'You'} />
-                        ))}
-                    </ScrollView>
-
-                    <Text style={styles.scrollHint}>Swipe for more players</Text>
-                </View>
-            </View>
-
-            <View style={styles.notesSection}>
-                <Text style={styles.sectionTitle}>Notes from Host</Text>
-                <View style={styles.notesBox}>
-                    <Text>Everyone bring boots please!</Text>
-                </View>
-            </View>
-        </View>
-
-        <Text style={styles.requiredPlayersSection}>{6 - players.length} more players required to start</Text>
-
-        {players.some(player => player.name === 'You') ? (
+        <View style={styles.container}>
+            <Text style={styles.title}>Team Up London</Text>
             <View style={styles.sideBySide}>
-                <Button
-                    containerStyle={{ flex: 1 }}
-                    title="Joined"
-                    disabled
-                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                    buttonStyle={styles.button}/>
+                <Text style={styles.gameTitle}>— {game?.name} </Text>
 
-                {/* exit icon */}
-                <View style={styles.leaveIconContainer}>
-                    <MaterialCommunityIcons
-                        name="exit-run"
-                        size={30}
-                        color="black"
-                        onPress={() => setShowLeaveModal(true)}
-                    />
+                <CustomIcon
+                    name={sport?.icon || 'default-icon'}
+                    family={sport?.icon_family as ICON_FAMILIES}
+                    size={(sport?.icon_size || 20) * 1.5}
+                    color="black"
+                />
+            </View>
+
+            <View style={styles.gameDetails}>
+                <View style={[styles.detailBlock, { flex: 1.5 }]}>
+                    {game && <Text style={[styles.detailText, styles.timeText]}>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>}
+                    <Text style={styles.detailText}>
+                        <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>
+                            {AVERAGE_SKILL_LEVEL(players)}
+                        </Text>
+                    </Text>
+                </View>
+                <View style={[styles.detailBlock, styles.rightAligned]}>
+                    <Text style={styles.detailText}><Text style={styles.tagText}>Location: </Text>{game?.location}</Text>
+                    <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>{game?.location_type}</Text>
+                    <Text style={styles.detailText}><Text style={styles.tagText}>Cost: </Text>{game?.cost === 0 ? 'Free' : `£${game?.cost}`}</Text>
                 </View>
             </View>
-        ) : (
-            <Button
-                title="Join"
-                onPress={handleJoin}
-                color="green"
-                titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                buttonStyle={styles.button}/>
-        )}
 
-        {/* Confirmation modal for leaving */}
-        <ConfirmationModal
-            visible={showLeaveModal}
-            title="Leave Game"
-            message="Are you sure you want to leave the game?"
-            confirmText="Leave"
-            cancelText="Cancel"
-            onCancel={() => setShowLeaveModal(false)}
-            onConfirm={() => {
-                handleLeave();
-                setShowLeaveModal(false);
-            }}
-        />
+            {mapRegion ? 
+                <GameMap mapRegion={mapRegion} distance={distance} gameId={gameId} location={game?.location || ""} /> :
+                <ActivityIndicator size="large" color="purple" style={{ marginTop: 20 }} />
+            }
 
-    </View>
-  );
+            <View style={styles.sideBySide}>
+                <View style={styles.playerSection}>
+                    <Text style={styles.sectionTitle}>
+                        Players ({players.length}/10)
+                    </Text>
+                    <View>
+                        <ScrollView
+                            horizontal
+                            contentContainerStyle={[styles.playerList, { paddingHorizontal: 16 }]}
+                            showsHorizontalScrollIndicator={true}
+                            snapToInterval={98}      // card width + horizontal margin
+                            decelerationRate="fast"
+                        >
+                            {players.map((player, idx) => (
+                                <PlayerCard
+                                    key={idx}
+                                    player={player}
+                                    highlightYou={player.id === YOU_PLAYER_ID}
+                                    isHost={player.id === hostId}
+                                />
+                            ))}
+                        </ScrollView>
+
+                        <Text style={styles.scrollHint}>Swipe for more players</Text>
+                    </View>
+                </View>
+
+                <View style={styles.notesSection}>
+                    <Text style={styles.sectionTitle}>Notes from Host</Text>
+                    <View style={styles.notesBox}>
+                        <Text>{game?.notes_from_host}</Text>
+                    </View>
+                </View>
+            </View>
+
+            <Text style={styles.requiredPlayersSection}>{(game?.min_players || 0) - players.length} more players required to start</Text>
+
+            {players.some(player => player.name === 'You') ? (
+                <View style={styles.sideBySide}>
+                    <Button
+                        containerStyle={{ flex: 1 }}
+                        title="Joined"
+                        disabled
+                        titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                        buttonStyle={styles.button} />
+
+                    {/* exit icon */}
+                    <View style={styles.leaveIconContainer}>
+                        <MaterialCommunityIcons
+                            name="exit-run"
+                            size={30}
+                            color="black"
+                            onPress={() => setShowLeaveModal(true)}
+                        />
+                    </View>
+                </View>
+            ) : (
+                <Button
+                    title="Join"
+                    onPress={handleJoin}
+                    color="green"
+                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
+                    buttonStyle={styles.button} />
+            )}
+
+            {/* Confirmation modal for leaving */}
+            <ConfirmationModal
+                visible={showLeaveModal}
+                title="Leave Game"
+                message="Are you sure you want to leave the game?"
+                confirmText="Leave"
+                cancelText="Cancel"
+                onCancel={() => setShowLeaveModal(false)}
+                onConfirm={() => {
+                    handleLeave();
+                    setShowLeaveModal(false);
+                }}
+            />
+
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({

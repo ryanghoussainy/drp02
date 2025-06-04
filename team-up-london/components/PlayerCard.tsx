@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Icon, Text } from '@rneui/themed';
-import { Player } from '../operations/Games';
+import Player from '../interfaces/Player';
 import { SKILL_MAPPING } from '../constants/skills';
 
 interface PlayerCardProps {
   player: Player;
   highlightYou: boolean;
+  isHost: boolean;
 }
 
-export default function PlayerCard({ player, highlightYou }: PlayerCardProps) {
+export default function PlayerCard({ player, highlightYou, isHost }: PlayerCardProps) {
   const skillLabel = SKILL_MAPPING[player.skill_level] || '';
   return (
     <View
@@ -21,7 +22,7 @@ export default function PlayerCard({ player, highlightYou }: PlayerCardProps) {
       <Icon name="person" type="material" size={24} color="black" />
       <Text style={styles.name}>{player.name}</Text>
       <Text style={styles.role}>
-        {player.host ? <Text style={styles.hostRole}>Host</Text> : 'Player'}
+        {isHost ? <Text style={styles.hostRole}>Host</Text> : 'Player'}
       </Text>
       <Text>Age: {player.age}</Text>
       <Text>{player.gender ? 'Male' : 'Female'}</Text>

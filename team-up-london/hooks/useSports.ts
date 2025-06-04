@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getSports, Sport } from '../operations/Sports';
+import { getSports } from '../operations/Sports';
+import Sport from '../interfaces/Sport';
 
 export default function useSports() {
   const [sports, setSports] = useState<Sport[]>([]);

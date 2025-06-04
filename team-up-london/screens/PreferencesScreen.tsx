@@ -5,7 +5,7 @@ import Fonts from '../config/Fonts';
 import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
 import CustomIcon from '../components/CustomIcon';
-import { ICON_FAMILIES } from '../constants/icon_families';
+import { ICON_FAMILIES } from '../constants/iconFamilies';
 
 export default function PreferencesScreen() {
     const { sports } = useSports();
@@ -51,7 +51,7 @@ export default function PreferencesScreen() {
                                 <CustomIcon
                                     name={item.icon}
                                     family={item.icon_family as ICON_FAMILIES}
-                                    size={item.size}
+                                    size={item.icon_size}
                                     color='purple'
                                 />
                             </View>
@@ -99,10 +99,11 @@ export default function PreferencesScreen() {
             {/* Next button */}
             <Button
                 title="Next"
-                buttonStyle={styles.nextButton}
+                buttonStyle={[styles.nextButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
                 titleStyle={styles.nextButtonText}
                 containerStyle={styles.nextButtonContainer}
                 ViewComponent={TouchableOpacity as unknown as typeof Component} // don't ask
+                disabled={selectedSports.length === 0} // disable if no sports selected
             />
         </View>
     );

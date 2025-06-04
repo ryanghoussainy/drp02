@@ -16,7 +16,7 @@ import {
     SimpleLineIcons,
     Zocial
 } from '@expo/vector-icons';
-import { ICON_FAMILIES } from '../constants/icon_families';
+import { ICON_FAMILIES } from '../constants/iconFamilies';
 
 type IconProps = {
     name: string;
