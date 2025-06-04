@@ -1,15 +1,17 @@
 import { db } from '../lib/supabase';
 import { joinGame, leaveGame } from '../operations/Games';
 
-const PLAYER_NAME = 'You';
+const PLAYER_ID = "a27ce332-d44c-4f19-96a0-d39f2ef8b821";
+const GAME_ID = "94242c75-5bd8-4b55-81b0-693f01ce8d60";
 
 async function testInGame() {
-  await joinGame(PLAYER_NAME);
+  await joinGame(PLAYER_ID, GAME_ID);
 
   const { data, error } = await db
-    .from('game')
+    .from('game_players')
     .select('*')
-    .eq('name', PLAYER_NAME)
+    .eq('game_id', GAME_ID)
+    .eq('player_id', PLAYER_ID);
 
   if (error) {
     throw new Error(`Failed to check in-game status: ${error.message}`);
@@ -21,12 +23,13 @@ async function testInGame() {
 }
 
 async function testNotInGame() {
-  await leaveGame(PLAYER_NAME);
+  await leaveGame(PLAYER_ID, GAME_ID);
 
   const { data, error } = await db
-    .from('game')
+    .from('game_players')
     .select('*')
-    .eq('name', PLAYER_NAME)
+    .eq('game_id', GAME_ID)
+    .eq('player_id', PLAYER_ID);
 
   if (error) {
     throw new Error(`Failed to check not in-game status: ${error.message}`);

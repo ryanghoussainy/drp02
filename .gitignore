@@ -6,3 +6,6 @@
 
 # vs code
 .vscode/
+
+# expo
+.expo/
