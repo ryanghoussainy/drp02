@@ -3,3 +3,6 @@
 
 # vercel
 .vercel/
+
+# vs code
+.vscode/
