@@ -7,6 +7,9 @@ import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
 import GameCard from '../components/GameCard';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
+import { getPlayersInGame } from '../operations/Games';
+import Player from '../interfaces/Player';
 
 export default function GamesDiscoveryScreen() {
     const {
@@ -28,6 +31,26 @@ export default function GamesDiscoveryScreen() {
 
     // Search
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Players cache keyed by game id
+    const [playersByGame, setPlayersByGame] = useState<{ [key: string]: Player[] }>({});
+
+    React.useEffect(() => {
+        const fetchPlayers = async () => {
+            // Collect all unique game IDs across the three sections
+            const allGames = [...forYouGames, ...nearYouGames, ...trySomethingNewGames];
+            const uniqueIds = Array.from(new Set(allGames.map((g) => g.id)));
+
+            const entries = await Promise.all(
+                uniqueIds.map(async (id) => [id, await getPlayersInGame(id)] as [string, Player[]])
+            );
+
+            setPlayersByGame(Object.fromEntries(entries));
+        };
+
+        fetchPlayers();
+    }, [forYouGames, nearYouGames, trySomethingNewGames]);
+
 
     // Filters
     const [skillFilter, setSkillFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert'>('all');
@@ -55,7 +78,12 @@ export default function GamesDiscoveryScreen() {
             }
 
             // 2. Skill-level filter
-            if (skillFilter !== 'all' && game.skill_level !== skillFilter) {
+            const averageSkillRaw = AVERAGE_SKILL_LEVEL(playersByGame[game.id] || []);
+            const averageSkillLevel =
+                typeof averageSkillRaw === 'string'
+                    ? averageSkillRaw.toLowerCase()
+                    : '';
+            if (skillFilter !== 'all' && averageSkillLevel !== skillFilter) {
                 return false;
             }
 
@@ -91,7 +119,7 @@ export default function GamesDiscoveryScreen() {
             <Text style={styles.title}>Team Up London</Text>
 
             <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                <Text style={styles.subTitle}>Games</Text>
+                <Text style={styles.subTitle}>Discovery</Text>
 
                 {/* Filter button */}
                 <TouchableOpacity
@@ -206,7 +234,7 @@ export default function GamesDiscoveryScreen() {
                     }}>
                         <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
                         {/* Skill-Level Picker */}
-                        <View style={{ marginBottom: 45 }}>
+                        <View style={styles.formGroup}>
                             <Text style={styles.subTitleText}>Skill Level</Text>
                             <View style={styles.pickerContainer}>
                                 <Picker
@@ -225,17 +253,17 @@ export default function GamesDiscoveryScreen() {
                             </View>
                         </View>
                         {/* Location Filter Input */}
-                        <View style={{ marginBottom: 16 }}>
+                        <View style={styles.formGroup}>
                             <Text style={styles.subTitleText}>Location</Text>
                             <TextInput
-                                style={styles.searchInput}
+                                style={styles.modalInput}
                                 placeholder="Location..."
                                 value={tempLocationFilter}
                                 onChangeText={setTempLocationFilter}
                             />
                         </View>
                         {/* Date Filter */}
-                        <View style={{ marginBottom: 16 }}>
+                        <View style={styles.formGroup}>
                             <Text style={styles.subTitleText}>Date</Text>
                             <TouchableOpacity
                                 onPress={() => setShowDatePicker(true)}
@@ -260,6 +288,7 @@ export default function GamesDiscoveryScreen() {
                                     value={tempSelectedDate || new Date()}
                                     mode="date"
                                     display="default"
+                                    style={styles.datePicker}
                                     onChange={(event, date) => {
                                         setShowDatePicker(Platform.OS === 'ios');
                                         if (date) setTempSelectedDate(date);
@@ -319,6 +348,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: Fonts.main,
         textAlign: 'left',
+        marginBottom: 8,
     },
     sideBySide: {
         flexDirection: 'row',
@@ -372,18 +402,42 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: Fonts.main,
     },
+    formGroup: {
+        marginBottom: 24,
+        width: '100%',
+    },
+    modalInput: {
+        height: 44,
+        width: '100%',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        fontSize: 16,
+        fontFamily: Fonts.main,
+    },
     filtersRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 8,
     },
     picker: {
-        borderRadius: 5,
+        width: '100%',
+        height: '100%',
         fontSize: 16,
         fontFamily: Fonts.main,
     },
     pickerContainer: {
-        flex: 1,
-        marginLeft: 8,
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        overflow: 'hidden',
+        height: Platform.OS === 'ios' ? 150 : 44, // keep wheel visible on iOS, dropdown‑sized on Android
+        justifyContent: 'flex-start',
+    },
+    datePicker: {
+        alignSelf: 'center',
+        marginTop: 10,
     },
 });
