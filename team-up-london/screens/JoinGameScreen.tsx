@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Button, Icon, Text } from '@rneui/themed';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
@@ -17,6 +16,7 @@ import { formatDate } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
 import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
@@ -39,13 +39,12 @@ export default function JoinGameScreen({ route }: Props) {
             <Text style={styles.title}>Team Up London</Text>
 
             {/* Back button */}
-            <Icon
+            <MaterialIcons
                 name="arrow-back"
-                type="material"
-                size={30}
+                size={24}
                 color="black"
                 onPress={() => navigation.goBack()}
-                containerStyle={{ position: 'absolute', top: 40, left: 10 }}
+                style={{ position: 'absolute', top: 45, left: 15 }}
             />
 
             <View style={styles.sideBySide}>
@@ -120,12 +119,12 @@ export default function JoinGameScreen({ route }: Props) {
 
             {players.some(player => player.id === YOU_PLAYER_ID) ? (
                 <View style={styles.sideBySide}>
-                    <Button
-                        containerStyle={{ flex: 1 }}
-                        title="Joined"
+                    <TouchableOpacity
+                        style={[styles.button, { backgroundColor: "#ccc", flex: 1 }]}
                         disabled
-                        titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                        buttonStyle={styles.button} />
+                    >
+                        <Text style={styles.buttonText}>Joined</Text>
+                    </TouchableOpacity>
 
                     {/* exit icon */}
                     <View style={styles.leaveIconContainer}>
@@ -138,12 +137,12 @@ export default function JoinGameScreen({ route }: Props) {
                     </View>
                 </View>
             ) : (
-                <Button
-                    title="Join"
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: 'green' }]}
                     onPress={handleJoin}
-                    color="green"
-                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                    buttonStyle={styles.button} />
+                >
+                    <Text style={styles.buttonText}>Join</Text>
+                </TouchableOpacity>
             )}
 
             {/* Confirmation modal for leaving */}
@@ -245,6 +244,12 @@ const styles = StyleSheet.create({
         padding: 25,
         marginVertical: 5,
         marginBottom: 16,
+    },
+    buttonText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#fff',
+        textAlign: 'center',
     },
     scrollHint: {
         fontSize: 14,

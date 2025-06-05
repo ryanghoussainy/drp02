@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Text } from '@rneui/themed';
-import { FlatList, Modal, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';

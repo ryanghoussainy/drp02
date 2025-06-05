@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import Game from '../interfaces/Game';
-import { Icon, Image, Text } from '@rneui/themed';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { formatDate } from 'date-fns';
 import useGamePlayers from '../hooks/useGamePlayers';
@@ -10,6 +9,8 @@ import useSports from '../hooks/useSports';
 import CustomIcon from './CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function GameCard({ game, onPress }: { game: Game, onPress?: () => void }) {
     const { players } = useGamePlayers(game.id);
@@ -44,7 +45,7 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
                     <Text>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
                     <Text><Text style={styles.tagText}>Avg. Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
-                        <Icon name="person" size={16}/> 
+                        <Ionicons name="person" size={16} color="black" />
                         <Text> {players.length}/{game.max_players}</Text>
                     </View>
                 </View>
@@ -55,7 +56,6 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
                             require("../assets/images/regentspark.png")
                         }
                         style={styles.gameImage}
-                        PlaceholderContent={<ActivityIndicator />}
                     />
                 </View>
             </View>

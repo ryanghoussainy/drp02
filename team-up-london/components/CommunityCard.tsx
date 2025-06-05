@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import Community from '../interfaces/Community';
-import { Icon, Text } from '@rneui/themed';
 import useSport from '../hooks/useSport';
 import CustomIcon from './CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import useCommunityPlayers from '../hooks/useCommunityPlayers';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function CommunityCard({ community, onPress }: { community: Community, onPress: () => void }) {
     const { sport } = useSport(community.sport_id);
@@ -15,7 +16,6 @@ export default function CommunityCard({ community, onPress }: { community: Commu
         <TouchableOpacity style={styles.card} onPress={onPress}>
             {/* Community Name */}
             <Text style={styles.title}>{community.name}</Text>
-
 
             {/* Sport Icon and Name */}
             <View style={[styles.sideBySide, { justifyContent: 'center' }]}>
@@ -41,9 +41,8 @@ export default function CommunityCard({ community, onPress }: { community: Commu
             {/* More Details with a right arrow */}
             <View style={[styles.sideBySide, { justifyContent: 'space-between', marginTop: 10 }]}>
                 <View style={{ alignItems: 'center' }}>
-                    <Icon
-                        name="group"
-                        type="material"
+                    <Ionicons
+                        name="people"
                         size={24}
                         color="black"
                         style={{ marginLeft: 5 }}
@@ -55,7 +54,7 @@ export default function CommunityCard({ community, onPress }: { community: Commu
                     Details
                 </Text>
 
-                <Icon name="chevron-right" type="material" size={24} color="purple" />
+                <MaterialIcons name="chevron-right" size={24} color="purple" />
             </View>
         </TouchableOpacity>
     )

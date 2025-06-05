@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Text } from '@rneui/themed';
 import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Picker } from '@react-native-picker/picker';
@@ -11,6 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Feather from '@expo/vector-icons/Feather';
 import Sport from '../interfaces/Sport';
 import useSports from '../hooks/useSports';
+import { Text } from 'react-native';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 

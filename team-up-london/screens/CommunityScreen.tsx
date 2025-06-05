@@ -1,5 +1,4 @@
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Avatar, Button, Icon, Text } from "@rneui/themed";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useCommunity from "../hooks/useCommunity";
 import Fonts from "../config/Fonts";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
@@ -17,6 +16,8 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import { RootStackParamList } from "../navigation/StackNavigator";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Button } from "react-native";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
@@ -46,13 +47,12 @@ export default function CommunityScreen({ route }: Props) {
             <Text style={styles.title}>Team Up London</Text>
 
             {/* Back button */}
-            <Icon
+            <MaterialIcons
                 name="arrow-back"
-                type="material"
-                size={30}
+                size={24}
                 color="black"
                 onPress={() => navigation.goBack()}
-                containerStyle={{ position: 'absolute', top: 25 }}
+                style={{ position: 'absolute', top: 30 }}
             />
 
             <View style={styles.sideBySide}>
@@ -79,19 +79,15 @@ export default function CommunityScreen({ route }: Props) {
                     {players.length > 0 ? (
                         players.map((item) => (
                             <View key={item.id} style={styles.memberRow}>
-                                {/* If you have avatars, replace this with the correct source */}
-                                <Avatar
-                                    rounded
-                                    size="small"
-                                    title={item.name.charAt(0)}
-                                    containerStyle={styles.avatar}
-                                />
+                                {/* Avatar with first letter of name */}
+                                <View style={styles.avatar}>
+                                    <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
+                                </View>
 
                                 {/* Host indicator */}
                                 {item.id === creator?.id && (
-                                    <Icon
+                                    <MaterialCommunityIcons
                                         name="crown"
-                                        type="material-community"
                                         size={26}
                                         color="gold"
                                     />
@@ -143,12 +139,12 @@ export default function CommunityScreen({ route }: Props) {
 
             {players.some(player => player.id === YOU_PLAYER_ID) ? (
                 <View style={styles.sideBySide}>
-                    <Button
-                        containerStyle={{ flex: 1 }}
-                        title="Joined"
+                    <TouchableOpacity
                         disabled
-                        titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                        buttonStyle={styles.button} />
+                        style={[styles.button, { backgroundColor: "#ccc", flex: 1 }]}
+                    >
+                        <Text style={styles.buttonText}>Joined</Text>
+                    </TouchableOpacity>
 
                     {/* exit icon */}
                     <View style={styles.leaveIconContainer}>
@@ -161,13 +157,13 @@ export default function CommunityScreen({ route }: Props) {
                     </View>
                 </View>
             ) : (
-                <Button
-                    title={community?.is_public ? "Join" : (requestedToJoin ? "Requested to Join" : "Request to Join")}
+                <TouchableOpacity
                     onPress={community?.is_public ? handleJoin : () => setRequestedToJoin(true)}
-                    color="green"
                     disabled={requestedToJoin}
-                    titleStyle={{ fontSize: 24, fontWeight: 'bold' }}
-                    buttonStyle={styles.button} />
+                    style={[styles.button, { backgroundColor: requestedToJoin ? "#ccc" : "green" }]}
+                >
+                    <Text style={styles.buttonText}>{community?.is_public ? "Join" : (requestedToJoin ? "Requested to Join" : "Request to Join")}</Text>
+                </TouchableOpacity>
             )}
 
             {/* Confirmation modal for leaving */}
@@ -248,6 +244,7 @@ const styles = StyleSheet.create({
         padding: 25,
         marginVertical: 5,
         marginBottom: 16,
+        backgroundColor: "green",
     },
     leaveIconContainer: {
         flexDirection: 'row',
@@ -286,6 +283,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#bbb',
         marginRight: 4,
     },
+    avatarText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        padding: 4,
+        borderRadius: 50,
+    },
     memberName: {
         fontSize: 16,
         marginLeft: 4,
@@ -295,5 +299,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#666',
         fontFamily: Fonts.main,
+    },
+    buttonText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#fff',
+        textAlign: 'center',
     },
 })

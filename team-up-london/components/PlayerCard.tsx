@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Icon, Text } from '@rneui/themed';
+import { View, StyleSheet, Text } from 'react-native';
 import Player from '../interfaces/Player';
 import { SKILL_MAPPING } from '../constants/skills';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface PlayerCardProps {
   player: Player;
@@ -24,7 +24,7 @@ export default function PlayerCard({ player, highlightYou, isHost, sportId }: Pl
         highlightYou ? { borderWidth: 2, borderColor: 'green' } : { borderWidth: 2, borderColor: '#eee' },
       ]}
     >
-      <Icon name="person" type="material" size={24} color="black" />
+      <Ionicons name="person" size={24} color="black" />
       <Text style={styles.name}>{player.name}</Text>
       <Text style={styles.role}>
         {isHost ? <Text style={styles.hostRole}>Host</Text> : 'Player'}

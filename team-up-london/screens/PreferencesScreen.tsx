@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, CheckBox, Slider, Text } from '@rneui/themed';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import Slider from '@react-native-community/slider';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
@@ -12,6 +12,8 @@ import { getPlayerPreferences, registerPreferences } from '../operations/Player'
 import useTimes from '../hooks/useTimes';
 import Time from '../interfaces/Time';
 import { format, parse } from 'date-fns';
+import { Text } from 'react-native';
+import Checkbox from 'expo-checkbox';
 
 export default function PreferencesScreen() {
     const { sports } = useSports();
@@ -87,9 +89,9 @@ export default function PreferencesScreen() {
                         const isChecked = selectedSports.includes(item);
                         return (
                             <View key={item.id} style={styles.sportItemContainer}>
-                                <CheckBox
-                                    checked={isChecked}
-                                    onPress={() => {
+                                <Checkbox
+                                    value={isChecked}
+                                    onValueChange={() => {
                                         const alreadySelected = selectedSports.includes(item);
                                         if (alreadySelected) {
                                             setSelectedSports((prev) =>
@@ -105,8 +107,8 @@ export default function PreferencesScreen() {
                                             setSkillLevels((prev) => ({ ...prev, [item.id]: 1 }));
                                         }
                                     }}
-                                    containerStyle={styles.checkboxContainer}
-                                    checkedColor="purple"
+                                    style={styles.checkboxContainer}
+                                    color="purple"
                                 />
                                 <View style={styles.sideBySide}>
                                     <Text
@@ -152,16 +154,13 @@ export default function PreferencesScreen() {
                                     style={styles.slider}
                                     thumbTintColor="purple"
                                     minimumTrackTintColor="purple"
-                                    maximumTrackTintColor="#ccc"
-                                    thumbProps={{
-                                        children: (
-                                            <Text style={{ color: 'white', fontSize: 12 }}>
-                                                {SKILL_MAPPING[skillLevels[item.id] || 1]}
-                                            </Text>
-                                        ),
-                                        style: styles.sliderThumb,
-                                    }}
+                                    maximumTrackTintColor="#444"
                                 />
+                                <View style={styles.sliderThumb}>
+                                    <Text style={{ color: 'white', fontSize: 12 }}>
+                                        {SKILL_MAPPING[skillLevels[item.id] || 1]}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
                     );
@@ -176,34 +175,35 @@ export default function PreferencesScreen() {
                 {times.map((item) => {
                     const isChecked = preferredTimes.includes(item.id);
                     return (
-                        <CheckBox
-                            key={item.id}
-                            title={displayTimes(item)}
-                            checked={isChecked}
-                            containerStyle={styles.checkboxContainer}
-                            checkedColor="purple"
-                            textStyle={styles.preferredTimeText}
-                            onPress={() => {
-                                setPreferredTimes((prev) =>
-                                    prev.includes(item.id)
-                                        ? prev.filter((time) => time !== item.id)
-                                        : [...prev, item.id]
-                                );
-                            }}
-                        />
+                        <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                            <Checkbox
+                                value={isChecked}
+                                style={styles.checkboxContainer}
+                                color="purple"
+                                onValueChange={() => {
+                                    setPreferredTimes((prev) =>
+                                        prev.includes(item.id)
+                                            ? prev.filter((time) => time !== item.id)
+                                            : [...prev, item.id]
+                                    );
+                                }}
+                            />
+                            <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                        </View>
                     );
                 })}
             </View>
 
             {/* Save Preferences button */}
-            <Button
-                title="Save Preferences"
-                buttonStyle={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
-                titleStyle={styles.saveButtonText}
-                containerStyle={styles.saveButtonContainer}
-                disabled={selectedSports.length === 0} // disable if no sports selected
-                onPress={handleSavePreferences}
-            />
+            <View style={styles.saveButtonContainer}>
+                <TouchableOpacity
+                    style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
+                    disabled={selectedSports.length === 0} // disable if no sports selected
+                    onPress={handleSavePreferences}
+                >
+                    <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save Preferences</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         backgroundColor: 'transparent',
         padding: 0,
+        margin: 4,
     },
     sportItemContainer: {
         marginRight: 16,

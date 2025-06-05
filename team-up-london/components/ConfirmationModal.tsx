@@ -1,6 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet } from 'react-native';
-import { Button } from '@rneui/themed';
+import { Modal, View, Text, StyleSheet, Button } from 'react-native';
 
 interface ConfirmationModalProps {
   visible: boolean;

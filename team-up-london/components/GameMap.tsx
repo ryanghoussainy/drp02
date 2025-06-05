@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import { Icon } from '@rneui/themed';
 import { GAME_LOCATION } from '../constants/maps';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 interface GameMapProps {
   mapRegion: Region | null;
@@ -56,9 +56,8 @@ export default function GameMap({ mapRegion, distance, gameId, location }: GameM
         style={styles.toggleMap}
         onPress={() => setSatelliteMode((prev) => !prev)}
       >
-        <Icon
+        <MaterialCommunityIcons
           name={satelliteMode ? 'map' : 'satellite'}
-          type="material"
           size={25}
           color="black"
         />
