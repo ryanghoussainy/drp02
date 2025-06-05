@@ -8,10 +8,15 @@ interface PlayerCardProps {
   player: Player;
   highlightYou: boolean;
   isHost: boolean;
+  sportId: string;
 }
 
-export default function PlayerCard({ player, highlightYou, isHost }: PlayerCardProps) {
-  const skillLabel = SKILL_MAPPING[player.skill_level] || '';
+export default function PlayerCard({ player, highlightYou, isHost, sportId }: PlayerCardProps) {
+  // Get index of sport in player's preferred sports
+  const sportIndex = player.preferred_sports_ids.indexOf(sportId);
+  // Get skill level for the sport, default to 0 if not found
+  const skillLevel = sportIndex !== -1 ? player.preferred_sports_skill_levels[sportIndex] : 0;
+  const skillLabel = SKILL_MAPPING[skillLevel] || '';
   return (
     <View
       style={[

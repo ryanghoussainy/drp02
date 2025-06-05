@@ -3,6 +3,7 @@ export default interface Player {
     name: string;
     age: number;
     gender: boolean;
-    skill_level: number;
     preferred_times?: string[]; // Optional, can be used to store preferred times for games
+    preferred_sports_ids: string[];
+    preferred_sports_skill_levels: number[];
 }

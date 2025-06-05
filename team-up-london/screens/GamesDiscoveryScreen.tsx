@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text } from '@rneui/themed';
-import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Modal, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
@@ -10,8 +10,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { getPlayersInGame } from '../operations/Games';
 import Player from '../interfaces/Player';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/StackNavigator';
+
+type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
 export default function GamesDiscoveryScreen() {
+    const navigation = useNavigation<GamesNavProp>();
+
     const {
         // For you section
         forYouSectionOpen,
@@ -78,7 +85,7 @@ export default function GamesDiscoveryScreen() {
             }
 
             // 2. Skill-level filter
-            const averageSkillRaw = AVERAGE_SKILL_LEVEL(playersByGame[game.id] || []);
+            const averageSkillRaw = AVERAGE_SKILL_LEVEL(playersByGame[game.id] || [], game.sport);
             const averageSkillLevel =
                 typeof averageSkillRaw === 'string'
                     ? averageSkillRaw.toLowerCase()
@@ -107,23 +114,16 @@ export default function GamesDiscoveryScreen() {
         });
     };
 
-    const onChangeDate = (event: any, pickedDate?: Date) => {
-        setShowDatePicker(Platform.OS === 'ios');
-        if (pickedDate) {
-            setTempSelectedDate(pickedDate);
-        }
-    };
-
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
 
-            <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                <Text style={styles.subTitle}>Discovery</Text>
+            <Text style={styles.subTitle}>Discovery</Text>
 
+            <View style={[styles.sideBySide, { marginBottom: 16 }]}>
                 {/* Filter button */}
                 <TouchableOpacity
-                    style={[styles.button, { marginLeft: 8, paddingVertical: 12 }]}
+                    style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: '40%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
                     onPress={() => {
                         setTempSkillFilter(skillFilter);
                         setTempLocationFilter(locationFilter);
@@ -131,6 +131,7 @@ export default function GamesDiscoveryScreen() {
                         setShowFilterModal(true);
                     }}
                 >
+                    <Feather name="filter" size={24} color="purple" />
                     <Text style={styles.buttonText}>Filter</Text>
                 </TouchableOpacity>
 
@@ -159,11 +160,9 @@ export default function GamesDiscoveryScreen() {
                 {forYouSectionOpen && (
                     <View style={styles.sectionContent}>
                         {/* Games list */}
-                        <FlatList
-                            data={applyAllFilters(forYouGames)}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => <GameCard game={item} />}
-                        />
+                        {applyAllFilters(forYouGames).map((game) => (
+                            <GameCard key={game.id} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                        ))}
                     </View>
                 )}
             </View>
@@ -319,7 +318,7 @@ export default function GamesDiscoveryScreen() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -366,6 +365,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 16,
         fontFamily: Fonts.main,
+        marginLeft: 8,
     },
     section: {
         marginBottom: 20,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         height: 50,
-        width: '52%',
+        width: '43%',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,

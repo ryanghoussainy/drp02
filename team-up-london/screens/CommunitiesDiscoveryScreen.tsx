@@ -3,55 +3,77 @@ import { Text } from '@rneui/themed';
 import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Picker } from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import useCommunities from '../hooks/useCommunities';
 import CommunityCard from '../components/CommunityCard';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/StackNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Feather from '@expo/vector-icons/Feather';
+import Sport from '../interfaces/Sport';
+import useSports from '../hooks/useSports';
+
+type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
 export default function CommunitiesScreen() {
     const { communities } = useCommunities();
+
+    const navigation = useNavigation<GamesNavProp>();
+
+    const { sports } = useSports();
 
     // Search
     const [searchQuery, setSearchQuery] = useState('');
 
     // Filters
-    const [skillFilter, setSkillFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert'>('all');
     const [locationFilter, setLocationFilter] = useState('');
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+    const [sportFilter, setSportFilter] = useState<'all' | Sport>('all');
 
     // Modal state for filters
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [tempSkillFilter, setTempSkillFilter] = useState(skillFilter);
     const [tempLocationFilter, setTempLocationFilter] = useState(locationFilter);
-    const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(selectedDate);
-    const [showDatePicker, setShowDatePicker] = useState(false);
-
-    const isSameDay = (d1: Date, d2: Date) =>
-        d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate();
+    const [tempSportFilter, setTempSportFilter] = useState(sportFilter);
 
     const applyAllFilters = (games: Array<any>) => {
-        
+        return communities.filter((community) => {
+            // 1. Name search (case-insensitive substring)
+            if (!community.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+                return false;
+            }
+
+            // 2. Sport filter (if selected, show only games of that sport)
+            if (sportFilter !== 'all' && community.sport_id !== sportFilter.id) {
+                return false;
+            }
+
+            // 3. Location filter (case-insensitive substring)
+            if (
+                locationFilter.length > 0 &&
+                !community.primary_location.toLowerCase().includes(locationFilter.toLowerCase())
+            ) {
+                return false;
+            }
+
+            return true;
+        });
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
 
+            <Text style={styles.subTitle}>Communities</Text>
+            
             <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                <Text style={styles.subTitle}>Communities</Text>
-
                 {/* Filter button */}
                 <TouchableOpacity
-                    style={[styles.button, { marginLeft: 8, paddingVertical: 12 }]}
+                    style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: "40%", flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
                     onPress={() => {
-                        setTempSkillFilter(skillFilter);
                         setTempLocationFilter(locationFilter);
-                        setTempSelectedDate(selectedDate);
+                        setTempSportFilter(sportFilter);
                         setShowFilterModal(true);
                     }}
                 >
+                    <Feather name="filter" size={24} color="purple" />
                     <Text style={styles.buttonText}>Filter</Text>
                 </TouchableOpacity>
 
@@ -65,10 +87,12 @@ export default function CommunitiesScreen() {
             </View>
 
             <FlatList
-                data={communities}
+                data={applyAllFilters(communities)}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
-                renderItem={({ item }) => <CommunityCard community={item} />}
+                renderItem={({ item }) => (
+                    <CommunityCard community={item} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
+                )}
             />
 
             {/* Filter Modal */}
@@ -97,17 +121,16 @@ export default function CommunitiesScreen() {
                             <Text style={styles.subTitleText}>Skill Level</Text>
                             <View style={styles.pickerContainer}>
                                 <Picker
-                                    selectedValue={tempSkillFilter}
+                                    selectedValue={tempSportFilter}
                                     onValueChange={(itemValue) =>
-                                        setTempSkillFilter(itemValue as 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert')
+                                        setTempSportFilter(itemValue as 'all' | Sport)
                                     }
                                     style={styles.picker}
                                 >
-                                    <Picker.Item label="All" value="all" />
-                                    <Picker.Item label="Beginner" value="beginner" />
-                                    <Picker.Item label="Intermediate" value="intermediate" />
-                                    <Picker.Item label="Advanced" value="advanced" />
-                                    <Picker.Item label="Expert" value="expert" />
+                                    <Picker.Item label="All Sports" value="all" />
+                                    {Object.entries(sports).map(([key, sport]) => (
+                                        <Picker.Item key={key} label={sport.name} value={sport} />
+                                    ))}
                                 </Picker>
                             </View>
                         </View>
@@ -121,40 +144,6 @@ export default function CommunitiesScreen() {
                                 onChangeText={setTempLocationFilter}
                             />
                         </View>
-                        {/* Date Filter */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Date</Text>
-                            <TouchableOpacity
-                                onPress={() => setShowDatePicker(true)}
-                                style={[styles.button, { paddingVertical: 12 }]}
-                            >
-                                <Text style={styles.buttonText}>
-                                    {tempSelectedDate
-                                        ? tempSelectedDate.toLocaleDateString()
-                                        : 'Pick Date'}
-                                </Text>
-                            </TouchableOpacity>
-                            {tempSelectedDate && (
-                                <TouchableOpacity
-                                    onPress={() => setTempSelectedDate(null)}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    <Text style={{ color: 'red', textAlign: 'center' }}>Clear Date</Text>
-                                </TouchableOpacity>
-                            )}
-                            {showDatePicker && (
-                                <DateTimePicker
-                                    value={tempSelectedDate || new Date()}
-                                    mode="date"
-                                    display="default"
-                                    style={styles.datePicker}
-                                    onChange={(event, date) => {
-                                        setShowDatePicker(Platform.OS === 'ios');
-                                        if (date) setTempSelectedDate(date);
-                                    }}
-                                />
-                            )}
-                        </View>
                         {/* Modal Actions */}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
                             <TouchableOpacity
@@ -166,9 +155,8 @@ export default function CommunitiesScreen() {
                             <TouchableOpacity
                                 style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: 'purple' }]}
                                 onPress={() => {
-                                    setSkillFilter(tempSkillFilter);
                                     setLocationFilter(tempLocationFilter);
-                                    setSelectedDate(tempSelectedDate);
+                                    setSportFilter(tempSportFilter);
                                     setShowFilterModal(false);
                                 }}
                             >
@@ -225,6 +213,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 16,
         fontFamily: Fonts.main,
+        marginLeft: 8,
     },
     section: {
         marginBottom: 20,
@@ -253,7 +242,7 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         height: 50,
-        width: '50%',
+        width: '43%',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,

@@ -9,8 +9,9 @@ import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 import useSports from '../hooks/useSports';
 import CustomIcon from './CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
+import { TouchableOpacity } from 'react-native';
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game, onPress }: { game: Game, onPress?: () => void }) {
     const { players } = useGamePlayers(game.id);
     const { sports } = useSports();
 
@@ -27,7 +28,7 @@ export default function GameCard({ game }: { game: Game }) {
     }
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={onPress}>
             <View style={styles.gameHeader}>
                 <CustomIcon
                     name={sport?.icon || 'default-icon'}
@@ -41,7 +42,7 @@ export default function GameCard({ game }: { game: Game }) {
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
                     <Text>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
-                    <Text><Text style={styles.tagText}>Avg. Skill: </Text>{AVERAGE_SKILL_LEVEL(players)}</Text>
+                    <Text><Text style={styles.tagText}>Avg. Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
                         <Icon name="person" size={16}/> 
                         <Text> {players.length}/{game.max_players}</Text>
@@ -59,7 +60,7 @@ export default function GameCard({ game }: { game: Game }) {
                 </View>
             </View>
             <Text style={styles.locationText}>{game.location} {renderDistance()}</Text>
-        </View>
+        </TouchableOpacity>
     )
 }
 

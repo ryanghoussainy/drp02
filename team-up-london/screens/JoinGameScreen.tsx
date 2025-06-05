@@ -14,8 +14,17 @@ import useGame from '../hooks/useGame';
 import CustomIcon from '../components/CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { formatDate } from 'date-fns';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/StackNavigator';
+import { useNavigation } from '@react-navigation/native';
 
-export default function JoinGameScreen({ gameId }: { gameId: string }) {
+type Props = NativeStackScreenProps<RootStackParamList, "Game">;
+
+export default function JoinGameScreen({ route }: Props) {
+    const navigation = useNavigation();
+
+    const { gameId } = route.params;
+
     const { distance, mapRegion } = useDistanceAndRegion({ gameId });
 
     const { players, handleJoin, handleLeave, hostId } = useGamePlayers(gameId);
@@ -28,6 +37,17 @@ export default function JoinGameScreen({ gameId }: { gameId: string }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
+
+            {/* Back button */}
+            <Icon
+                name="arrow-back"
+                type="material"
+                size={30}
+                color="black"
+                onPress={() => navigation.goBack()}
+                containerStyle={{ position: 'absolute', top: 40, left: 10 }}
+            />
+
             <View style={styles.sideBySide}>
                 <Text style={styles.gameTitle}>— {game?.name} </Text>
 
@@ -44,7 +64,7 @@ export default function JoinGameScreen({ gameId }: { gameId: string }) {
                     {game && <Text style={[styles.detailText, styles.timeText]}>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>}
                     <Text style={styles.detailText}>
                         <Text style={styles.tagText}>Average Skill:</Text> <Text style={styles.highlight}>
-                            {AVERAGE_SKILL_LEVEL(players)}
+                            {AVERAGE_SKILL_LEVEL(players, game?.sport_id || '')}
                         </Text>
                     </Text>
                 </View>
@@ -79,6 +99,7 @@ export default function JoinGameScreen({ gameId }: { gameId: string }) {
                                     player={player}
                                     highlightYou={player.id === YOU_PLAYER_ID}
                                     isHost={player.id === hostId}
+                                    sportId={game?.sport_id || ''}
                                 />
                             ))}
                         </ScrollView>
@@ -155,6 +176,7 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         textAlign: 'center',
         marginVertical: 12,
+        marginTop: 20,
     },
     gameTitle: {
         fontSize: 22,

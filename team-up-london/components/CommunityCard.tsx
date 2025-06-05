@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet} from 'react-native';
+import { View, StyleSheet, TouchableOpacity} from 'react-native';
 import Community from '../interfaces/Community';
 import { Icon, Text } from '@rneui/themed';
 import useSport from '../hooks/useSport';
@@ -7,12 +7,12 @@ import CustomIcon from './CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import useCommunityPlayers from '../hooks/useCommunityPlayers';
 
-export default function CommunityCard({ community }: { community: Community }) {
+export default function CommunityCard({ community, onPress }: { community: Community, onPress: () => void }) {
     const { sport } = useSport(community.sport_id);
     const { players, creatorId } = useCommunityPlayers(community.id);
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={onPress}>
             {/* Community Name */}
             <Text style={styles.title}>{community.name}</Text>
 
@@ -57,7 +57,7 @@ export default function CommunityCard({ community }: { community: Community }) {
 
                 <Icon name="chevron-right" type="material" size={24} color="purple" />
             </View>
-        </View>
+        </TouchableOpacity>
     )
 }
 

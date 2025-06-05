@@ -14,9 +14,17 @@ import { YOU_PLAYER_ID } from "../constants/youPlayerId";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import ConfirmationModal from "../components/ConfirmationModal";
+import { RootStackParamList } from "../navigation/StackNavigator";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
 
+type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
-export default function CommunityScreen({ communityId }: { communityId: string }) {
+export default function CommunityScreen({ route }: Props) {
+    const { communityId } = route.params;
+
+    const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
+
     const { community } = useCommunity(communityId);
     const { player: creator } = usePlayer(community?.creator_id || "");
     const { sport } = useSport(community?.sport_id || "");
@@ -36,6 +44,16 @@ export default function CommunityScreen({ communityId }: { communityId: string }
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
+
+            {/* Back button */}
+            <Icon
+                name="arrow-back"
+                type="material"
+                size={30}
+                color="black"
+                onPress={() => navigation.goBack()}
+                containerStyle={{ position: 'absolute', top: 25 }}
+            />
 
             <View style={styles.sideBySide}>
                 <Text style={styles.subTitle}>{community?.name}</Text>
@@ -120,7 +138,7 @@ export default function CommunityScreen({ communityId }: { communityId: string }
             {/* Games coming up */}
             <Text style={styles.subTitle}>Upcoming Games</Text>
             {games.map((game, idx) => (
-                <GameCard key={idx} game={game} />
+                <GameCard key={idx} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
             ))}
 
             {players.some(player => player.id === YOU_PLAYER_ID) ? (
@@ -182,6 +200,7 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         textAlign: 'center',
         marginVertical: 12,
+        marginTop: 20,
     },
     subTitle: {
         fontSize: 24,
