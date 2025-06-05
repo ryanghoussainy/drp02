@@ -80,7 +80,7 @@ export default function CommunitiesScreen() {
                 {/* Search input */}
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Search games..."
+                    placeholder="Search..."
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                 />
