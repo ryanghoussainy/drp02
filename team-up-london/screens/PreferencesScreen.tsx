@@ -12,6 +12,17 @@ export default function PreferencesScreen() {
     const [selectedSports, setSelectedSports] = useState<string[]>([]);
     const [skillLevels, setSkillLevels] = useState<{ [key: string]: number }>({});
 
+    // Preferred times
+    const [preferredTimes, setPreferredTimes] = useState<string[]>([]);
+
+    const ALL_PREFERRED_TIMES = [
+        'Morning (6am-12pm)',
+        'Weekdays',
+        'Afternoon (12pm-6pm)',
+        'Weekends',
+        'Evening (6pm-12am)',
+    ];
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
@@ -19,7 +30,7 @@ export default function PreferencesScreen() {
 
             {/* Select sports section */}
             <View style={styles.section}>
-                <Text style={styles.subTitleText}>Select your sports</Text>
+                <Text style={styles.subTitleText}>Select your sports (at least one)</Text>
 
                 {/* List sports with checkboxes */}
                 <FlatList
@@ -94,6 +105,35 @@ export default function PreferencesScreen() {
                         </View>
                     )}
                 />
+            </View>
+
+            {/* Preferred times section */}
+            <View style={styles.section}>
+                <Text style={styles.subTitleText}>Preferred times for sports (tick all that apply)</Text>
+
+                <FlatList
+                    data={ALL_PREFERRED_TIMES}
+                    keyExtractor={(item) => item}
+                    numColumns={2}
+                    columnWrapperStyle={styles.checkboxColumnContainer}
+                    renderItem={({ item }) => (
+                        <CheckBox
+                            title={item}
+                            checked={preferredTimes.includes(item)}
+                            containerStyle={styles.checkboxContainer}
+                            checkedColor='purple'
+                            textStyle={styles.preferredTimeText}
+                            onPress={() => {
+                                setPreferredTimes((prev) =>
+                                    prev.includes(item)
+                                        ? prev.filter((time) => time !== item)
+                                        : [...prev, item]
+                                );
+                            }}
+                        />
+                    )}
+                />
+
             </View>
 
             {/* Next button */}
@@ -249,5 +289,13 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         overflow: 'hidden',
         borderRadius: 10,
+    },
+    checkboxColumnContainer: {
+        justifyContent: 'space-between',
+    },
+    preferredTimeText: {
+        fontSize: 14,
+        fontFamily: Fonts.main,
+        color: '#444',
     },
 });
