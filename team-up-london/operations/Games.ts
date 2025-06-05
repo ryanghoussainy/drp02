@@ -69,13 +69,7 @@ export async function getPlayersInGame(game_id: string): Promise<Player[]> {
         return [];
     }
 
-    return players.map((player: any) => ({
-        id: player.id,
-        name: player.name,
-        age: player.age,
-        gender: player.gender,
-        skill_level: player.skill_level,
-    }));
+    return players as Player[];
 }
 
 // For you games
@@ -89,18 +83,5 @@ export async function getForYouGames(playerId: string): Promise<Game[]> {
         return [];
     }
 
-    return games.map((game: any) => ({
-        id: game.id,
-        name: game.name,
-        host_id: game.host_id,
-        start_time: game.start_time,
-        end_time: game.end_time,
-        location: game.location,
-        location_type: game.location_type,
-        sport_id: game.sport_id,
-        notes_from_host: game.notes_from_host,
-        max_players: game.max_players,
-        min_players: game.min_players,
-        cost: game.cost,
-    }));
+    return games as Game[];
 }

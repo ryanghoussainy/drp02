@@ -1,4 +1,5 @@
 import Community from "../interfaces/Community";
+import Game from "../interfaces/Game";
 import Player from "../interfaces/Player";
 import { db } from "../lib/supabase";
 import { Alert } from "react-native";
@@ -57,4 +58,45 @@ export async function getPlayersInCommunity(communityId: string): Promise<Player
     }
 
     return players as Player[];
+}
+
+// Get games in a community
+export async function getGamesInCommunity(communityId: string): Promise<Game[]> {
+    const { data, error } = await db
+        .from("games")
+        .select("*")
+        .eq("community_id", communityId);
+
+    if (error) {
+        Alert.alert(error.message);
+        return [];
+    }
+
+    return data as Game[];
+}
+
+// Join a community
+export async function joinCommunity(playerId: string, communityId: string) {
+    const { error } = await db
+        .from("community_players")
+        .upsert({
+            player_id: playerId,
+            community_id: communityId,
+        });
+    if (error) {
+        Alert.alert(error.message);
+    }
+}
+
+// Leave a community
+export async function leaveCommunity(playerId: string, communityId: string) {
+    const { error } = await db
+        .from("community_players")
+        .delete()
+        .eq("player_id", playerId)
+        .eq("community_id", communityId);
+
+    if (error) {
+        Alert.alert(error.message);
+    }
 }

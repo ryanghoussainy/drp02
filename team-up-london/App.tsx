@@ -4,11 +4,12 @@ import JoinGameScreen from './screens/JoinGameScreen';
 import PreferencesScreen from './screens/PreferencesScreen';
 import GamesDiscoveryScreen from './screens/GamesDiscoveryScreen';
 import CommunitiesDiscoveryScreen from './screens/CommunitiesDiscoveryScreen';
+import CommunityScreen from './screens/CommunityScreen';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <CommunitiesDiscoveryScreen />
+      <CommunityScreen communityId="cd342b7a-13b0-4396-84e4-6ec27839c585" />
       <StatusBar style="auto" />
     </View>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import Player from '../interfaces/Player';
-import { getCommunity, getPlayersInCommunity } from '../operations/Communities';
+import { getCommunity, getPlayersInCommunity, joinCommunity, leaveCommunity } from '../operations/Communities';
 
 export default function useCommunityPlayers(community_id: string) {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -29,5 +29,16 @@ export default function useCommunityPlayers(community_id: string) {
     refreshPlayers();
   }, []);
 
-  return { players, creatorId };
+  const handleJoin = async () => {
+    // TODO: Implement join community logic
+    await joinCommunity(YOU_PLAYER_ID, community_id);
+    await refreshPlayers();
+  }
+
+  const handleLeave = async () => {
+    await leaveCommunity(YOU_PLAYER_ID, community_id);
+    await refreshPlayers();
+  }
+
+  return { players, creatorId, handleJoin, handleLeave };
 }

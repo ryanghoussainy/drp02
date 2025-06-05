@@ -97,7 +97,7 @@ export default function JoinGameScreen({ gameId }: { gameId: string }) {
 
             <Text style={styles.requiredPlayersSection}>{(game?.min_players || 0) - players.length} more players required to start</Text>
 
-            {players.some(player => player.name === 'You') ? (
+            {players.some(player => player.id === YOU_PLAYER_ID) ? (
                 <View style={styles.sideBySide}>
                     <Button
                         containerStyle={{ flex: 1 }}

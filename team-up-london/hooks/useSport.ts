@@ -11,8 +11,10 @@ export default function useSport(sportId: string) {
   };
 
   useEffect(() => {
-    refreshSport();
-  }, []);
+    if (sportId) {
+      refreshSport();
+    }
+  }, [sportId]);
 
   return { sport };
 }
