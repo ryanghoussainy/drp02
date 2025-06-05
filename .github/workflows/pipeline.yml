@@ -23,7 +23,7 @@ jobs:
 
       - name: Run tests
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
           npm test
         working-directory: ${{ env.APP_DIR }}
 
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install deps & EAS
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
           npm i -g eas-cli
         working-directory: ${{ env.APP_DIR }}
 
@@ -76,7 +76,7 @@ jobs:
       
       - name: Install deps & EAS
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
           npm i -g eas-cli
         working-directory: ${{ env.APP_DIR }}
 
