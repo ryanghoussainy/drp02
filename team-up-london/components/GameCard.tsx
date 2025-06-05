@@ -18,6 +18,14 @@ export default function GameCard({ game }: { game: Game }) {
 
     const sport = sports.find(s => s.id === game.sport_id);
 
+    const renderDistance = () => {
+        if (distance) {
+            return `(${distance?.km.toFixed(1)} km / ${distance?.miles.toFixed(1)} mi)`
+        } else {
+            return '(Getting distance...)';
+        }
+    }
+
     return (
         <View style={styles.card}>
             <View style={styles.gameHeader}>
@@ -50,7 +58,7 @@ export default function GameCard({ game }: { game: Game }) {
                     />
                 </View>
             </View>
-            <Text style={styles.locationText}>{game.location} ({distance?.km.toFixed(1)} km / {distance?.miles.toFixed(1)} mi)</Text>
+            <Text style={styles.locationText}>{game.location} {renderDistance()}</Text>
         </View>
     )
 }

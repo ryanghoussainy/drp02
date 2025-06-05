@@ -7,7 +7,7 @@ import GamesDiscoveryScreen from './screens/GamesDiscoveryScreen';
 export default function App() {
   return (
     <View style={styles.container}>
-      <PreferencesScreen />
+      <GamesDiscoveryScreen />
       <StatusBar style="auto" />
     </View>
   );

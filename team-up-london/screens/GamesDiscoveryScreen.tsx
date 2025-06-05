@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     modalInput: {
-        height: 44,
+        height: 55,
         width: '100%',
         borderColor: '#ccc',
         borderWidth: 1,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         overflow: 'hidden',
-        height: Platform.OS === 'ios' ? 150 : 44, // keep wheel visible on iOS, dropdown‑sized on Android
+        height: Platform.OS === 'ios' ? 150 : 55, // keep wheel visible on iOS, dropdown‑sized on Android
         justifyContent: 'flex-start',
     },
     datePicker: {
