@@ -3,11 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import JoinGameScreen from './screens/JoinGameScreen';
 import PreferencesScreen from './screens/PreferencesScreen';
 import GamesDiscoveryScreen from './screens/GamesDiscoveryScreen';
+import CommunitiesDiscoveryScreen from './screens/CommunitiesDiscoveryScreen';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <GamesDiscoveryScreen />
+      <CommunitiesDiscoveryScreen />
       <StatusBar style="auto" />
     </View>
   );
