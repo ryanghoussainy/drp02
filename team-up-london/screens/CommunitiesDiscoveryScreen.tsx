@@ -118,7 +118,7 @@ export default function CommunitiesScreen() {
                         <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
                         {/* Skill-Level Picker */}
                         <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Skill Level</Text>
+                            <Text style={styles.subTitleText}>Sports</Text>
                             <View style={styles.pickerContainer}>
                                 <Picker
                                     selectedValue={tempSportFilter}
