@@ -75,6 +75,7 @@ export default function PreferencesScreen() {
     }
 
     return (
+        <View>
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Team Up London</Text>
             <Text style={styles.subTitle}>Preferences</Text>
@@ -139,23 +140,31 @@ export default function PreferencesScreen() {
                 {selectedSports.map((item) => {
                     return (
                         <View key={item.id} style={styles.selectedSportContainer}>
+                            <View>
+                                <Text style={styles.selectedSportText}>{item.name}</Text>
+                            </View>
                             <View style={styles.sideBySide}>
-                                <View>
-                                    <Text style={styles.selectedSportText}>{item.name}</Text>
+                                <View style={styles.sliderWrapper}>
+                                    <Slider
+                                        value={skillLevels[item.id] || 1}
+                                        minimumValue={1}
+                                        maximumValue={Object.keys(SKILL_MAPPING).length}
+                                        step={1}
+                                        onValueChange={(value) =>
+                                            setSkillLevels((prev) => ({ ...prev, [item.id]: value }))
+                                        }
+                                        style={styles.slider}
+                                        thumbTintColor="purple"
+                                        minimumTrackTintColor="purple"
+                                        maximumTrackTintColor="#444"
+                                    />
+                                    {/* Notches */}
+                                    <View style={styles.notchesContainer} pointerEvents="none">
+                                        {Array.from({ length: Object.keys(SKILL_MAPPING).length }).map((_, idx) => (
+                                            <View key={idx} style={styles.notch} />
+                                        ))}
+                                    </View>
                                 </View>
-                                <Slider
-                                    value={skillLevels[item.id] || 1}
-                                    minimumValue={1}
-                                    maximumValue={Object.keys(SKILL_MAPPING).length}
-                                    step={1}
-                                    onValueChange={(value) =>
-                                        setSkillLevels((prev) => ({ ...prev, [item.id]: value }))
-                                    }
-                                    style={styles.slider}
-                                    thumbTintColor="purple"
-                                    minimumTrackTintColor="purple"
-                                    maximumTrackTintColor="#444"
-                                />
                                 <View style={styles.sliderThumb}>
                                     <Text style={{ color: 'white', fontSize: 12 }}>
                                         {SKILL_MAPPING[skillLevels[item.id] || 1]}
@@ -172,39 +181,79 @@ export default function PreferencesScreen() {
                 <Text style={styles.subTitleText}>
                     Preferred times for sports (tick all that apply)
                 </Text>
-                {times.map((item) => {
-                    const isChecked = preferredTimes.includes(item.id);
-                    return (
-                        <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                            <Checkbox
-                                value={isChecked}
-                                style={styles.checkboxContainer}
-                                color="purple"
-                                onValueChange={() => {
-                                    setPreferredTimes((prev) =>
-                                        prev.includes(item.id)
-                                            ? prev.filter((time) => time !== item.id)
-                                            : [...prev, item.id]
-                                    );
-                                }}
-                            />
-                            <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
-                        </View>
-                    );
-                })}
-            </View>
+                
+                {/* Specific time slots (have start & end) */}
+                <Text style={styles.timeCategoryText}>Time Slots</Text>
+                {times
+                    .filter(t => t.start_time && t.end_time)
+                    .map((item) => {
+                        const isChecked = preferredTimes.includes(item.id);
+                        return (
+                            <View
+                                key={item.id}
+                                style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
+                            >
+                                <Checkbox
+                                    value={isChecked}
+                                    style={styles.checkboxContainer}
+                                    color="purple"
+                                    onValueChange={() => {
+                                        setPreferredTimes((prev) =>
+                                            prev.includes(item.id)
+                                                ? prev.filter((time) => time !== item.id)
+                                                : [...prev, item.id]
+                                        );
+                                    }}
+                                />
+                                <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                            </View>
+                        );
+                    })}
 
-            {/* Save Preferences button */}
-            <View style={styles.saveButtonContainer}>
-                <TouchableOpacity
-                    style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
-                    disabled={selectedSports.length === 0} // disable if no sports selected
-                    onPress={handleSavePreferences}
-                >
-                    <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save Preferences</Text>
-                </TouchableOpacity>
+                {/* General time preferences (no start/end) */}
+                <Text style={[styles.timeCategoryText, { marginTop: 12 }]}>
+                    Days
+                </Text>
+                <View style={[styles.sideBySide, {marginHorizontal: 50}]}>
+                    {times
+                    .filter(t => !(t.start_time && t.end_time))
+                    .map((item) => {
+                        const isChecked = preferredTimes.includes(item.id);
+                        return (
+                            <View
+                                key={item.id}
+                                style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
+                            >
+                                <Checkbox
+                                    value={isChecked}
+                                    style={styles.checkboxContainer}
+                                    color="purple"
+                                    onValueChange={() => {
+                                        setPreferredTimes((prev) =>
+                                            prev.includes(item.id)
+                                                ? prev.filter((time) => time !== item.id)
+                                                : [...prev, item.id]
+                                        );
+                                    }}
+                                />
+                                <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                            </View>
+                        );
+                    })}
+                </View>
             </View>
         </ScrollView>
+
+        {/* Save Preferences button */}
+        <TouchableOpacity
+            style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
+            disabled={selectedSports.length === 0} // disable if no sports selected
+            onPress={handleSavePreferences}
+        >
+            <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
+        </TouchableOpacity>
+
+        </View>
     );
 }
 
@@ -303,9 +352,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     savePreferencesButton: {
-        width: '40%',
-        marginTop: 20,
-        paddingVertical: 12,
+        padding: 12,
         backgroundColor: '#f0f0f0',
         borderColor: 'purple',
         borderRadius: 10,
@@ -317,6 +364,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         elevation: 2,
+        position: 'absolute',
+        bottom: 10,
+        right: 15,
     },
     saveButtonText: {
         fontSize: 18,
@@ -326,7 +376,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     saveButtonContainer: {
-        flex: 1,
         alignItems: 'center',
         marginRight: 8,
         marginBottom: 8,
@@ -337,5 +386,29 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: Fonts.main,
         color: '#444',
+    },
+    timeCategoryText: {
+        fontSize: 16,
+        fontFamily: Fonts.main,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    sliderWrapper: {
+        flex: 1,
+        position: 'relative',
+        justifyContent: 'center',
+    },
+    notchesContainer: {
+        position: 'absolute',
+        left: 30,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: 188,
+    },
+    notch: {
+        width: 2,
+        height: 8,
+        backgroundColor: '#444',
     },
 });

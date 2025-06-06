@@ -27,11 +27,13 @@ export default function CommunitiesScreen() {
     // Filters
     const [locationFilter, setLocationFilter] = useState('');
     const [sportFilter, setSportFilter] = useState<'all' | Sport>('all');
+    const [privacyFilter, setPrivacyFilter] = useState<'all' | 'public' | 'private'>('all');
 
     // Modal state for filters
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [tempLocationFilter, setTempLocationFilter] = useState(locationFilter);
     const [tempSportFilter, setTempSportFilter] = useState(sportFilter);
+    const [tempPrivacyFilter, setTempPrivacyFilter] = useState(privacyFilter);
 
     const applyAllFilters = (games: Array<any>) => {
         return communities.filter((community) => {
@@ -53,6 +55,15 @@ export default function CommunitiesScreen() {
                 return false;
             }
 
+            // 4. Privacy filter
+            if (privacyFilter === 'public' && !community.is_public) {
+                return false;
+            }
+            if (privacyFilter === 'private' && community.is_public) {
+                return false;
+            }
+
+
             return true;
         });
     };
@@ -70,6 +81,7 @@ export default function CommunitiesScreen() {
                     onPress={() => {
                         setTempLocationFilter(locationFilter);
                         setTempSportFilter(sportFilter);
+                        setTempPrivacyFilter(privacyFilter);
                         setShowFilterModal(true);
                     }}
                 >
@@ -147,6 +159,26 @@ export default function CommunitiesScreen() {
                                 onChangeText={setTempLocationFilter}
                             />
                         </View>
+                        
+                        {/* Private or Public Filter*/}
+                        <View style={styles.formGroup}>
+                            <Text style={styles.subTitleText}>Privacy</Text>
+                            <View style={styles.pickerContainer}>
+                                <Picker
+                                    selectedValue={tempPrivacyFilter}
+                                    dropdownIconColor={'purple'}
+                                    onValueChange={(itemValue) =>
+                                        setTempPrivacyFilter(itemValue as 'all' | 'public' | 'private')
+                                    }
+                                    style={styles.picker}
+                                >
+                                    <Picker.Item label="All" value="all" />
+                                    <Picker.Item label="Public Only" value="public" />
+                                    <Picker.Item label="Private Only" value="private" />
+                                </Picker>
+                            </View>
+                        </View>
+
                         {/* Modal Actions */}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
                             <TouchableOpacity
@@ -158,8 +190,9 @@ export default function CommunitiesScreen() {
                             <TouchableOpacity
                                 style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: 'purple' }]}
                                 onPress={() => {
-                                    setLocationFilter(tempLocationFilter);
                                     setSportFilter(tempSportFilter);
+                                    setLocationFilter(tempLocationFilter);
+                                    setPrivacyFilter(tempPrivacyFilter);
                                     setShowFilterModal(false);
                                 }}
                             >
