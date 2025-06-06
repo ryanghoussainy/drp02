@@ -128,7 +128,7 @@ export default function CommunitiesScreen() {
                         width: '90%',
                         maxWidth: 400,
                     }}>
-                        <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
+                        <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Communities</Text>
                         {/* Skill-Level Picker */}
                         <View style={styles.formGroup}>
                             <Text style={styles.subTitleText}>Sports</Text>
