@@ -17,11 +17,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import useGameCommunity from '../hooks/useGameCommunity';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
 export default function JoinGameScreen({ route }: Props) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
 
     const { gameId } = route.params;
 
@@ -30,6 +31,8 @@ export default function JoinGameScreen({ route }: Props) {
     const { players, handleJoin, handleLeave, hostId } = useGamePlayers(gameId);
 
     const { game, sport } = useGame(gameId);
+
+    const { community } = useGameCommunity(gameId);
 
     // Modal for confirmation when leaving
     const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -57,6 +60,8 @@ export default function JoinGameScreen({ route }: Props) {
                     color="black"
                 />
             </View>
+
+            {community && <Text style={styles.subTitle} onPress={() => navigation.navigate( "Community", { communityId: community.id })}>Community: <Text style={{textDecorationLine: "underline"}}>{community?.name}</Text></Text>}
 
             <View style={styles.gameDetails}>
                 <View style={[styles.detailBlock, { flex: 1.5 }]}>
@@ -277,4 +282,9 @@ const styles = StyleSheet.create({
         marginRight: 2,
         backgroundColor: "red",
     },
+    subTitle: {
+        fontFamily: Fonts.main,
+        marginBottom: 5,
+        marginTop: -10,
+    }
 });

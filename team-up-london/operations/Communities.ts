@@ -100,3 +100,28 @@ export async function leaveCommunity(playerId: string, communityId: string) {
         Alert.alert(error.message);
     }
 }
+
+// Get a game community
+export async function getGameCommunity(gameId: string) {
+    const { data: community_id, error: gameError } = await db
+        .from("games")
+        .select("community_id")
+        .eq("id", gameId)
+        .single();
+
+    if (gameError) {
+        Alert.alert(gameError.message);
+    }
+
+    const { data: community, error: communityError } = await db
+        .from("communities")
+        .select("*")
+        .eq("id", community_id?.community_id)
+        .single();
+    
+    if (communityError) {
+        Alert.alert(communityError.message);
+    }
+
+    return community;
+}

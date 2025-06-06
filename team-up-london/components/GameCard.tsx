@@ -11,6 +11,7 @@ import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import useGameCommunity from '../hooks/useGameCommunity';
 
 export default function GameCard({ game, onPress }: { game: Game, onPress?: () => void }) {
     const { players } = useGamePlayers(game.id);
@@ -28,6 +29,8 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
         }
     }
 
+    const { community } = useGameCommunity(game.id);
+
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
             <View style={styles.gameHeader}>
@@ -39,6 +42,8 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
                 />
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
+
+            <Text style={styles.gameCommunity}>Community: {community?.name}</Text>
 
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
@@ -91,6 +96,12 @@ const styles = StyleSheet.create({
         borderBottomColor: 'purple',
         borderRadius: 10,
         marginLeft: 10,
+    },
+    gameCommunity: {
+        fontStyle: 'italic',
+        marginTop: -5,
+        marginBottom: 3,
+        textAlign: 'center',
     },
     tagText: {
         fontWeight: 'bold',
