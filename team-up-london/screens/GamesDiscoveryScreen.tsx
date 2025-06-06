@@ -137,6 +137,7 @@ export default function GamesDiscoveryScreen() {
                 {/* Search input */}
                 <TextInput
                     style={styles.searchInput}
+                    placeholderTextColor='#888'
                     placeholder="Search..."
                     value={searchQuery}
                     onChangeText={setSearchQuery}
@@ -256,6 +257,7 @@ export default function GamesDiscoveryScreen() {
                             <TextInput
                                 style={styles.modalInput}
                                 placeholder="Location..."
+                                placeholderTextColor={'#888'}
                                 value={tempLocationFilter}
                                 onChangeText={setTempLocationFilter}
                             />
@@ -425,6 +427,7 @@ const styles = StyleSheet.create({
         height: '100%',
         fontSize: 16,
         fontFamily: Fonts.main,
+        color: '#333',
     },
     pickerContainer: {
         width: '100%',
