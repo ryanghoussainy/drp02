@@ -25,7 +25,7 @@ type IconProps = {
     color: string;
 };
 
-export default function CustomIcon({ name, family, size, color }: IconProps) {
+export default function SportIcon({ name, family, size, color }: IconProps) {
     if (family === 'AntDesign') {
         return <AntDesign name={name as keyof typeof AntDesign.glyphMap} size={size} color={color} />;
     } else if (family === 'Entypo') {

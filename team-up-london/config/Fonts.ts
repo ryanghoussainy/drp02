@@ -1,3 +1,4 @@
 export default {
-    main: "sans-serif-condensed",
+    main: "MyFont-Regular",
+    bold: "MyFont-Bold",
 };

@@ -6,12 +6,13 @@ import { formatDate } from 'date-fns';
 import useGamePlayers from '../hooks/useGamePlayers';
 import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 import useSports from '../hooks/useSports';
-import CustomIcon from './CustomIcon';
+import SportIcon from './SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import useGameCommunity from '../hooks/useGameCommunity';
+import Colours from '../config/Colours';
 
 export default function GameCard({ game, onPress }: { game: Game, onPress?: () => void }) {
     const { players } = useGamePlayers(game.id);
@@ -34,11 +35,11 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
             <View style={styles.gameHeader}>
-                <CustomIcon
+                <SportIcon
                     name={sport?.icon || 'default-icon'}
                     family={sport?.icon_family as ICON_FAMILIES}
                     size={sport?.icon_size || 20}
-                    color="purple"
+                    color={Colours.primary}
                 />
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
@@ -48,7 +49,7 @@ export default function GameCard({ game, onPress }: { game: Game, onPress?: () =
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
                     <Text>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
-                    <Text><Text style={styles.tagText}>Avg. Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
+                    <Text><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
                         <Ionicons name="person" size={16} color="black" />
                         <Text> {players.length}/{game.max_players}</Text>
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 4,
         borderBottomWidth: 1,
-        borderBottomColor: 'purple',
+        borderBottomColor: Colours.primary,
         borderRadius: 10,
         marginLeft: 10,
     },

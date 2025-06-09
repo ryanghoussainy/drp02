@@ -5,54 +5,58 @@ import { StyleSheet } from "react-native";
 import PreferencesScreen from "../screens/PreferencesScreen";
 import CommunitiesScreen from "../screens/CommunitiesDiscoveryScreen";
 import GamesDiscoveryScreen from "../screens/GamesDiscoveryScreen";
+import Colours from "../config/Colours";
 
 const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
-  return (
-    <Tab.Navigator screenOptions={{ tabBarStyle: [styles.tabBar, { backgroundColor: "purple" }] }}>
-        <Tab.Screen
-            name="Preferences"
-            options={() => ({
-            tabBarIcon: ({ color }) => (
-                <FontAwesome6 name="sliders" size={24} color={color} />
-            ),
-            headerShown: false,
-            tabBarActiveTintColor: "white",
-            tabBarLabelStyle: styles.tabBarLabel,
-            })}>
-            {() => <PreferencesScreen />}
-        </Tab.Screen>
+    return (
+        <Tab.Navigator screenOptions={{ tabBarStyle: [styles.tabBar, { backgroundColor: Colours.mainBar }] }}>
+            <Tab.Screen
+                name="Preferences"
+                options={() => ({
+                    tabBarIcon: ({ color }) => (
+                        <FontAwesome6 name="sliders" size={24} color={color} />
+                    ),
+                    headerShown: false,
+                    tabBarInactiveTintColor: Colours.inactive,
+                    tabBarActiveTintColor: Colours.active,
+                    tabBarLabelStyle: styles.tabBarLabel,
+                })}>
+                {() => <PreferencesScreen />}
+            </Tab.Screen>
 
-        <Tab.Screen
-            name="Communities"
-            options={() => ({
-            tabBarIcon: ({ color }) => (
-                <Ionicons name="people" size={30} color={color} />
-            ),
-            headerShown: false,
-            tabBarActiveTintColor: "white",
-            tabBarLabelStyle: styles.tabBarLabel,
-            })}
-        >
-            {() => <CommunitiesScreen />}
-        </Tab.Screen>
+            <Tab.Screen
+                name="Communities"
+                options={() => ({
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons name="people" size={30} color={color} />
+                    ),
+                    headerShown: false,
+                    tabBarInactiveTintColor: Colours.inactive,
+                    tabBarActiveTintColor: Colours.active,
+                    tabBarLabelStyle: styles.tabBarLabel,
+                })}
+            >
+                {() => <CommunitiesScreen />}
+            </Tab.Screen>
 
-        <Tab.Screen
-            name="Discover Games"
-            options={() => ({
-            tabBarIcon: ({ color }) => (
-                <Ionicons name="football" size={30} color={color} />
-            ),
-            headerShown: false,
-            tabBarActiveTintColor: "white",
-            tabBarLabelStyle: styles.tabBarLabel,
-            })}
-        >
-            {() => <GamesDiscoveryScreen />}
-        </Tab.Screen>
-    </Tab.Navigator>
-  );
+            <Tab.Screen
+                name="Discover Games"
+                options={() => ({
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons name="football" size={30} color={color} />
+                    ),
+                    headerShown: false,
+                    tabBarInactiveTintColor: Colours.inactive,
+                    tabBarActiveTintColor: Colours.active,
+                    tabBarLabelStyle: styles.tabBarLabel,
+                })}
+            >
+                {() => <GamesDiscoveryScreen />}
+            </Tab.Screen>
+        </Tab.Navigator>
+    );
 };
 
 const styles = StyleSheet.create({

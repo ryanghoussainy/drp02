@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
-import CustomIcon from '../components/CustomIcon';
+import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import Sport from '../interfaces/Sport';
@@ -14,6 +14,8 @@ import Time from '../interfaces/Time';
 import { format, parse } from 'date-fns';
 import { Text } from 'react-native';
 import Checkbox from 'expo-checkbox';
+import Colours from '../config/Colours';
+import { useCustomFonts } from '../hooks/useCustomFonts';
 
 export default function PreferencesScreen() {
     const { sports } = useSports();
@@ -76,182 +78,183 @@ export default function PreferencesScreen() {
 
     return (
         <View>
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Team Up London</Text>
-            <Text style={styles.subTitle}>Preferences</Text>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Text style={styles.title}>Team Up London</Text>
+                <Text style={styles.subTitle}>Preferences</Text>
 
-            {/* Select sports section */}
-            <View style={styles.section}>
-                <Text style={styles.subTitleText}>Select your sports (at least one)</Text>
+                {/* Select sports section */}
+                <View style={styles.section}>
+                    <Text style={styles.subTitleText}>Which sports interest you? (at least one)</Text>
 
-                {/* List sports with checkboxes */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {sports.map((item) => {
-                        const isChecked = selectedSports.includes(item);
-                        return (
-                            <View key={item.id} style={styles.sportItemContainer}>
-                                <Checkbox
-                                    value={isChecked}
-                                    onValueChange={() => {
-                                        const alreadySelected = selectedSports.includes(item);
-                                        if (alreadySelected) {
-                                            setSelectedSports((prev) =>
-                                                prev.filter((s) => s !== item)
-                                            );
-                                            setSkillLevels((prev) => {
-                                                const copy = { ...prev };
-                                                delete copy[item.id];
-                                                return copy;
-                                            });
-                                        } else {
-                                            setSelectedSports((prev) => [...prev, item]);
-                                            setSkillLevels((prev) => ({ ...prev, [item.id]: 1 }));
-                                        }
-                                    }}
-                                    style={styles.checkboxContainer}
-                                    color="purple"
-                                />
-                                <View style={styles.sideBySide}>
-                                    <Text
-                                        style={[
-                                            styles.sportText,
-                                            { fontWeight: isChecked ? 'bold' : 'normal' },
-                                        ]}
-                                    >
-                                        {item.name}
-                                    </Text>
-                                    <CustomIcon
-                                        name={item.icon}
-                                        family={item.icon_family as ICON_FAMILIES}
-                                        size={item.icon_size}
-                                        color="purple"
+                    {/* List sports with checkboxes */}
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {sports.map((item) => {
+                            const isChecked = selectedSports.includes(item);
+                            return (
+                                <View key={item.id} style={styles.sportItemContainer}>
+                                    <Checkbox
+                                        value={isChecked}
+                                        onValueChange={() => {
+                                            const alreadySelected = selectedSports.includes(item);
+                                            if (alreadySelected) {
+                                                setSelectedSports((prev) =>
+                                                    prev.filter((s) => s !== item)
+                                                );
+                                                setSkillLevels((prev) => {
+                                                    const copy = { ...prev };
+                                                    delete copy[item.id];
+                                                    return copy;
+                                                });
+                                            } else {
+                                                setSelectedSports((prev) => [...prev, item]);
+                                                setSkillLevels((prev) => ({ ...prev, [item.id]: 1 }));
+                                            }
+                                        }}
+                                        style={styles.checkboxContainer}
+                                        color={Colours.primary}
                                     />
-                                </View>
-                            </View>
-                        );
-                    })}
-                </ScrollView>
-                <Text style={styles.scollHint}>Swipe for more</Text>
-            </View>
-
-            <View style={styles.section}>
-                <Text style={styles.subTitleText}>Select skill level</Text>
-
-                {selectedSports.map((item) => {
-                    return (
-                        <View key={item.id} style={styles.selectedSportContainer}>
-                            <View>
-                                <Text style={styles.selectedSportText}>{item.name}</Text>
-                            </View>
-                            <View style={styles.sideBySide}>
-                                <View style={styles.sliderWrapper}>
-                                    <Slider
-                                        value={skillLevels[item.id] || 1}
-                                        minimumValue={1}
-                                        maximumValue={Object.keys(SKILL_MAPPING).length}
-                                        step={1}
-                                        onValueChange={(value) =>
-                                            setSkillLevels((prev) => ({ ...prev, [item.id]: value }))
-                                        }
-                                        style={styles.slider}
-                                        thumbTintColor="purple"
-                                        minimumTrackTintColor="purple"
-                                        maximumTrackTintColor="#444"
-                                    />
-                                    {/* Notches */}
-                                    <View style={styles.notchesContainer} pointerEvents="none">
-                                        {Array.from({ length: Object.keys(SKILL_MAPPING).length }).map((_, idx) => (
-                                            <View key={idx} style={styles.notch} />
-                                        ))}
+                                    <View style={styles.sideBySide}>
+                                        <Text
+                                            style={[
+                                                styles.sportText,
+                                                { fontWeight: isChecked ? 'bold' : 'normal' },
+                                            ]}
+                                        >
+                                            {item.name}
+                                        </Text>
+                                        <SportIcon
+                                            name={item.icon}
+                                            family={item.icon_family as ICON_FAMILIES}
+                                            size={item.icon_size}
+                                            color={Colours.primary}
+                                        />
                                     </View>
                                 </View>
-                                <View style={styles.sliderThumb}>
-                                    <Text style={{ color: 'white', fontSize: 12 }}>
-                                        {SKILL_MAPPING[skillLevels[item.id] || 1]}
-                                    </Text>
+                            );
+                        })}
+                    </ScrollView>
+                    <Text style={styles.scollHint}>Swipe for more</Text>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.subTitleText}>How skilled are you?</Text>
+
+                    {selectedSports.map((item) => {
+                        return (
+                            <View key={item.id} style={styles.selectedSportContainer}>
+                                <View>
+                                    <Text style={styles.selectedSportText}>{item.name}</Text>
                                 </View>
-                            </View>
-                        </View>
-                    );
-                })}
-            </View>
+                                <View style={styles.sideBySide}>
+                                    <View style={styles.sliderWrapper}>
+                                        <Slider
+                                            value={skillLevels[item.id] || 1}
+                                            minimumValue={1}
+                                            maximumValue={Object.keys(SKILL_MAPPING).length}
+                                            step={1}
+                                            onValueChange={(value) =>
+                                                setSkillLevels((prev) => ({ ...prev, [item.id]: value }))
+                                            }
+                                            style={styles.slider}
+                                            thumbTintColor={Colours.primary}
+                                            minimumTrackTintColor={Colours.primary}
+                                            maximumTrackTintColor="#444"
 
-            {/* Preferred times section */}
-            <View style={styles.section}>
-                <Text style={styles.subTitleText}>
-                    Preferred times for sports (tick all that apply)
-                </Text>
-                
-                {/* Specific time slots (have start & end) */}
-                <Text style={styles.timeCategoryText}>Time Slots</Text>
-                {times
-                    .filter(t => t.start_time && t.end_time)
-                    .map((item) => {
-                        const isChecked = preferredTimes.includes(item.id);
-                        return (
-                            <View
-                                key={item.id}
-                                style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
-                            >
-                                <Checkbox
-                                    value={isChecked}
-                                    style={styles.checkboxContainer}
-                                    color="purple"
-                                    onValueChange={() => {
-                                        setPreferredTimes((prev) =>
-                                            prev.includes(item.id)
-                                                ? prev.filter((time) => time !== item.id)
-                                                : [...prev, item.id]
-                                        );
-                                    }}
-                                />
-                                <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
-                            </View>
-                        );
-                    })}
-
-                {/* General time preferences (no start/end) */}
-                <Text style={[styles.timeCategoryText, { marginTop: 12 }]}>
-                    Days
-                </Text>
-                <View style={[styles.sideBySide, {marginHorizontal: 50}]}>
-                    {times
-                    .filter(t => !(t.start_time && t.end_time))
-                    .map((item) => {
-                        const isChecked = preferredTimes.includes(item.id);
-                        return (
-                            <View
-                                key={item.id}
-                                style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
-                            >
-                                <Checkbox
-                                    value={isChecked}
-                                    style={styles.checkboxContainer}
-                                    color="purple"
-                                    onValueChange={() => {
-                                        setPreferredTimes((prev) =>
-                                            prev.includes(item.id)
-                                                ? prev.filter((time) => time !== item.id)
-                                                : [...prev, item.id]
-                                        );
-                                    }}
-                                />
-                                <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                                        />
+                                        {/* Notches */}
+                                        <View style={styles.notchesContainer} pointerEvents="none">
+                                            {Array.from({ length: Object.keys(SKILL_MAPPING).length }).map((_, idx) => (
+                                                <View key={idx} style={styles.notch} />
+                                            ))}
+                                        </View>
+                                    </View>
+                                    <View style={styles.sliderThumb}>
+                                        <Text style={{ color: 'white', fontSize: 12 }}>
+                                            {SKILL_MAPPING[skillLevels[item.id] || 1]}
+                                        </Text>
+                                    </View>
+                                </View>
                             </View>
                         );
                     })}
                 </View>
-            </View>
-        </ScrollView>
 
-        {/* Save Preferences button */}
-        <TouchableOpacity
-            style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
-            disabled={selectedSports.length === 0} // disable if no sports selected
-            onPress={handleSavePreferences}
-        >
-            <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
-        </TouchableOpacity>
+                {/* Preferred times section */}
+                <View style={styles.section}>
+                    <Text style={styles.subTitleText}>
+                        Preferred times for sports (tick all that apply)
+                    </Text>
+
+                    {/* Specific time slots (have start & end) */}
+                    <Text style={styles.timeCategoryText}>Time Slots</Text>
+                    {times
+                        .filter(t => t.start_time && t.end_time)
+                        .map((item) => {
+                            const isChecked = preferredTimes.includes(item.id);
+                            return (
+                                <View
+                                    key={item.id}
+                                    style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
+                                >
+                                    <Checkbox
+                                        value={isChecked}
+                                        style={styles.checkboxContainer}
+                                        color={Colours.primary}
+                                        onValueChange={() => {
+                                            setPreferredTimes((prev) =>
+                                                prev.includes(item.id)
+                                                    ? prev.filter((time) => time !== item.id)
+                                                    : [...prev, item.id]
+                                            );
+                                        }}
+                                    />
+                                    <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                                </View>
+                            );
+                        })}
+
+                    {/* General time preferences (no start/end) */}
+                    <Text style={[styles.timeCategoryText, { marginTop: 12 }]}>
+                        Days
+                    </Text>
+                    <View style={[styles.sideBySide, { marginHorizontal: 50 }]}>
+                        {times
+                            .filter(t => !(t.start_time && t.end_time))
+                            .map((item) => {
+                                const isChecked = preferredTimes.includes(item.id);
+                                return (
+                                    <View
+                                        key={item.id}
+                                        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
+                                    >
+                                        <Checkbox
+                                            value={isChecked}
+                                            style={styles.checkboxContainer}
+                                            color={Colours.primary}
+                                            onValueChange={() => {
+                                                setPreferredTimes((prev) =>
+                                                    prev.includes(item.id)
+                                                        ? prev.filter((time) => time !== item.id)
+                                                        : [...prev, item.id]
+                                                );
+                                            }}
+                                        />
+                                        <Text style={styles.preferredTimeText}>{displayTimes(item)}</Text>
+                                    </View>
+                                );
+                            })}
+                    </View>
+                </View>
+            </ScrollView>
+
+            {/* Save Preferences button */}
+            <TouchableOpacity
+                style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
+                disabled={selectedSports.length === 0} // disable if no sports selected
+                onPress={handleSavePreferences}
+            >
+                <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
+            </TouchableOpacity>
 
         </View>
     );
@@ -341,7 +344,7 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'purple',
+        backgroundColor: Colours.primary,
         borderRadius: 20,
     },
     scollHint: {
@@ -354,7 +357,7 @@ const styles = StyleSheet.create({
     savePreferencesButton: {
         padding: 12,
         backgroundColor: '#f0f0f0',
-        borderColor: 'purple',
+        borderColor: Colours.primary,
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: {

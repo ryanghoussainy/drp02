@@ -12,6 +12,7 @@ import Player from '../interfaces/Player';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
+import Colours from '../config/Colours';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -130,7 +131,7 @@ export default function GamesDiscoveryScreen() {
                         setShowFilterModal(true);
                     }}
                 >
-                    <Feather name="filter" size={24} color="purple" />
+                    <Feather name="filter" size={24} color={Colours.primary} />
                     <Text style={styles.buttonText}>Filter</Text>
                 </TouchableOpacity>
 
@@ -154,7 +155,7 @@ export default function GamesDiscoveryScreen() {
                     <Feather
                         name={forYouSectionOpen ? 'chevron-up' : 'chevron-down'}
                         size={20}
-                        color="purple"
+                        color={Colours.primary}
                     />
                 </TouchableOpacity>
                 {forYouSectionOpen && (
@@ -177,7 +178,7 @@ export default function GamesDiscoveryScreen() {
                     <Feather
                         name={nearYouSectionOpen ? 'chevron-up' : 'chevron-down'}
                         size={20}
-                        color="purple"
+                        color={Colours.primary}
                     />
                 </TouchableOpacity>
                 {nearYouSectionOpen && (
@@ -199,7 +200,7 @@ export default function GamesDiscoveryScreen() {
                     <Feather
                         name={trySomethingNewSectionOpen ? 'chevron-up' : 'chevron-down'}
                         size={20}
-                        color="purple"
+                        color={Colours.primary}
                     />
                 </TouchableOpacity>
                 {trySomethingNewSectionOpen && (
@@ -305,7 +306,7 @@ export default function GamesDiscoveryScreen() {
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: 'purple' }]}
+                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
                                 onPress={() => {
                                     setSkillFilter(tempSkillFilter);
                                     setLocationFilter(tempLocationFilter);

@@ -4,7 +4,7 @@ import Fonts from "../config/Fonts";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import usePlayer from "../hooks/usePlayer";
 import useSport from "../hooks/useSport";
-import CustomIcon from "../components/CustomIcon";
+import SportIcon from "../components/SportIcon";
 import { ICON_FAMILIES } from "../constants/iconFamilies";
 import useCommunityGames from "../hooks/useCommunityGames";
 import GameCard from "../components/GameCard";
@@ -17,7 +17,9 @@ import { RootStackParamList } from "../navigation/StackNavigator";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Button } from "react-native";
+import useSports from "../hooks/useSports";
+import Colours from "../config/Colours";
+import BackArrow from "../components/BackArrow";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
@@ -28,7 +30,8 @@ export default function CommunityScreen({ route }: Props) {
 
     const { community } = useCommunity(communityId);
     const { player: creator } = usePlayer(community?.creator_id || "");
-    const { sport } = useSport(community?.sport_id || "");
+    const { sports: allSports } = useSports();
+    const sports = allSports.filter(s => community?.sports_ids.includes(s.id));
 
     const { games } = useCommunityGames(communityId);
     const { players, handleJoin, handleLeave } = useCommunityPlayers(communityId);
@@ -44,19 +47,15 @@ export default function CommunityScreen({ route }: Props) {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Team Up London</Text>
-
-            {/* Back button */}
-            <MaterialIcons
-                name="arrow-back"
-                size={24}
-                color="black"
-                onPress={() => navigation.goBack()}
-                style={{ position: 'absolute', top: 30 }}
-            />
+            <View style={[styles.sideBySide, { marginTop: 10 }]}>
+                {/* Back button */}
+                <BackArrow
+                    style={{ top: 20 }}
+                />
+                <Text style={styles.title}>{community?.name}</Text>
+            </View>
 
             <View style={styles.sideBySide}>
-                <Text style={styles.subTitle}>{community?.name}</Text>
 
                 <TouchableOpacity
                     onPress={() => setShowMembers(prev => !prev)}
@@ -112,13 +111,16 @@ export default function CommunityScreen({ route }: Props) {
             <View style={styles.communityDetails}>
                 <View style={[styles.detailBlock, { flex: 1.6 }]}>
                     <View style={[styles.sideBySide, { justifyContent: "flex-start" }]}>
-                        <Text style={[styles.detailText, { marginRight: 4 }]}><Text style={styles.tagText}>Sport: </Text>{sport?.name}</Text>
-                        <CustomIcon
-                            name={sport?.icon || 'default-icon'}
-                            family={sport?.icon_family as ICON_FAMILIES}
-                            size={(sport?.icon_size || 20) * 0.8}
-                            color="purple"
-                        />
+                        <Text style={[styles.detailText, { marginRight: 4 }]}><Text style={styles.tagText}>Sports: </Text></Text>
+                        {sports.map(sport => (
+                            <SportIcon
+                                key={sport.id}
+                                name={sport?.icon || 'default-icon'}
+                                family={sport?.icon_family as ICON_FAMILIES}
+                                size={(sport?.icon_size || 20) * 0.8}
+                                color={Colours.primary}
+                            />
+                        ))}
                     </View>
 
                     <Text style={styles.detailText}><Text style={styles.tagText}>Needs acceptance: </Text>{community?.is_public ? "No" : "Yes"}</Text>
@@ -216,7 +218,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: 'purple',
+        borderColor: Colours.primary,
     },
     communityDetails: {
         flexDirection: 'row',

@@ -125,3 +125,35 @@ export async function getGameCommunity(gameId: string) {
 
     return community;
 }
+
+// Create a community
+export async function createCommunity(
+    name: string,
+    description: string,
+    primary_location: string,
+    primary_location_type: 'Sports Venue' | 'Park',
+    is_public: boolean,
+    sports_ids: string[],
+    creator_id: string,
+): Promise<Community | null> {
+    const { data, error } = await db
+        .from("communities")
+        .insert({
+            name,
+            description,
+            primary_location,
+            primary_location_type,
+            is_public,
+            sports_ids,
+            creator_id,
+        })
+        .select("*")
+        .single();
+
+    if (error) {
+        Alert.alert(error.message);
+        return null;
+    }
+
+    return data as Community;
+}

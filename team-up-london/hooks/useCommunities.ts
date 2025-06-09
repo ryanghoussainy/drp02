@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Community from '../interfaces/Community';
 import { getCommunities } from '../operations/Communities';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function useCommunities() {
@@ -11,9 +12,11 @@ export default function useCommunities() {
     setCommunities(fetchedCommunities);
   };
 
-  useEffect(() => {
-    refreshCommunities();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      refreshCommunities();
+    }, [])
+  );
 
   return { communities, refreshCommunities };
 }

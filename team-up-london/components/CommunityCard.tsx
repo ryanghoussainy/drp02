@@ -1,15 +1,20 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import Community from '../interfaces/Community';
-import useSport from '../hooks/useSport';
-import CustomIcon from './CustomIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import useCommunityPlayers from '../hooks/useCommunityPlayers';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import useSports from '../hooks/useSports';
+import Colours from '../config/Colours';
+import SportIcon from './SportIcon';
 
 export default function CommunityCard({ community, onPress }: { community: Community, onPress: () => void }) {
-    const { sport } = useSport(community.sport_id);
+    const { sports: allSports } = useSports();
+    const sports = allSports.filter(s => community.sports_ids.includes(s.id));
+
     const { players, creatorId } = useCommunityPlayers(community.id);
 
     return (
@@ -19,24 +24,22 @@ export default function CommunityCard({ community, onPress }: { community: Commu
 
             {/* Sport Icon and Name */}
             <View style={[styles.sideBySide, { justifyContent: 'center' }]}>
-                <Text style={[styles.sportText, { marginRight: 5 }]}>{sport?.name}</Text>
-                <CustomIcon
-                    name={sport?.icon || 'default-icon'}
-                    family={sport?.icon_family as ICON_FAMILIES}
-                    size={sport?.icon_size || 20}
-                    color="purple"
-                />
+                {sports?.map(sport => (
+                    <SportIcon
+                        key={sport.id}
+                        name={sport?.icon || 'default-icon'}
+                        family={sport?.icon_family as ICON_FAMILIES}
+                        size={sport?.icon_size || 20}
+                        color={Colours.primary}
+                    />
+                ))}
             </View>
 
             {/* Primary Location */}
-            <Text style={styles.sportText}>
-                <Text style={{ fontWeight: 'bold' }}>Primary Location:</Text> {community.primary_location}
-            </Text>
-
-            {/* Public/private */}
-            <Text style={styles.sportText}>
-                <Text style={{ fontWeight: 'bold' }}> {community.is_public ? 'Public' : 'Private'} Community</Text>
-            </Text>
+            <View style={styles.sportText}>
+                <FontAwesome6 name="location-dot" size={18} color="black" />
+                <Text style={{ marginLeft: 5 }} numberOfLines={1}>{community.primary_location}</Text>
+            </View>
 
             {/* More Details with a right arrow */}
             <View style={[styles.sideBySide, { justifyContent: 'space-between', marginTop: 10 }]}>
@@ -54,8 +57,13 @@ export default function CommunityCard({ community, onPress }: { community: Commu
                     Details
                 </Text>
 
-                <MaterialIcons name="chevron-right" size={24} color="purple" />
+                <MaterialIcons name="chevron-right" size={24} color={Colours.primary} />
             </View>
+
+            {/* Public/Private Indicator */}
+            {!community.is_public && (
+                <FontAwesome5 style={styles.lockIcon} name="lock" size={24} color="black" />
+            )}
         </TouchableOpacity>
     )
 }
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 4,
         borderBottomWidth: 1,
-        borderBottomColor: 'purple',
+        borderBottomColor: Colours.primary,
         borderRadius: 10,
     },
     sportText: {
@@ -87,6 +95,7 @@ const styles = StyleSheet.create({
         color: '#444',
         textAlign: 'center',
         fontStyle: 'italic',
+        flexDirection: 'row',
     },
     sideBySide: {
         flexDirection: 'row',
@@ -98,5 +107,10 @@ const styles = StyleSheet.create({
         color: 'grey',
         fontWeight: 'bold',
         textAlign: 'right',
+    },
+    lockIcon: {
+        position: 'absolute',
+        top: -10,
+        right: 5,
     },
 });

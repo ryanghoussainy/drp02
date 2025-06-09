@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import Player from '../interfaces/Player';
 import { SKILL_MAPPING } from '../constants/skills';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Colours from '../config/Colours';
 
 interface PlayerCardProps {
   player: Player;
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   skillText: {
-    color: 'purple',
+    color: Colours.primary,
     fontSize: 14,
     marginLeft: 4,
   },

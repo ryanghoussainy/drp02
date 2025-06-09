@@ -5,6 +5,6 @@ export default interface Community {
     description: string;
     primary_location: string;
     primary_location_type: string;
-    sport_id: string;
     is_public: boolean;
+    sports_ids: string[];
 }

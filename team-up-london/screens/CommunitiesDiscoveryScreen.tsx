@@ -11,6 +11,7 @@ import Feather from '@expo/vector-icons/Feather';
 import Sport from '../interfaces/Sport';
 import useSports from '../hooks/useSports';
 import { Text } from 'react-native';
+import Colours from '../config/Colours';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -35,7 +36,7 @@ export default function CommunitiesScreen() {
     const [tempSportFilter, setTempSportFilter] = useState(sportFilter);
     const [tempPrivacyFilter, setTempPrivacyFilter] = useState(privacyFilter);
 
-    const applyAllFilters = (games: Array<any>) => {
+    const applyAllFilters = (communities: Array<any>) => {
         return communities.filter((community) => {
             // 1. Name search (case-insensitive substring)
             if (!community.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -43,7 +44,7 @@ export default function CommunitiesScreen() {
             }
 
             // 2. Sport filter (if selected, show only games of that sport)
-            if (sportFilter !== 'all' && community.sport_id !== sportFilter.id) {
+            if (sportFilter !== 'all' && !community.sports_ids.includes(sportFilter.id)) {
                 return false;
             }
 
@@ -73,7 +74,7 @@ export default function CommunitiesScreen() {
             <Text style={styles.title}>Team Up London</Text>
 
             <Text style={styles.subTitle}>Communities</Text>
-            
+
             <View style={[styles.sideBySide, { marginBottom: 16 }]}>
                 {/* Filter button */}
                 <TouchableOpacity
@@ -85,7 +86,7 @@ export default function CommunitiesScreen() {
                         setShowFilterModal(true);
                     }}
                 >
-                    <Feather name="filter" size={24} color="purple" />
+                    <Feather name="filter" size={24} color={Colours.primary} />
                     <Text style={styles.buttonText}>Filter</Text>
                 </TouchableOpacity>
 
@@ -107,6 +108,15 @@ export default function CommunitiesScreen() {
                     <CommunityCard community={item} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
                 )}
             />
+
+            {/* Create Community Button */}
+            <TouchableOpacity
+                style={[styles.button, { paddingVertical: 12, flexDirection: 'row' }]}
+                onPress={() => navigation.navigate("CreateCommunity")}
+            >
+                <Feather name="plus" size={24} color={Colours.primary} />
+                <Text style={styles.buttonText}>Create Community</Text>
+            </TouchableOpacity>
 
             {/* Filter Modal */}
             <Modal
@@ -135,7 +145,7 @@ export default function CommunitiesScreen() {
                             <View style={styles.pickerContainer}>
                                 <Picker
                                     selectedValue={tempSportFilter}
-                                    dropdownIconColor={'purple'}
+                                    dropdownIconColor={Colours.primary}
                                     onValueChange={(itemValue) =>
                                         setTempSportFilter(itemValue as 'all' | Sport)
                                     }
@@ -159,14 +169,14 @@ export default function CommunitiesScreen() {
                                 onChangeText={setTempLocationFilter}
                             />
                         </View>
-                        
+
                         {/* Private or Public Filter*/}
                         <View style={styles.formGroup}>
                             <Text style={styles.subTitleText}>Privacy</Text>
                             <View style={styles.pickerContainer}>
                                 <Picker
                                     selectedValue={tempPrivacyFilter}
-                                    dropdownIconColor={'purple'}
+                                    dropdownIconColor={Colours.primary}
                                     onValueChange={(itemValue) =>
                                         setTempPrivacyFilter(itemValue as 'all' | 'public' | 'private')
                                     }
@@ -188,7 +198,7 @@ export default function CommunitiesScreen() {
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: 'purple' }]}
+                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
                                 onPress={() => {
                                     setSportFilter(tempSportFilter);
                                     setLocationFilter(tempLocationFilter);

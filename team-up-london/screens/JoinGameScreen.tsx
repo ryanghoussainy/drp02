@@ -10,7 +10,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import useGame from '../hooks/useGame';
-import CustomIcon from '../components/CustomIcon';
+import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { formatDate } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +18,8 @@ import { RootStackParamList } from '../navigation/StackNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useGameCommunity from '../hooks/useGameCommunity';
+import Colours from '../config/Colours';
+import BackArrow from '../components/BackArrow';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
@@ -42,18 +44,14 @@ export default function JoinGameScreen({ route }: Props) {
             <Text style={styles.title}>Team Up London</Text>
 
             {/* Back button */}
-            <MaterialIcons
-                name="arrow-back"
-                size={24}
-                color="black"
-                onPress={() => navigation.goBack()}
-                style={{ position: 'absolute', top: 45, left: 15 }}
+            <BackArrow
+                style={{ position: 'absolute', top: 45, left: 10 }}
             />
 
             <View style={styles.sideBySide}>
                 <Text style={styles.gameTitle}>— {game?.name} </Text>
 
-                <CustomIcon
+                <SportIcon
                     name={sport?.icon || 'default-icon'}
                     family={sport?.icon_family as ICON_FAMILIES}
                     size={(sport?.icon_size || 20) * 1.5}
@@ -61,7 +59,7 @@ export default function JoinGameScreen({ route }: Props) {
                 />
             </View>
 
-            {community && <Text style={styles.subTitle} onPress={() => navigation.navigate( "Community", { communityId: community.id })}>Community: <Text style={{textDecorationLine: "underline"}}>{community?.name}</Text></Text>}
+            {community && <Text style={styles.subTitle} onPress={() => navigation.navigate("Community", { communityId: community.id })}>Community: <Text style={{ color: Colours.secondary, textDecorationLine: "underline" }}>{community?.name}</Text></Text>}
 
             <View style={styles.gameDetails}>
                 <View style={[styles.detailBlock, { flex: 1.5 }]}>
@@ -79,9 +77,9 @@ export default function JoinGameScreen({ route }: Props) {
                 </View>
             </View>
 
-            {mapRegion ? 
+            {mapRegion ?
                 <GameMap mapRegion={mapRegion} distance={distance} gameId={gameId} location={game?.location || ""} /> :
-                <ActivityIndicator size="large" color="purple" style={{ marginTop: 20 }} />
+                <ActivityIndicator size="large" color={Colours.primary} style={{ marginTop: 20 }} />
             }
 
             <View style={styles.sideBySide}>
@@ -143,7 +141,7 @@ export default function JoinGameScreen({ route }: Props) {
                 </View>
             ) : (
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: 'green' }]}
+                    style={[styles.button, { backgroundColor: Colours.success }]}
                     onPress={handleJoin}
                 >
                     <Text style={styles.buttonText}>Join</Text>
@@ -191,10 +189,11 @@ const styles = StyleSheet.create({
     gameDetails: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#f8f8f8',
+        backgroundColor: Colours.accentBackground,
         padding: 12,
         marginBottom: 20,
         borderLeftWidth: 2,
+        borderLeftColor: Colours.primary,
     },
     detailBlock: {
         flex: 1,
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     highlight: {
-        color: 'purple',
+        color: Colours.primary,
         fontSize: 16,
         fontWeight: 'regular',
     },
@@ -286,5 +285,6 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         marginBottom: 5,
         marginTop: -10,
+        marginLeft: 25
     }
 });
