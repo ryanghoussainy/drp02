@@ -34,27 +34,27 @@ export default function CreateCommunityScreen({ navigation }: Props) {
 
     const handleCreateCommunityPress = async () => {
         if (!name.trim()) {
-            Alert.alert('Error', 'My Lord, please enter a community name.');
+            Alert.alert('Error', 'Please enter a community name.');
             return;
         }
         if (!description.trim()) {
-            Alert.alert('Error', 'My Lord, please enter a community description.');
+            Alert.alert('Error', 'Please enter a community description.');
             return;
         }
         if (selectedSports.length === 0) {
-            Alert.alert('Error', 'My Lord, please select at least one sport.');
+            Alert.alert('Error', 'Please select at least one sport.');
             return;
         }
         if (!primaryLocation.trim()) {
-            Alert.alert('Error', 'My Lord, please enter a primary location.');
+            Alert.alert('Error', 'Please enter a primary location.');
             return;
         }
         if (!locationType) {
-            Alert.alert('Error', 'My Lord, please select a location type.');
+            Alert.alert('Error', 'Please select a location type.');
             return;
         }
         if (isPublic === null) {
-            Alert.alert('Error', 'My Lord, please choose whether the community is public or private.');
+            Alert.alert('Error', 'Please choose whether the community is public or private.');
             return;
         }
 
@@ -71,7 +71,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
 
         if (!community) {
             setLoading(false);
-            Alert.alert('Error', 'My Lord, unable to create community. Please try again.');
+            Alert.alert('Error', 'Unable to create community. Please try again.');
             return;
         }
 
@@ -99,7 +99,11 @@ export default function CreateCommunityScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.field}>
-                <Text style={styles.label}>Name</Text>
+                <Text style={[styles.label, { paddingTop: 10 }]}>Fields marked with <Text style={{ color: 'red' }}>*</Text> are required.</Text>
+            </View>
+
+            <View style={styles.field}>
+                <Text style={styles.label}>Name <Text style={{ color: 'red' }}>*</Text></Text>
                 <TextInput
                     style={styles.input}
                     value={name}
@@ -110,7 +114,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.field}>
-                <Text style={styles.label}>Description</Text>
+                <Text style={styles.label}>Description <Text style={{ color: 'red' }}>*</Text></Text>
                 <TextInput
                     style={[styles.input, { height: 100 }]}
                     value={description}
@@ -121,7 +125,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
                 />
             </View>
 
-            <Text style={[styles.label, { marginTop: 16 }]}>Select Sports</Text>
+            <Text style={[styles.label]}>Select Sports <Text style={{ color: 'red' }}>*</Text></Text>
             <View style={styles.sportsContainer}>
                 {sports.map((s) => (
                     <TouchableOpacity
@@ -151,7 +155,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.field}>
-                <Text style={styles.label}>Primary Location</Text>
+                <Text style={[styles.label, { paddingTop: 10 }]}>Primary Location <Text style={{ color: 'red' }}>*</Text></Text>
                 <TextInput
                     style={styles.input}
                     value={primaryLocation}
@@ -162,7 +166,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
 
             {/* Location Type Boxes */}
             <View style={styles.field}>
-                <Text style={styles.label}>Location Type</Text>
+                <Text style={styles.label}>Location Type <Text style={{ color: 'red' }}>*</Text></Text>
                 <View style={styles.optionContainer}>
                     {['Sports Venue', 'Park'].map((type) => (
                         <TouchableOpacity
@@ -188,7 +192,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
 
             {/* Public/Private Boxes */}
             <View style={styles.field}>
-                <Text style={styles.label}>Visibility</Text>
+                <Text style={styles.label}>Visibility <Text style={{ color: 'red' }}>*</Text></Text>
                 <View style={styles.optionContainer}>
                     {[
                         { label: 'Public', value: true },
@@ -214,9 +218,9 @@ export default function CreateCommunityScreen({ navigation }: Props) {
                     ))}
                 </View>
                 <Text style={styles.explanation}>
-                    Public: My Lord, anyone can find and join this community.
+                    Public: Anyone can find and join this community.
                     {'\n'}
-                    Private: My Lord, only invited members can discover and join.
+                    Private: Only invited members can discover and join.
                 </Text>
             </View>
 
@@ -269,7 +273,6 @@ const styles = StyleSheet.create({
     sportsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginTop: 8,
     },
     sportItem: {
         alignItems: 'center',
