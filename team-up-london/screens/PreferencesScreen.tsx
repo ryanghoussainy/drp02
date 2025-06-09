@@ -1,65 +1,57 @@
-import React, { useEffect, useState } from 'react';
 import Slider from '@react-native-community/slider';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
 import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { YOU_PLAYER_ID } from '../constants/youPlayerId';
-import Sport from '../interfaces/Sport';
-import { getPlayerPreferences, registerPreferences } from '../operations/Player';
+import { registerPreferences } from '../operations/Player';
 import useTimes from '../hooks/useTimes';
 import Time from '../interfaces/Time';
 import { format, parse } from 'date-fns';
 import { Text } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import Colours from '../config/Colours';
-import { useCustomFonts } from '../hooks/useCustomFonts';
+import usePreferences from '../hooks/usePreferences';
+import Sport from '../interfaces/Sport';
+import { useState } from 'react';
 
-export default function PreferencesScreen() {
+export default function PreferencesScreen(
+    { preferences }: { preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
+        setPreferredTimes: React.Dispatch<React.SetStateAction<string[]>>,
+        setSelectedSports: React.Dispatch<React.SetStateAction<Sport[]>>,
+        setSkillLevels: React.Dispatch<React.SetStateAction<Record<string, number>>>
+     }; } = { preferences: undefined }
+) {
     const { sports } = useSports();
-    const [selectedSports, setSelectedSports] = useState<Sport[]>([]); // Store selected sports by their IDs
-    const [skillLevels, setSkillLevels] = useState<{ [key: string]: number }>({});
     const { times } = useTimes();
 
-    // Preferred times (IDs)
-    const [preferredTimes, setPreferredTimes] = useState<string[]>([]);
+    const { preferredTimes, skillLevels,
+        setPreferredTimes, setSelectedSports, setSkillLevels
+    } = preferences || usePreferences(sports);
+    // Selected sports determines whether or not to show the whole main tab navigator
+    // So we need to submit it before showing the navigator
+    // So we have a "local" temporary selected sports state instead of using the parent one
+    const [tempSelectedSports, setTempSelectedSports] = useState<Sport[]>(preferences?.selectedSports || []);
 
     const handleSavePreferences = async () => {
         // Send data to backend
         await registerPreferences(
             YOU_PLAYER_ID,
             preferredTimes,
-            selectedSports.map(s => s.id), // send only IDs
+            tempSelectedSports.map(s => s.id), // send only IDs
             Object.values(skillLevels)
         )
 
-        // Navigate to communities
-    }
+        // Show success message
+        Alert.alert("Success", "Your preferences have been saved!");
 
-    // Get preferences when screen is focused
-    useEffect(() => {
-        if (sports.length === 0) return; // wait for sports to load
-
-        const fetchPreferences = async () => {
-            const { preferred_times, preferred_sports_ids, preferred_sports_skill_levels } = await getPlayerPreferences(YOU_PLAYER_ID);
-            setPreferredTimes(preferred_times || []);
-            setSelectedSports(sports.filter(s => preferred_sports_ids?.includes(s.id)));
-
-            // create a map of all the preferred sports and their corresponding skill levels
-            const skillLevelMap: { [key: string]: number } = {};
-            preferred_sports_ids?.forEach((id: string, index: number) => {
-                if (preferred_sports_skill_levels && preferred_sports_skill_levels[index]) {
-                    skillLevelMap[id] = preferred_sports_skill_levels[index];
-                }
-            });
-
-            setSkillLevels(skillLevelMap);
+        // Save temporary selected sports to the parent state
+        if (preferences) {
+            setSelectedSports(tempSelectedSports);
         }
-
-        fetchPreferences();
-    }, [sports])
+    }
 
     const displayTimes = (time: Time) => {
         if (time.start_time && time.end_time) {
@@ -77,7 +69,7 @@ export default function PreferencesScreen() {
     }
 
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
                 <Text style={styles.subTitle}>Preferences</Text>
@@ -89,15 +81,15 @@ export default function PreferencesScreen() {
                     {/* List sports with checkboxes */}
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {sports.map((item) => {
-                            const isChecked = selectedSports.includes(item);
+                            const isChecked = tempSelectedSports.includes(item);
                             return (
                                 <View key={item.id} style={styles.sportItemContainer}>
                                     <Checkbox
                                         value={isChecked}
                                         onValueChange={() => {
-                                            const alreadySelected = selectedSports.includes(item);
+                                            const alreadySelected = tempSelectedSports.includes(item);
                                             if (alreadySelected) {
-                                                setSelectedSports((prev) =>
+                                                setTempSelectedSports((prev) =>
                                                     prev.filter((s) => s !== item)
                                                 );
                                                 setSkillLevels((prev) => {
@@ -106,7 +98,7 @@ export default function PreferencesScreen() {
                                                     return copy;
                                                 });
                                             } else {
-                                                setSelectedSports((prev) => [...prev, item]);
+                                                setTempSelectedSports((prev) => [...prev, item]);
                                                 setSkillLevels((prev) => ({ ...prev, [item.id]: 1 }));
                                             }
                                         }}
@@ -139,7 +131,7 @@ export default function PreferencesScreen() {
                 <View style={styles.section}>
                     <Text style={styles.subTitleText}>How skilled are you?</Text>
 
-                    {selectedSports.map((item) => {
+                    {tempSelectedSports.map((item) => {
                         return (
                             <View key={item.id} style={styles.selectedSportContainer}>
                                 <View>
@@ -249,11 +241,11 @@ export default function PreferencesScreen() {
 
             {/* Save Preferences button */}
             <TouchableOpacity
-                style={[styles.savePreferencesButton, { borderWidth: selectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
-                disabled={selectedSports.length === 0} // disable if no sports selected
+                style={[styles.savePreferencesButton, { borderWidth: tempSelectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
+                disabled={tempSelectedSports.length === 0} // disable if no sports selected
                 onPress={handleSavePreferences}
             >
-                <Text style={[styles.saveButtonText, { color: selectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
+                <Text style={[styles.saveButtonText, { color: tempSelectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
             </TouchableOpacity>
 
         </View>

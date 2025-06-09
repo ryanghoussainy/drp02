@@ -16,7 +16,6 @@ import { formatDate } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
 import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
 import BackArrow from '../components/BackArrow';

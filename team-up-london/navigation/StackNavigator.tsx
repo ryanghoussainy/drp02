@@ -4,6 +4,7 @@ import MainTabNavigator from "./MainTabNavigator";
 import JoinGameScreen from "../screens/JoinGameScreen";
 import CommunityScreen from "../screens/CommunityScreen";
 import CreateCommunityScreen from "../screens/CreateCommunityScreen";
+import PreferencesScreen from "../screens/PreferencesScreen";
 
 export type RootStackParamList = {
     "Main": undefined;
