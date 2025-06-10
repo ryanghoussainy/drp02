@@ -6,12 +6,14 @@ import CommunityScreen from "../screens/CommunityScreen";
 import CreateCommunityScreen from "../screens/CreateCommunityScreen";
 import PreferencesScreen from "../screens/PreferencesScreen";
 import Player from "../interfaces/Player";
+import CreateGameScreen from "../screens/CreateGameScreen";
 
 export type RootStackParamList = {
     "Main": undefined;
     "Game": { gameId: string };
     "Community": { communityId: string };
     "CreateCommunity": undefined;
+    "CreateGame": undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,6 +41,10 @@ export default function Navigator ({ player }: { player: Player }) {
 
             <Stack.Screen name="CreateCommunity">
                 {(props) => <CreateCommunityScreen {...props} player={player} />}
+            </Stack.Screen>
+
+            <Stack.Screen name="CreateGame">
+                {(props) => <CreateGameScreen {...props} player={player} />}
             </Stack.Screen>
 
         </Stack.Navigator>

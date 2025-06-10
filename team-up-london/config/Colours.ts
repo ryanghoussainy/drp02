@@ -12,5 +12,6 @@ export default {
     inactive: '#B0B0B0',       // Gray for Inactive Tabs/Buttons
     active: '#682BD7',         // Reuse Primary Purple for Active Elements
     mainBar: '#F8F9FD',        // Soft Light Gray/Blue for Bottom/Top Nav Bars
-    accentBackground: '#F4EEFF'
+    accentBackground: '#F4EEFF',
+    extraButtons: '#D0E8FF'    // Blue for Extra Buttons or Special Actions
 };

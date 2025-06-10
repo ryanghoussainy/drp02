@@ -85,3 +85,45 @@ export async function getForYouGames(playerId: string): Promise<Game[]> {
 
     return games as Game[];
 }
+
+// Create game
+export async function createGame(
+    name: string,
+    start_time: Date,
+    end_time: Date,
+    location: string,
+    location_type: string,
+    notes_from_host: string,
+    max_players: number,
+    min_players: number,
+    sport_id: string,
+    cost: number,
+    host_id: string,
+    community_id?: string | null,
+): Promise<Game> {
+    const { data, error } = await db
+        .from("games")
+        .insert([{
+            name,
+            start_time,
+            end_time,
+            location,
+            location_type,
+            notes_from_host,
+            max_players,
+            min_players,
+            sport_id,
+            cost,
+            host_id,
+            community_id,
+        }])
+        .select("*")
+        .single();
+
+    if (error) {
+        Alert.alert(error.message);
+        throw new Error(error.message);
+    }
+
+    return data as Game;
+}

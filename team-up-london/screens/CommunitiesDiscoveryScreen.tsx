@@ -71,148 +71,152 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Team Up London</Text>
+        <View style={{ flex: 1 }}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Team Up London</Text>
 
-            <Text style={styles.subTitle}>Communities</Text>
+                <Text style={styles.subTitle}>Communities</Text>
 
-            <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                {/* Filter button */}
-                <TouchableOpacity
-                    style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: "40%", flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
-                    onPress={() => {
-                        setTempLocationFilter(locationFilter);
-                        setTempSportFilter(sportFilter);
-                        setTempPrivacyFilter(privacyFilter);
-                        setShowFilterModal(true);
-                    }}
-                >
-                    <Feather name="filter" size={24} color={Colours.primary} />
-                    <Text style={styles.buttonText}>Filter</Text>
-                </TouchableOpacity>
+                <View style={[styles.sideBySide, { marginBottom: 16 }]}>
+                    {/* Filter button */}
+                    <TouchableOpacity
+                        style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: "40%", flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
+                        onPress={() => {
+                            setTempLocationFilter(locationFilter);
+                            setTempSportFilter(sportFilter);
+                            setTempPrivacyFilter(privacyFilter);
+                            setShowFilterModal(true);
+                        }}
+                    >
+                        <Feather name="filter" size={24} color={Colours.primary} />
+                        <Text style={styles.buttonText}>Filter</Text>
+                    </TouchableOpacity>
 
-                {/* Search input */}
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search..."
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
+                    {/* Search input */}
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search..."
+                        placeholderTextColor="#888"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                </View>
+
+                <FlatList
+                    data={applyAllFilters(communities)}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2}
+                    renderItem={({ item }) => (
+                        <CommunityCard community={item} player={player} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
+                    )}
                 />
-            </View>
 
-            <FlatList
-                data={applyAllFilters(communities)}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                renderItem={({ item }) => (
-                    <CommunityCard community={item} player={player} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
-                )}
-            />
+                {/* Filter Modal */}
+                <Modal
+                    visible={showFilterModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowFilterModal(false)}
+                >
+                    <View style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.4)',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <View style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            padding: 20,
+                            width: '90%',
+                            maxWidth: 400,
+                        }}>
+                            <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Communities</Text>
+                            {/* Skill-Level Picker */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Sports</Text>
+                                <View style={styles.pickerContainer}>
+                                    <Picker
+                                        selectedValue={tempSportFilter}
+                                        dropdownIconColor={Colours.primary}
+                                        onValueChange={(itemValue) =>
+                                            setTempSportFilter(itemValue as 'all' | Sport)
+                                        }
+                                        style={styles.picker}
+                                    >
+                                        <Picker.Item label="All Sports" value="all" />
+                                        {Object.entries(sports).map(([key, sport]) => (
+                                            <Picker.Item key={key} label={sport.name} value={sport} />
+                                        ))}
+                                    </Picker>
+                                </View>
+                            </View>
+                            {/* Location Filter Input */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Location</Text>
+                                <TextInput
+                                    style={styles.modalInput}
+                                    placeholder="Location..."
+                                    placeholderTextColor="#888"
+                                    value={tempLocationFilter}
+                                    onChangeText={setTempLocationFilter}
+                                />
+                            </View>
+
+                            {/* Private or Public Filter*/}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Privacy</Text>
+                                <View style={styles.pickerContainer}>
+                                    <Picker
+                                        selectedValue={tempPrivacyFilter}
+                                        dropdownIconColor={Colours.primary}
+                                        onValueChange={(itemValue) =>
+                                            setTempPrivacyFilter(itemValue as 'all' | 'public' | 'private')
+                                        }
+                                        style={styles.picker}
+                                    >
+                                        <Picker.Item label="All" value="all" />
+                                        <Picker.Item label="Public Only" value="public" />
+                                        <Picker.Item label="Private Only" value="private" />
+                                    </Picker>
+                                </View>
+                            </View>
+
+                            {/* Modal Actions */}
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+                                <TouchableOpacity
+                                    style={[styles.button, { flex: 1, marginRight: 8 }]}
+                                    onPress={() => setShowFilterModal(false)}
+                                >
+                                    <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
+                                    onPress={() => {
+                                        setSportFilter(tempSportFilter);
+                                        setLocationFilter(tempLocationFilter);
+                                        setPrivacyFilter(tempPrivacyFilter);
+                                        setShowFilterModal(false);
+                                    }}
+                                >
+                                    <Text style={[styles.buttonText, { color: 'white' }]}>Apply</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
 
             {/* Create Community Button */}
             <TouchableOpacity
-                style={[styles.button, { paddingVertical: 12, flexDirection: 'row' }]}
+                style={[
+                    styles.button,
+                    { backgroundColor: Colours.extraButtons, borderColor: Colours.primary, borderWidth: 2, position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
                 onPress={() => navigation.navigate("CreateCommunity")}
             >
                 <Feather name="plus" size={24} color={Colours.primary} />
-                <Text style={styles.buttonText}>Create Community</Text>
+                <Text style={[styles.buttonText, { color: '#003366' }]}>Create Community</Text>
             </TouchableOpacity>
-
-            {/* Filter Modal */}
-            <Modal
-                visible={showFilterModal}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setShowFilterModal(false)}
-            >
-                <View style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0,0,0,0.4)',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}>
-                    <View style={{
-                        backgroundColor: '#fff',
-                        borderRadius: 12,
-                        padding: 20,
-                        width: '90%',
-                        maxWidth: 400,
-                    }}>
-                        <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Communities</Text>
-                        {/* Skill-Level Picker */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Sports</Text>
-                            <View style={styles.pickerContainer}>
-                                <Picker
-                                    selectedValue={tempSportFilter}
-                                    dropdownIconColor={Colours.primary}
-                                    onValueChange={(itemValue) =>
-                                        setTempSportFilter(itemValue as 'all' | Sport)
-                                    }
-                                    style={styles.picker}
-                                >
-                                    <Picker.Item label="All Sports" value="all" />
-                                    {Object.entries(sports).map(([key, sport]) => (
-                                        <Picker.Item key={key} label={sport.name} value={sport} />
-                                    ))}
-                                </Picker>
-                            </View>
-                        </View>
-                        {/* Location Filter Input */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Location</Text>
-                            <TextInput
-                                style={styles.modalInput}
-                                placeholder="Location..."
-                                placeholderTextColor="#888"
-                                value={tempLocationFilter}
-                                onChangeText={setTempLocationFilter}
-                            />
-                        </View>
-
-                        {/* Private or Public Filter*/}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Privacy</Text>
-                            <View style={styles.pickerContainer}>
-                                <Picker
-                                    selectedValue={tempPrivacyFilter}
-                                    dropdownIconColor={Colours.primary}
-                                    onValueChange={(itemValue) =>
-                                        setTempPrivacyFilter(itemValue as 'all' | 'public' | 'private')
-                                    }
-                                    style={styles.picker}
-                                >
-                                    <Picker.Item label="All" value="all" />
-                                    <Picker.Item label="Public Only" value="public" />
-                                    <Picker.Item label="Private Only" value="private" />
-                                </Picker>
-                            </View>
-                        </View>
-
-                        {/* Modal Actions */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
-                            <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginRight: 8 }]}
-                                onPress={() => setShowFilterModal(false)}
-                            >
-                                <Text style={styles.buttonText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
-                                onPress={() => {
-                                    setSportFilter(tempSportFilter);
-                                    setLocationFilter(tempLocationFilter);
-                                    setPrivacyFilter(tempPrivacyFilter);
-                                    setShowFilterModal(false);
-                                }}
-                            >
-                                <Text style={[styles.buttonText, { color: 'white' }]}>Apply</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 }

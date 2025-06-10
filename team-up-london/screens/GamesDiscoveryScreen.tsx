@@ -135,258 +135,269 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Team Up London</Text>
+        <View style={{ flex: 1 }}>
+            <ScrollView style={styles.container}>
+                <Text style={styles.title}>Team Up London</Text>
 
-            <Text style={styles.subTitle}>Discovery</Text>
+                <Text style={styles.subTitle}>Discovery</Text>
 
-            <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                {/* Filter button */}
-                <TouchableOpacity
-                    style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: '40%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
-                    onPress={() => {
-                        setTempSkillFilter(skillFilter);
-                        setTempLocationFilter(locationFilter);
-                        setTempSelectedDate(selectedDate);
-                        setTempSelectedSportIds([...selectedSportIds]);
-                        setShowFilterModal(true);
-                    }}
-                >
-                    <Feather name="filter" size={24} color={Colours.primary} />
-                    <Text style={styles.buttonText}>Filter</Text>
-                </TouchableOpacity>
+                <View style={[styles.sideBySide, { marginBottom: 16 }]}>
+                    {/* Filter button */}
+                    <TouchableOpacity
+                        style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: '40%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
+                        onPress={() => {
+                            setTempSkillFilter(skillFilter);
+                            setTempLocationFilter(locationFilter);
+                            setTempSelectedDate(selectedDate);
+                            setTempSelectedSportIds([...selectedSportIds]);
+                            setShowFilterModal(true);
+                        }}
+                    >
+                        <Feather name="filter" size={24} color={Colours.primary} />
+                        <Text style={styles.buttonText}>Filter</Text>
+                    </TouchableOpacity>
 
-                {/* Search input */}
-                <TextInput
-                    style={styles.searchInput}
-                    placeholderTextColor='#888'
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                />
-            </View>
-
-            {/* For you section */}
-            <View style={styles.section}>
-                <TouchableOpacity
-                    style={styles.sectionHeader}
-                    onPress={() => setForYouSectionOpen(!forYouSectionOpen)}
-                >
-                    <Text style={styles.subTitleText}>For You</Text>
-                    <Feather
-                        name={forYouSectionOpen ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color={Colours.primary}
+                    {/* Search input */}
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholderTextColor='#888'
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
                     />
-                </TouchableOpacity>
-                {forYouSectionOpen && (
-                    <View style={styles.sectionContent}>
-                        {/* Games list */}
-                        {applyAllFilters(forYouGames).map((game) => (
-                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
-                        ))}
-                    </View>
-                )}
-            </View>
+                </View>
 
-            {/* Near You section */}
-            <View style={styles.section}>
-                <TouchableOpacity
-                    style={styles.sectionHeader}
-                    onPress={() => setNearYouSectionOpen(!nearYouSectionOpen)}
+                {/* For you section */}
+                <View style={styles.section}>
+                    <TouchableOpacity
+                        style={styles.sectionHeader}
+                        onPress={() => setForYouSectionOpen(!forYouSectionOpen)}
+                    >
+                        <Text style={styles.subTitleText}>For You</Text>
+                        <Feather
+                            name={forYouSectionOpen ? 'chevron-up' : 'chevron-down'}
+                            size={20}
+                            color={Colours.primary}
+                        />
+                    </TouchableOpacity>
+                    {forYouSectionOpen && (
+                        <View style={styles.sectionContent}>
+                            {/* Games list */}
+                            {/* {applyAllFilters(forYouGames).map((game) => (
+                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            ))} */}
+                        </View>
+                    )}
+                </View>
+
+                {/* Near You section */}
+                <View style={styles.section}>
+                    <TouchableOpacity
+                        style={styles.sectionHeader}
+                        onPress={() => setNearYouSectionOpen(!nearYouSectionOpen)}
+                    >
+                        <Text style={styles.subTitleText}>Near You</Text>
+                        <Feather
+                            name={nearYouSectionOpen ? 'chevron-up' : 'chevron-down'}
+                            size={20}
+                            color={Colours.primary}
+                        />
+                    </TouchableOpacity>
+                    {nearYouSectionOpen && (
+                        <View style={styles.sectionContent}>
+                            {applyAllFilters(nearYouGames).map((game) => (
+                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            ))}
+                        </View>
+                    )}
+                </View>
+
+                {/* Try Something New section */}
+                <View style={styles.section}>
+                    <TouchableOpacity
+                        style={styles.sectionHeader}
+                        onPress={() => setTrySomethingNewSectionOpen(!trySomethingNewSectionOpen)}
+                    >
+                        <Text style={styles.subTitleText}>Try Something New</Text>
+                        <Feather
+                            name={trySomethingNewSectionOpen ? 'chevron-up' : 'chevron-down'}
+                            size={20}
+                            color={Colours.primary}
+                        />
+                    </TouchableOpacity>
+                    {trySomethingNewSectionOpen && (
+                        <View style={styles.sectionContent}>
+                            {applyAllFilters(trySomethingNewGames).map((game) => (
+                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            ))}
+                        </View>
+                    )}
+                </View>
+
+                {/* Filter Modal */}
+                <Modal
+                    visible={showFilterModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={() => setShowFilterModal(false)}
                 >
-                    <Text style={styles.subTitleText}>Near You</Text>
-                    <Feather
-                        name={nearYouSectionOpen ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color={Colours.primary}
-                    />
-                </TouchableOpacity>
-                {nearYouSectionOpen && (
-                    <View style={styles.sectionContent}>
-                        {applyAllFilters(nearYouGames).map((game) => (
-                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
-                        ))}
-                    </View>
-                )}
-            </View>
-
-            {/* Try Something New section */}
-            <View style={styles.section}>
-                <TouchableOpacity
-                    style={styles.sectionHeader}
-                    onPress={() => setTrySomethingNewSectionOpen(!trySomethingNewSectionOpen)}
-                >
-                    <Text style={styles.subTitleText}>Try Something New</Text>
-                    <Feather
-                        name={trySomethingNewSectionOpen ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color={Colours.primary}
-                    />
-                </TouchableOpacity>
-                {trySomethingNewSectionOpen && (
-                    <View style={styles.sectionContent}>
-                        {applyAllFilters(trySomethingNewGames).map((game) => (
-                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
-                        ))}
-                    </View>
-                )}
-            </View>
-
-            {/* Filter Modal */}
-            <Modal
-                visible={showFilterModal}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setShowFilterModal(false)}
-            >
-                <View style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0,0,0,0.4)',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}>
                     <View style={{
-                        backgroundColor: '#fff',
-                        borderRadius: 12,
-                        padding: 20,
-                        width: '90%',
-                        maxWidth: 400,
-                        maxHeight: '80%',
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.4)',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}>
-                        <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
-                        
-                        <ScrollView showsVerticalScrollIndicator={false}>
-                            {/* Sports Filter */}
-                            <View style={styles.formGroup}>
-                                <Text style={styles.subTitleText}>Sports</Text>
-                                <ScrollView 
-                                    horizontal 
-                                    showsHorizontalScrollIndicator={false}
-                                    style={styles.sportsContainer}
-                                    contentContainerStyle={styles.sportsContentContainer}
-                                >
-                                    {sports.map((sport) => (
+                        <View style={{
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            padding: 20,
+                            width: '90%',
+                            maxWidth: 400,
+                            maxHeight: '80%',
+                        }}>
+                            <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
+                            
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                {/* Sports Filter */}
+                                <View style={styles.formGroup}>
+                                    <Text style={styles.subTitleText}>Sports</Text>
+                                    <ScrollView 
+                                        horizontal 
+                                        showsHorizontalScrollIndicator={false}
+                                        style={styles.sportsContainer}
+                                        contentContainerStyle={styles.sportsContentContainer}
+                                    >
+                                        {sports.map((sport) => (
+                                            <TouchableOpacity
+                                                key={sport.id}
+                                                style={[
+                                                    styles.sportChip,
+                                                    tempSelectedSportIds.includes(sport.id) && styles.sportChipSelected
+                                                ]}
+                                                onPress={() => toggleSportSelection(sport.id, true)}
+                                            >
+                                                <Text style={[
+                                                    styles.sportChipText,
+                                                    tempSelectedSportIds.includes(sport.id) && styles.sportChipTextSelected
+                                                ]}>
+                                                    {sport.name}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </ScrollView>
+                                    {tempSelectedSportIds.length > 0 && (
                                         <TouchableOpacity
-                                            key={sport.id}
-                                            style={[
-                                                styles.sportChip,
-                                                tempSelectedSportIds.includes(sport.id) && styles.sportChipSelected
-                                            ]}
-                                            onPress={() => toggleSportSelection(sport.id, true)}
+                                            onPress={() => setTempSelectedSportIds([])}
+                                            style={{ marginTop: 8 }}
                                         >
-                                            <Text style={[
-                                                styles.sportChipText,
-                                                tempSelectedSportIds.includes(sport.id) && styles.sportChipTextSelected
-                                            ]}>
-                                                {sport.name}
-                                            </Text>
+                                            <Text style={{ color: 'red', textAlign: 'center', fontSize: 14 }}>Clear All Sports</Text>
                                         </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                                {tempSelectedSportIds.length > 0 && (
-                                    <TouchableOpacity
-                                        onPress={() => setTempSelectedSportIds([])}
-                                        style={{ marginTop: 8 }}
-                                    >
-                                        <Text style={{ color: 'red', textAlign: 'center', fontSize: 14 }}>Clear All Sports</Text>
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-
-                            {/* Skill-Level Picker */}
-                            <View style={styles.formGroup}>
-                                <Text style={styles.subTitleText}>Skill Level</Text>
-                                <View style={styles.pickerContainer}>
-                                    <Picker
-                                        selectedValue={tempSkillFilter}
-                                        onValueChange={(itemValue) =>
-                                            setTempSkillFilter(itemValue as 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert')
-                                        }
-                                        style={styles.picker}
-                                    >
-                                        <Picker.Item label="All" value="all" />
-                                        <Picker.Item label="Beginner" value="beginner" />
-                                        <Picker.Item label="Intermediate" value="intermediate" />
-                                        <Picker.Item label="Advanced" value="advanced" />
-                                        <Picker.Item label="Expert" value="expert" />
-                                    </Picker>
+                                    )}
                                 </View>
-                            </View>
-                            
-                            {/* Location Filter Input */}
-                            <View style={styles.formGroup}>
-                                <Text style={styles.subTitleText}>Location</Text>
-                                <TextInput
-                                    style={styles.modalInput}
-                                    placeholder="Location..."
-                                    placeholderTextColor={'#888'}
-                                    value={tempLocationFilter}
-                                    onChangeText={setTempLocationFilter}
-                                />
-                            </View>
-                            
-                            {/* Date Filter */}
-                            <View style={styles.formGroup}>
-                                <Text style={styles.subTitleText}>Date</Text>
-                                <TouchableOpacity
-                                    onPress={() => setShowDatePicker(true)}
-                                    style={[styles.button, { paddingVertical: 12 }]}
-                                >
-                                    <Text style={styles.buttonText}>
-                                        {tempSelectedDate
-                                            ? tempSelectedDate.toLocaleDateString()
-                                            : 'Pick Date'}
-                                    </Text>
-                                </TouchableOpacity>
-                                {tempSelectedDate && (
-                                    <TouchableOpacity
-                                        onPress={() => setTempSelectedDate(null)}
-                                        style={{ marginTop: 8 }}
-                                    >
-                                        <Text style={{ color: 'red', textAlign: 'center' }}>Clear Date</Text>
-                                    </TouchableOpacity>
-                                )}
-                                {showDatePicker && (
-                                    <DateTimePicker
-                                        value={tempSelectedDate || new Date()}
-                                        mode="date"
-                                        display="default"
-                                        style={styles.datePicker}
-                                        onChange={(event, date) => {
-                                            setShowDatePicker(Platform.OS === 'ios');
-                                            if (date) setTempSelectedDate(date);
-                                        }}
+
+                                {/* Skill-Level Picker */}
+                                <View style={styles.formGroup}>
+                                    <Text style={styles.subTitleText}>Skill Level</Text>
+                                    <View style={styles.pickerContainer}>
+                                        <Picker
+                                            selectedValue={tempSkillFilter}
+                                            onValueChange={(itemValue) =>
+                                                setTempSkillFilter(itemValue as 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert')
+                                            }
+                                            style={styles.picker}
+                                        >
+                                            <Picker.Item label="All" value="all" />
+                                            <Picker.Item label="Beginner" value="beginner" />
+                                            <Picker.Item label="Intermediate" value="intermediate" />
+                                            <Picker.Item label="Advanced" value="advanced" />
+                                            <Picker.Item label="Expert" value="expert" />
+                                        </Picker>
+                                    </View>
+                                </View>
+                                
+                                {/* Location Filter Input */}
+                                <View style={styles.formGroup}>
+                                    <Text style={styles.subTitleText}>Location</Text>
+                                    <TextInput
+                                        style={styles.modalInput}
+                                        placeholder="Location..."
+                                        placeholderTextColor={'#888'}
+                                        value={tempLocationFilter}
+                                        onChangeText={setTempLocationFilter}
                                     />
-                                )}
+                                </View>
+                                
+                                {/* Date Filter */}
+                                <View style={styles.formGroup}>
+                                    <Text style={styles.subTitleText}>Date</Text>
+                                    <TouchableOpacity
+                                        onPress={() => setShowDatePicker(true)}
+                                        style={[styles.button, { paddingVertical: 12 }]}
+                                    >
+                                        <Text style={styles.buttonText}>
+                                            {tempSelectedDate
+                                                ? tempSelectedDate.toLocaleDateString()
+                                                : 'Pick Date'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {tempSelectedDate && (
+                                        <TouchableOpacity
+                                            onPress={() => setTempSelectedDate(null)}
+                                            style={{ marginTop: 8 }}
+                                        >
+                                            <Text style={{ color: 'red', textAlign: 'center' }}>Clear Date</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={tempSelectedDate || new Date()}
+                                            mode="date"
+                                            display="default"
+                                            style={styles.datePicker}
+                                            onChange={(event, date) => {
+                                                setShowDatePicker(Platform.OS === 'ios');
+                                                if (date) setTempSelectedDate(date);
+                                            }}
+                                        />
+                                    )}
+                                </View>
+                            </ScrollView>
+                            
+                            {/* Modal Actions */}
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+                                <TouchableOpacity
+                                    style={[styles.button, { flex: 1, marginRight: 8 }]}
+                                    onPress={() => setShowFilterModal(false)}
+                                >
+                                    <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
+                                    onPress={() => {
+                                        setSkillFilter(tempSkillFilter);
+                                        setLocationFilter(tempLocationFilter);
+                                        setSelectedDate(tempSelectedDate);
+                                        setSelectedSportIds([...tempSelectedSportIds]);
+                                        setShowFilterModal(false);
+                                    }}
+                                >
+                                    <Text style={[styles.buttonText, { color: 'white' }]}>Apply</Text>
+                                </TouchableOpacity>
                             </View>
-                        </ScrollView>
-                        
-                        {/* Modal Actions */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
-                            <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginRight: 8 }]}
-                                onPress={() => setShowFilterModal(false)}
-                            >
-                                <Text style={styles.buttonText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.button, { flex: 1, marginLeft: 8, backgroundColor: Colours.primary }]}
-                                onPress={() => {
-                                    setSkillFilter(tempSkillFilter);
-                                    setLocationFilter(tempLocationFilter);
-                                    setSelectedDate(tempSelectedDate);
-                                    setSelectedSportIds([...tempSelectedSportIds]);
-                                    setShowFilterModal(false);
-                                }}
-                            >
-                                <Text style={[styles.buttonText, { color: 'white' }]}>Apply</Text>
-                            </TouchableOpacity>
                         </View>
                     </View>
-                </View>
-            </Modal>
-        </ScrollView>
+                </Modal>
+            </ScrollView>
+
+            {/* Create Game Button */}
+            <TouchableOpacity
+                style={[styles.button, { position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
+                onPress={() => navigation.navigate("CreateGame")}
+            >
+                <Feather name="plus" size={24} color={Colours.primary} />
+                <Text style={styles.buttonText}>Create Game</Text>
+            </TouchableOpacity>
+        </View>
     );
 }
 

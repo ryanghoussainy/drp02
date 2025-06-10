@@ -2,8 +2,8 @@ export default interface Game {
     id: string;
     name: string;
     host_id: string;
-    start_time: string;
-    end_time: string;
+    start_time: Date;
+    end_time: Date;
     location: string;
     notes_from_host: string;
     max_players: number;
@@ -12,4 +12,6 @@ export default interface Game {
     cost: number;
     location_type: string;
     community_id?: string; // Optional, for community games
+    latitude: number;
+    longitude: number;
 }
