@@ -5,7 +5,6 @@ import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
 import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
-import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import { registerPreferences } from '../operations/Player';
 import useTimes from '../hooks/useTimes';
 import Time from '../interfaces/Time';
@@ -16,20 +15,21 @@ import Colours from '../config/Colours';
 import usePreferences from '../hooks/usePreferences';
 import Sport from '../interfaces/Sport';
 import { useEffect, useState } from 'react';
+import Player from '../interfaces/Player';
 
 export default function PreferencesScreen(
-    { preferences }: { preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
+    { player, preferences }: { player: Player, preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
         setPreferredTimes: React.Dispatch<React.SetStateAction<string[]>>,
         setSelectedSports: React.Dispatch<React.SetStateAction<Sport[]>>,
         setSkillLevels: React.Dispatch<React.SetStateAction<Record<string, number>>>
-     }; } = { preferences: undefined }
+     }; }
 ) {
     const { sports } = useSports();
     const { times } = useTimes();
 
     const { preferredTimes, skillLevels, selectedSports: parentSelectedSports,
         setPreferredTimes, setSelectedSports, setSkillLevels
-    } = preferences || usePreferences(sports);
+    } = preferences || usePreferences(player.id, sports);
     // Selected sports determines whether or not to show the whole main tab navigator
     // So we need to submit it before showing the navigator
     // So we have a "local" temporary selected sports state instead of using the parent one
@@ -44,7 +44,7 @@ export default function PreferencesScreen(
     const handleSavePreferences = async () => {
         // Send data to backend
         await registerPreferences(
-            YOU_PLAYER_ID,
+            player.id,
             preferredTimes,
             tempSelectedSports.map(s => s.id), // send only IDs
             Object.values(skillLevels)

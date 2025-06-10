@@ -2,28 +2,26 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import useCommunity from "../hooks/useCommunity";
 import Fonts from "../config/Fonts";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import usePlayer from "../hooks/usePlayer";
-import useSport from "../hooks/useSport";
 import SportIcon from "../components/SportIcon";
 import { ICON_FAMILIES } from "../constants/iconFamilies";
 import useCommunityGames from "../hooks/useCommunityGames";
 import GameCard from "../components/GameCard";
 import useCommunityPlayers from "../hooks/useCommunityPlayers";
-import { YOU_PLAYER_ID } from "../constants/youPlayerId";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { RootStackParamList } from "../navigation/StackNavigator";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import useSports from "../hooks/useSports";
 import Colours from "../config/Colours";
 import BackArrow from "../components/BackArrow";
+import Player from "../interfaces/Player";
+import usePlayer from "../hooks/usePlayer";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
-export default function CommunityScreen({ route }: Props) {
+export default function CommunityScreen({ player, route }: { player: Player} & Props) {
     const { communityId } = route.params;
 
     const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
@@ -34,7 +32,7 @@ export default function CommunityScreen({ route }: Props) {
     const sports = allSports.filter(s => community?.sports_ids.includes(s.id));
 
     const { games } = useCommunityGames(communityId);
-    const { players, handleJoin, handleLeave } = useCommunityPlayers(communityId);
+    const { players, handleJoin, handleLeave } = useCommunityPlayers(player.id, communityId);
 
     // Modal for confirmation when leaving
     const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -76,15 +74,15 @@ export default function CommunityScreen({ route }: Props) {
             {showMembers && (
                 <View style={styles.membersListContainer}>
                     {players.length > 0 ? (
-                        players.map((item) => (
-                            <View key={item.id} style={styles.memberRow}>
+                        players.map((p) => (
+                            <View key={p.id} style={styles.memberRow}>
                                 {/* Avatar with first letter of name */}
                                 <View style={styles.avatar}>
-                                    <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
+                                    <Text style={styles.avatarText}>{p.name.charAt(0)}</Text>
                                 </View>
 
                                 {/* Host indicator */}
-                                {item.id === creator?.id && (
+                                {p.id === creator?.id && (
                                     <MaterialCommunityIcons
                                         name="crown"
                                         size={26}
@@ -92,7 +90,7 @@ export default function CommunityScreen({ route }: Props) {
                                     />
                                 )}
 
-                                <Text style={styles.memberName}>{item.name}</Text>
+                                <Text style={styles.memberName}>{p.name}</Text>
                             </View>
                         ))
                     ) : (
@@ -136,10 +134,10 @@ export default function CommunityScreen({ route }: Props) {
             {/* Games coming up */}
             <Text style={styles.subTitle}>Upcoming Games</Text>
             {games.map((game, idx) => (
-                <GameCard key={idx} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                <GameCard key={idx} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
             ))}
 
-            {players.some(player => player.id === YOU_PLAYER_ID) ? (
+            {players.some(p => p.id === player.id) ? (
                 <View style={styles.sideBySide}>
                     <TouchableOpacity
                         disabled

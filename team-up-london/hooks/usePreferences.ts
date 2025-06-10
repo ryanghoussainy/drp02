@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import Sport from '../interfaces/Sport';
 import { getPlayerPreferences } from '../operations/Player';
-import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 
 
-export default function usePreferences(sports: Sport[]) {
+export default function usePreferences(playerId: string, sports: Sport[]) {
     const [preferredTimes, setPreferredTimes] = useState<string[]>([]);
     const [selectedSports, setSelectedSports] = useState<Sport[]>([]);
     const [skillLevels, setSkillLevels] = useState<{ [key: string]: number }>({});
 
     const fetchPreferences = async () => {
-        const { preferred_times, preferred_sports_ids, preferred_sports_skill_levels } = await getPlayerPreferences(YOU_PLAYER_ID);
+        const { preferred_times, preferred_sports_ids, preferred_sports_skill_levels } = await getPlayerPreferences(playerId);
         setPreferredTimes(preferred_times || []);
         setSelectedSports(sports.filter(s => preferred_sports_ids?.includes(s.id)));
 
@@ -27,10 +26,10 @@ export default function usePreferences(sports: Sport[]) {
 
     // Get community data when screen is focused
     useEffect(() => {
-        if (sports.length === 0) return; // wait for sports to load
+        if (sports.length === 0 || !playerId) return; // wait for sports to load
 
         fetchPreferences();
-    }, [sports]);
+    }, [sports, playerId]);
 
 
     return { preferredTimes, selectedSports, skillLevels,

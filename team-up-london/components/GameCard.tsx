@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import Game from '../interfaces/Game';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { formatDate } from 'date-fns';
@@ -13,9 +13,10 @@ import { Text } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
+import Player from '../interfaces/Player';
 
-export default function GameCard({ game, onPress }: { game: Game, onPress?: () => void }) {
-    const { players } = useGamePlayers(game.id);
+export default function GameCard({ player, game, onPress }: { player: Player, game: Game, onPress?: () => void }) {
+    const { players } = useGamePlayers(player.id, game.id);
     const { sports } = useSports();
 
     const { distance } = useDistanceAndRegion({ gameId: game.id });

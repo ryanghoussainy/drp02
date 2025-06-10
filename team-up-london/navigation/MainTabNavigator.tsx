@@ -6,10 +6,11 @@ import PreferencesScreen from "../screens/PreferencesScreen";
 import CommunitiesScreen from "../screens/CommunitiesDiscoveryScreen";
 import GamesDiscoveryScreen from "../screens/GamesDiscoveryScreen";
 import Colours from "../config/Colours";
+import Player from "../interfaces/Player";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabNavigator() {
+export default function MainTabNavigator({ player }: { player: Player }) {
     return (
         <Tab.Navigator screenOptions={{ tabBarStyle: [styles.tabBar, { backgroundColor: Colours.mainBar }] }}>
             <Tab.Screen
@@ -23,7 +24,7 @@ export default function MainTabNavigator() {
                     tabBarActiveTintColor: Colours.active,
                     tabBarLabelStyle: styles.tabBarLabel,
                 })}>
-                {() => <PreferencesScreen />}
+                {() => <PreferencesScreen player={player} />}
             </Tab.Screen>
 
             <Tab.Screen
@@ -38,7 +39,7 @@ export default function MainTabNavigator() {
                     tabBarLabelStyle: styles.tabBarLabel,
                 })}
             >
-                {() => <CommunitiesScreen />}
+                {() => <CommunitiesScreen player={player} />}
             </Tab.Screen>
 
             <Tab.Screen
@@ -53,7 +54,7 @@ export default function MainTabNavigator() {
                     tabBarLabelStyle: styles.tabBarLabel,
                 })}
             >
-                {() => <GamesDiscoveryScreen />}
+                {() => <GamesDiscoveryScreen player={player} />}
             </Tab.Screen>
         </Tab.Navigator>
     );

@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { getForYouGames } from '../operations/Games';
-import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import Game from '../interfaces/Game';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function useGamesDiscoverySections() {
+export default function useGamesDiscoverySections(playerId: string) {
     // For you section
     const [forYouSectionOpen, setForYouSectionOpen] = useState<boolean>(true);
     const [forYouGames, setForYouGames] = useState<Game[]>([]);
@@ -21,7 +20,7 @@ export default function useGamesDiscoverySections() {
     useFocusEffect(
         useCallback(() => {
             const fetchForYouGames = async () => {
-            const forYouGames = await getForYouGames(YOU_PLAYER_ID);
+            const forYouGames = await getForYouGames(playerId);
             setForYouGames(forYouGames);
             };
 

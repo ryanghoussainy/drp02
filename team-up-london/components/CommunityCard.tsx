@@ -10,12 +10,13 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import useSports from '../hooks/useSports';
 import Colours from '../config/Colours';
 import SportIcon from './SportIcon';
+import Player from '../interfaces/Player';
 
-export default function CommunityCard({ community, onPress }: { community: Community, onPress: () => void }) {
+export default function CommunityCard({ player, community, onPress }: { player: Player, community: Community, onPress: () => void }) {
     const { sports: allSports } = useSports();
     const sports = allSports.filter(s => community.sports_ids.includes(s.id));
 
-    const { players, creatorId } = useCommunityPlayers(community.id);
+    const { players, creatorId } = useCommunityPlayers(player.id, community.id);
 
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>

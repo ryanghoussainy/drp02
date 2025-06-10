@@ -12,10 +12,11 @@ import Sport from '../interfaces/Sport';
 import useSports from '../hooks/useSports';
 import { Text } from 'react-native';
 import Colours from '../config/Colours';
+import Player from '../interfaces/Player';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
-export default function CommunitiesScreen() {
+export default function CommunitiesScreen({ player }: { player: Player }) {
     const { communities } = useCommunities();
 
     const navigation = useNavigation<GamesNavProp>();
@@ -105,7 +106,7 @@ export default function CommunitiesScreen() {
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 renderItem={({ item }) => (
-                    <CommunityCard community={item} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
+                    <CommunityCard community={item} player={player} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
                 )}
             />
 

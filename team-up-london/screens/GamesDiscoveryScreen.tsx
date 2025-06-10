@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
@@ -16,7 +16,7 @@ import Colours from '../config/Colours';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
-export default function GamesDiscoveryScreen() {
+export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const navigation = useNavigation<GamesNavProp>();
 
     const {
@@ -34,7 +34,7 @@ export default function GamesDiscoveryScreen() {
         trySomethingNewSectionOpen,
         setTrySomethingNewSectionOpen,
         trySomethingNewGames,
-    } = useGamesDiscoverySections();
+    } = useGamesDiscoverySections(player.id);
 
     // Search
     const [searchQuery, setSearchQuery] = useState('');
@@ -42,7 +42,7 @@ export default function GamesDiscoveryScreen() {
     // Players cache keyed by game id
     const [playersByGame, setPlayersByGame] = useState<{ [key: string]: Player[] }>({});
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchPlayers = async () => {
             // Collect all unique game IDs across the three sections
             const allGames = [...forYouGames, ...nearYouGames, ...trySomethingNewGames];
@@ -162,7 +162,7 @@ export default function GamesDiscoveryScreen() {
                     <View style={styles.sectionContent}>
                         {/* Games list */}
                         {applyAllFilters(forYouGames).map((game) => (
-                            <GameCard key={game.id} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
                         ))}
                     </View>
                 )}

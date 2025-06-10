@@ -5,6 +5,7 @@ import JoinGameScreen from "../screens/JoinGameScreen";
 import CommunityScreen from "../screens/CommunityScreen";
 import CreateCommunityScreen from "../screens/CreateCommunityScreen";
 import PreferencesScreen from "../screens/PreferencesScreen";
+import Player from "../interfaces/Player";
 
 export type RootStackParamList = {
     "Main": undefined;
@@ -15,7 +16,7 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function Navigator () {
+export default function Navigator ({ player }: { player: Player }) {
   return (
     <NavigationContainer>
         <Stack.Navigator
@@ -23,21 +24,21 @@ export default function Navigator () {
                 headerShown: false,
             }}
         >
-            <Stack.Screen
-                name="Main"
-                component={MainTabNavigator}
-            />
-            <Stack.Screen name="Game"
-                component={JoinGameScreen}
-            />
+            <Stack.Screen name="Main">
+                {() => <MainTabNavigator player={player} />}
+            </Stack.Screen>
 
-            <Stack.Screen name="Community"
-                component={CommunityScreen}
-            />
+            <Stack.Screen name="Game">
+                {(props) => <JoinGameScreen {...props} player={player} />}
+            </Stack.Screen>
 
-            <Stack.Screen name="CreateCommunity"
-                component={CreateCommunityScreen}
-            />
+            <Stack.Screen name="Community">
+                {(props) => <CommunityScreen {...props} player={player} />}
+            </Stack.Screen>
+
+            <Stack.Screen name="CreateCommunity">
+                {(props) => <CreateCommunityScreen {...props} player={player} />}
+            </Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>

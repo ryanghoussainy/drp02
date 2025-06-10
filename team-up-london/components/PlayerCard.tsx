@@ -7,12 +7,12 @@ import Colours from '../config/Colours';
 
 interface PlayerCardProps {
   player: Player;
-  highlightYou: boolean;
+  isYou: boolean;
   isHost: boolean;
   sportId: string;
 }
 
-export default function PlayerCard({ player, highlightYou, isHost, sportId }: PlayerCardProps) {
+export default function PlayerCard({ player, isYou, isHost, sportId }: PlayerCardProps) {
   // Get index of sport in player's preferred sports
   const sportIndex = player.preferred_sports_ids.indexOf(sportId);
   // Get skill level for the sport, default to 0 if not found
@@ -22,7 +22,7 @@ export default function PlayerCard({ player, highlightYou, isHost, sportId }: Pl
     <View
       style={[
         styles.card,
-        highlightYou ? { borderWidth: 2, borderColor: 'green' } : { borderWidth: 2, borderColor: '#eee' },
+        isYou ? { borderWidth: 2, borderColor: 'green' } : { borderWidth: 2, borderColor: '#eee' },
       ]}
     >
       <Ionicons name="person" size={24} color="black" />

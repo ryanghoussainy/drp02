@@ -8,7 +8,6 @@ import GameMap from '../components/GameMap';
 import useGamePlayers from '../hooks/useGamePlayers';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
-import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import useGame from '../hooks/useGame';
 import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
@@ -19,17 +18,18 @@ import { useNavigation } from '@react-navigation/native';
 import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
 import BackArrow from '../components/BackArrow';
+import Player from '../interfaces/Player';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
-export default function JoinGameScreen({ route }: Props) {
+export default function JoinGameScreen({ player, route }: { player: Player } & Props) {
     const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
 
     const { gameId } = route.params;
 
     const { distance, mapRegion } = useDistanceAndRegion({ gameId });
 
-    const { players, handleJoin, handleLeave, hostId } = useGamePlayers(gameId);
+    const { players, handleJoin, handleLeave, hostId } = useGamePlayers(player.id, gameId);
 
     const { game, sport } = useGame(gameId);
 
@@ -94,12 +94,12 @@ export default function JoinGameScreen({ route }: Props) {
                             snapToInterval={98}      // card width + horizontal margin
                             decelerationRate="fast"
                         >
-                            {players.map((player, idx) => (
+                            {players.map((p, idx) => (
                                 <PlayerCard
                                     key={idx}
-                                    player={player}
-                                    highlightYou={player.id === YOU_PLAYER_ID}
-                                    isHost={player.id === hostId}
+                                    player={p}
+                                    isYou={p.id === player.id}
+                                    isHost={p.id === hostId}
                                     sportId={game?.sport_id || ''}
                                 />
                             ))}
@@ -119,7 +119,7 @@ export default function JoinGameScreen({ route }: Props) {
 
             <Text style={styles.requiredPlayersSection}>{(game?.min_players || 0) - players.length} more players required to start</Text>
 
-            {players.some(player => player.id === YOU_PLAYER_ID) ? (
+            {players.some(p => p.id === player.id) ? (
                 <View style={styles.sideBySide}>
                     <TouchableOpacity
                         style={[styles.button, { backgroundColor: "#ccc", flex: 1 }]}

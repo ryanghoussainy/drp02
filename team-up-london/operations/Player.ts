@@ -60,3 +60,18 @@ export async function getPlayerPreferences(playerId: string): Promise<{
         preferred_sports_skill_levels: data?.preferred_sports_skill_levels || [],
     };
 }
+
+// Get player by name
+export async function getPlayerByName(name: string): Promise<Player> {
+    const { data, error } = await db
+        .from("players")
+        .select("*")
+        .eq("name", name)
+        .single();
+
+    if (error) {
+        Alert.alert(error.message);
+    }
+
+    return data as Player;
+}

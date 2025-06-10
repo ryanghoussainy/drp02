@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     View,
     ScrollView,
@@ -16,12 +16,12 @@ import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { createCommunity, joinCommunity } from '../operations/Communities';
 import Colours from '../config/Colours';
-import { YOU_PLAYER_ID } from '../constants/youPlayerId';
 import BackArrow from '../components/BackArrow';
+import Player from '../interfaces/Player';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateCommunity'>;
 
-export default function CreateCommunityScreen({ navigation }: Props) {
+export default function CreateCommunityScreen({ player, navigation }: { player: Player } & Props) {
     const { sports } = useSports();
 
     const [name, setName] = useState('');
@@ -66,7 +66,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
             locationType,
             isPublic,
             selectedSports,
-            YOU_PLAYER_ID, // creator ID
+            player.id, // creator ID
         );
 
         if (!community) {
@@ -76,7 +76,7 @@ export default function CreateCommunityScreen({ navigation }: Props) {
         }
 
         // Add the creator as a member
-        await joinCommunity(YOU_PLAYER_ID, community.id);
+        await joinCommunity(player.id, community.id);
 
         setLoading(false);
         navigation.replace('Community', { communityId: community.id });
