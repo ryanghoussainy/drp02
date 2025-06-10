@@ -84,7 +84,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
             <View style={styles.sideBySide}>
                 <View style={styles.playerSection}>
                     <Text style={styles.sectionTitle}>
-                        Players ({players.length}/10)
+                        Players ({players.length}/{game?.max_players})
                     </Text>
                     <View>
                         <ScrollView
