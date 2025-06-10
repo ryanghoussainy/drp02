@@ -15,7 +15,7 @@ import Checkbox from 'expo-checkbox';
 import Colours from '../config/Colours';
 import usePreferences from '../hooks/usePreferences';
 import Sport from '../interfaces/Sport';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function PreferencesScreen(
     { preferences }: { preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
@@ -27,13 +27,19 @@ export default function PreferencesScreen(
     const { sports } = useSports();
     const { times } = useTimes();
 
-    const { preferredTimes, skillLevels,
+    const { preferredTimes, skillLevels, selectedSports: parentSelectedSports,
         setPreferredTimes, setSelectedSports, setSkillLevels
     } = preferences || usePreferences(sports);
     // Selected sports determines whether or not to show the whole main tab navigator
     // So we need to submit it before showing the navigator
     // So we have a "local" temporary selected sports state instead of using the parent one
-    const [tempSelectedSports, setTempSelectedSports] = useState<Sport[]>(preferences?.selectedSports || []);
+    const [tempSelectedSports, setTempSelectedSports] = useState<Sport[]>(
+        preferences?.selectedSports || parentSelectedSports
+    );
+
+    useEffect(() => {
+        setTempSelectedSports(parentSelectedSports);
+    }, [parentSelectedSports])
 
     const handleSavePreferences = async () => {
         // Send data to backend
