@@ -23,4 +23,20 @@ export const GAME_LOCATION: Record<string, { latitude: number; longitude: number
     latitude: 51.420048, 
     longitude: -0.192927
   },
+  "1e85a411-b9d6-46b1-8f88-821b2888165b": {
+    latitude: 51.506249,
+    longitude: -0.176205,
+  },
+  "2c30d0b6-517f-4a11-bf68-1f503c3655d8": {
+    latitude: 51.459422, 
+    longitude: -0.148873,
+  },
+  "86d05f64-651c-41c4-a13b-4b173e5c5fd4": {
+    latitude: 51.529924, 
+    longitude:-0.172146,
+  },
+  "de26523a-8741-4042-b17a-42f2e4e043ad": {
+    latitude: 51.463684, 
+    longitude: -0.112975
+  },
 };
