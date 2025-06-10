@@ -45,7 +45,7 @@ export default function GameCard({ player, game, onPress }: { player: Player, ga
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
 
-            <Text style={styles.gameCommunity}>Community: {community?.name}</Text>
+            {community && <Text style={styles.gameCommunity}>Community: {community.name}</Text> }
 
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>

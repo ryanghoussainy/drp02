@@ -3,6 +3,7 @@ import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpac
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
+import useSports from '../hooks/useSports';
 import GameCard from '../components/GameCard';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -18,6 +19,7 @@ type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
 export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const navigation = useNavigation<GamesNavProp>();
+    const { sports } = useSports();
 
     const {
         // For you section
@@ -58,24 +60,35 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         fetchPlayers();
     }, [forYouGames, nearYouGames, trySomethingNewGames]);
 
-
     // Filters
     const [skillFilter, setSkillFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert'>('all');
     const [locationFilter, setLocationFilter] = useState('');
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+    const [selectedSportIds, setSelectedSportIds] = useState<string[]>([]);
 
     // Modal state for filters
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [tempSkillFilter, setTempSkillFilter] = useState(skillFilter);
     const [tempLocationFilter, setTempLocationFilter] = useState(locationFilter);
     const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(selectedDate);
+    const [tempSelectedSportIds, setTempSelectedSportIds] = useState<string[]>(selectedSportIds);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const isSameDay = (d1: Date, d2: Date) =>
         d1.getFullYear() === d2.getFullYear() &&
         d1.getMonth() === d2.getMonth() &&
         d1.getDate() === d2.getDate();
+
+    const toggleSportSelection = (sportId: string, isTemp: boolean = false) => {
+        const currentSelection = isTemp ? tempSelectedSportIds : selectedSportIds;
+        const setSelection = isTemp ? setTempSelectedSportIds : setSelectedSportIds;
+        
+        if (currentSelection.includes(sportId)) {
+            setSelection(currentSelection.filter(id => id !== sportId));
+        } else {
+            setSelection([...currentSelection, sportId]);
+        }
+    };
 
     const applyAllFilters = (games: Array<any>) => {
         return games.filter((game) => {
@@ -110,6 +123,17 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 }
             }
 
+            // 5. Sports filter (if sports are selected, game must include at least one selected sport)
+            if (selectedSportIds.length > 0) {
+                const gameSportIds = game.sports_ids || [];
+                const hasMatchingSport = selectedSportIds.some(sportId => 
+                    gameSportIds.includes(sportId)
+                );
+                if (!hasMatchingSport) {
+                    return false;
+                }
+            }
+
             return true;
         });
     };
@@ -128,6 +152,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                         setTempSkillFilter(skillFilter);
                         setTempLocationFilter(locationFilter);
                         setTempSelectedDate(selectedDate);
+                        setTempSelectedSportIds([...selectedSportIds]);
                         setShowFilterModal(true);
                     }}
                 >
@@ -231,72 +256,116 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                         padding: 20,
                         width: '90%',
                         maxWidth: 400,
+                        maxHeight: '80%',
                     }}>
                         <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
-                        {/* Skill-Level Picker */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Skill Level</Text>
-                            <View style={styles.pickerContainer}>
-                                <Picker
-                                    selectedValue={tempSkillFilter}
-                                    onValueChange={(itemValue) =>
-                                        setTempSkillFilter(itemValue as 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert')
-                                    }
-                                    style={styles.picker}
+                        
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {/* Sports Filter */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Sports</Text>
+                                <ScrollView 
+                                    horizontal 
+                                    showsHorizontalScrollIndicator={false}
+                                    style={styles.sportsContainer}
+                                    contentContainerStyle={styles.sportsContentContainer}
                                 >
-                                    <Picker.Item label="All" value="all" />
-                                    <Picker.Item label="Beginner" value="beginner" />
-                                    <Picker.Item label="Intermediate" value="intermediate" />
-                                    <Picker.Item label="Advanced" value="advanced" />
-                                    <Picker.Item label="Expert" value="expert" />
-                                </Picker>
+                                    {sports.map((sport) => (
+                                        <TouchableOpacity
+                                            key={sport.id}
+                                            style={[
+                                                styles.sportChip,
+                                                tempSelectedSportIds.includes(sport.id) && styles.sportChipSelected
+                                            ]}
+                                            onPress={() => toggleSportSelection(sport.id, true)}
+                                        >
+                                            <Text style={[
+                                                styles.sportChipText,
+                                                tempSelectedSportIds.includes(sport.id) && styles.sportChipTextSelected
+                                            ]}>
+                                                {sport.name}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
+                                {tempSelectedSportIds.length > 0 && (
+                                    <TouchableOpacity
+                                        onPress={() => setTempSelectedSportIds([])}
+                                        style={{ marginTop: 8 }}
+                                    >
+                                        <Text style={{ color: 'red', textAlign: 'center', fontSize: 14 }}>Clear All Sports</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
-                        </View>
-                        {/* Location Filter Input */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Location</Text>
-                            <TextInput
-                                style={styles.modalInput}
-                                placeholder="Location..."
-                                placeholderTextColor={'#888'}
-                                value={tempLocationFilter}
-                                onChangeText={setTempLocationFilter}
-                            />
-                        </View>
-                        {/* Date Filter */}
-                        <View style={styles.formGroup}>
-                            <Text style={styles.subTitleText}>Date</Text>
-                            <TouchableOpacity
-                                onPress={() => setShowDatePicker(true)}
-                                style={[styles.button, { paddingVertical: 12 }]}
-                            >
-                                <Text style={styles.buttonText}>
-                                    {tempSelectedDate
-                                        ? tempSelectedDate.toLocaleDateString()
-                                        : 'Pick Date'}
-                                </Text>
-                            </TouchableOpacity>
-                            {tempSelectedDate && (
-                                <TouchableOpacity
-                                    onPress={() => setTempSelectedDate(null)}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    <Text style={{ color: 'red', textAlign: 'center' }}>Clear Date</Text>
-                                </TouchableOpacity>
-                            )}
-                            {showDatePicker && (
-                                <DateTimePicker
-                                    value={tempSelectedDate || new Date()}
-                                    mode="date"
-                                    display="default"
-                                    style={styles.datePicker}
-                                    onChange={(event, date) => {
-                                        setShowDatePicker(Platform.OS === 'ios');
-                                        if (date) setTempSelectedDate(date);
-                                    }}
+
+                            {/* Skill-Level Picker */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Skill Level</Text>
+                                <View style={styles.pickerContainer}>
+                                    <Picker
+                                        selectedValue={tempSkillFilter}
+                                        onValueChange={(itemValue) =>
+                                            setTempSkillFilter(itemValue as 'all' | 'beginner' | 'intermediate' | 'advanced' | 'expert')
+                                        }
+                                        style={styles.picker}
+                                    >
+                                        <Picker.Item label="All" value="all" />
+                                        <Picker.Item label="Beginner" value="beginner" />
+                                        <Picker.Item label="Intermediate" value="intermediate" />
+                                        <Picker.Item label="Advanced" value="advanced" />
+                                        <Picker.Item label="Expert" value="expert" />
+                                    </Picker>
+                                </View>
+                            </View>
+                            
+                            {/* Location Filter Input */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Location</Text>
+                                <TextInput
+                                    style={styles.modalInput}
+                                    placeholder="Location..."
+                                    placeholderTextColor={'#888'}
+                                    value={tempLocationFilter}
+                                    onChangeText={setTempLocationFilter}
                                 />
-                            )}
-                        </View>
+                            </View>
+                            
+                            {/* Date Filter */}
+                            <View style={styles.formGroup}>
+                                <Text style={styles.subTitleText}>Date</Text>
+                                <TouchableOpacity
+                                    onPress={() => setShowDatePicker(true)}
+                                    style={[styles.button, { paddingVertical: 12 }]}
+                                >
+                                    <Text style={styles.buttonText}>
+                                        {tempSelectedDate
+                                            ? tempSelectedDate.toLocaleDateString()
+                                            : 'Pick Date'}
+                                    </Text>
+                                </TouchableOpacity>
+                                {tempSelectedDate && (
+                                    <TouchableOpacity
+                                        onPress={() => setTempSelectedDate(null)}
+                                        style={{ marginTop: 8 }}
+                                    >
+                                        <Text style={{ color: 'red', textAlign: 'center' }}>Clear Date</Text>
+                                    </TouchableOpacity>
+                                )}
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={tempSelectedDate || new Date()}
+                                        mode="date"
+                                        display="default"
+                                        style={styles.datePicker}
+                                        onChange={(event, date) => {
+                                            setShowDatePicker(Platform.OS === 'ios');
+                                            if (date) setTempSelectedDate(date);
+                                        }}
+                                    />
+                                )}
+                            </View>
+                        </ScrollView>
+                        
                         {/* Modal Actions */}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
                             <TouchableOpacity
@@ -311,6 +380,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                     setSkillFilter(tempSkillFilter);
                                     setLocationFilter(tempLocationFilter);
                                     setSelectedDate(tempSelectedDate);
+                                    setSelectedSportIds([...tempSelectedSportIds]);
                                     setShowFilterModal(false);
                                 }}
                             >
@@ -442,5 +512,35 @@ const styles = StyleSheet.create({
     datePicker: {
         alignSelf: 'center',
         marginTop: 10,
+    },
+    sportsContainer: {
+        maxHeight: 60,
+    },
+    sportsContentContainer: {
+        paddingHorizontal: 4,
+        alignItems: 'center',
+    },
+    sportChip: {
+        backgroundColor: '#f0f0f0',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        marginRight: 8,
+        marginVertical: 4,
+    },
+    sportChipSelected: {
+        backgroundColor: Colours.primary,
+        borderColor: Colours.primary,
+    },
+    sportChipText: {
+        fontSize: 14,
+        fontFamily: Fonts.main,
+        color: '#333',
+    },
+    sportChipTextSelected: {
+        color: 'white',
+        fontWeight: '600',
     },
 });

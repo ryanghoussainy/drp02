@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getGame, getPlayersInGame, joinGame, leaveGame } from '../operations/Games';
 import Player from '../interfaces/Player';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function useGamePlayers(playerId: string, gameId: string) {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -24,9 +25,15 @@ export default function useGamePlayers(playerId: string, gameId: string) {
     setPlayers(sorted);
   };
 
-  useEffect(() => {
-    refreshPlayers();
-  }, []);
+  // useEffect(() => {
+  //   refreshPlayers();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlayers();
+    }, [players])
+  )
 
   const handleJoin = async () => {
     if (players.some((p) => p.id === playerId)) return;

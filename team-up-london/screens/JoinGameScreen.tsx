@@ -143,7 +143,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                     style={[styles.button, 
                         game?.max_players && players.length >= game.max_players ? { backgroundColor: "grey" } : { backgroundColor: Colours.success }]}
                     onPress={handleJoin}
-                    disabled={(game?.max_players && players.length >= game.max_players) || true}
+                    disabled={(game?.max_players && players.length >= game.max_players) || false}
                 >
                     <Text style={styles.buttonText}>{game?.max_players && players.length >= game.max_players ? 'Full' : 'Join'}</Text>
                 </TouchableOpacity>

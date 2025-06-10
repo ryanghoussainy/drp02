@@ -218,9 +218,9 @@ export default function CreateCommunityScreen({ player, navigation }: { player: 
                     ))}
                 </View>
                 <Text style={styles.explanation}>
-                    Public: Anyone can find and join this community.
+                    Public: Anyone can join this community.
                     {'\n'}
-                    Private: Only invited members can discover and join.
+                    Private: Players need to be accepted by you to join.
                 </Text>
             </View>
 
