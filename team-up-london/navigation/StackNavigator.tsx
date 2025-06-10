@@ -22,6 +22,7 @@ export default function Navigator ({ player }: { player: Player }) {
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
+                animation: "slide_from_right"
             }}
         >
             <Stack.Screen name="Main">
