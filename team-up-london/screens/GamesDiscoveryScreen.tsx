@@ -183,9 +183,9 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                     {forYouSectionOpen && (
                         <View style={styles.sectionContent}>
                             {/* Games list */}
-                            {/* {applyAllFilters(forYouGames).map((game) => (
+                            {applyAllFilters(forYouGames).map((game) => (
                                 <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
-                            ))} */}
+                            ))}
                         </View>
                     )}
                 </View>

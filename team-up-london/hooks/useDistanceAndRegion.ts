@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import { Region } from 'react-native-maps';
-import { GAME_LOCATION } from '../constants/maps';
+import { getGame } from '../operations/Games';
 
 interface Distance {
   km: number;
@@ -25,12 +25,26 @@ export default function useDistanceAndRegion({ gameId }: { gameId: string }) {
     })();
   }, []);
 
+  // Location coordinates for the game
+  const [latitude, getLatitude] = useState<number | null>(null);
+  const [longitude, getLongitude] = useState<number | null>(null);
   useEffect(() => {
-    if (!location) return;
+    const fetchGame = async () => {
+      const game = await getGame(gameId);
+      if (game) {
+        getLatitude(game.latitude);
+        getLongitude(game.longitude);
+      }
+    };
+    fetchGame();
+  }, [gameId]);
+
+  useEffect(() => {
+    if (!location || !latitude || !longitude) return;
 
     const toRad = (val: number) => (val * Math.PI) / 180;
     const { latitude: lat1, longitude: lon1 } = location;
-    const { latitude: lat2, longitude: lon2 } = GAME_LOCATION[gameId];
+    const { latitude: lat2, longitude: lon2 } = { latitude, longitude };
 
     // Haversine calculation
     const R = 6371; // Radius in km
@@ -45,17 +59,17 @@ export default function useDistanceAndRegion({ gameId }: { gameId: string }) {
     setDistance({ km, miles });
 
     // Compute mid‐point and deltas for map region
-    const midLatitude = (lat1 + GAME_LOCATION[gameId].latitude) / 2;
-    const midLongitude = (lon1 + GAME_LOCATION[gameId].longitude) / 2;
-    const latitudeDelta = Math.abs(lat1 - GAME_LOCATION[gameId].latitude) * 2 || 0.05;
-    const longitudeDelta = Math.abs(lon1 - GAME_LOCATION[gameId].longitude) * 2 || 0.05;
+    const midLatitude = (lat1 + latitude) / 2;
+    const midLongitude = (lon1 + longitude) / 2;
+    const latitudeDelta = Math.abs(lat1 - latitude) * 2 || 0.05;
+    const longitudeDelta = Math.abs(lon1 - longitude) * 2 || 0.05;
     setMapRegion({
       latitude: midLatitude,
       longitude: midLongitude,
       latitudeDelta,
       longitudeDelta,
     });
-  }, [location]);
+  }, [location, latitude, longitude]);
 
   return { distance, mapRegion };
 }

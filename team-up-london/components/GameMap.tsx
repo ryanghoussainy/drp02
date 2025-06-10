@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import { GAME_LOCATION } from '../constants/maps';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { getGame } from '../operations/Games';
 
 interface GameMapProps {
   mapRegion: Region | null;
@@ -23,6 +23,20 @@ export default function GameMap({ mapRegion, distance, gameId, location }: GameM
     }
   }, [markerRef.current]);
 
+  // Location coordinates for the game
+  const [latitude, getLatitude] = useState<number | null>(null);
+  const [longitude, getLongitude] = useState<number | null>(null);
+  useEffect(() => {
+    const fetchGame = async () => {
+      const game = await getGame(gameId);
+      if (game) {
+        getLatitude(game.latitude);
+        getLongitude(game.longitude);
+      }
+    };
+    fetchGame();
+  }, [gameId]);
+
   return (
     <View style={{ flex: 1 }}>
       {mapRegion && (
@@ -36,12 +50,15 @@ export default function GameMap({ mapRegion, distance, gameId, location }: GameM
           showsMyLocationButton
           mapType={satelliteMode ? 'hybrid' : 'standard'}
         >
-          <Marker
-            ref={markerRef}
-            coordinate={GAME_LOCATION[gameId]}
-            title="Game"
-            description={location}
-          />
+          {latitude && longitude && (
+            <Marker
+              ref={markerRef}
+              coordinate={{ latitude, longitude }}
+              title="Game"
+              description={location}
+              tracksViewChanges={false}
+            />
+          )}
         </MapView>
       )}
 

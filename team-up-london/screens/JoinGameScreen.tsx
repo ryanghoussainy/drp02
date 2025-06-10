@@ -76,10 +76,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                 </View>
             </View>
 
-            {mapRegion ?
-                <GameMap mapRegion={mapRegion} distance={distance} gameId={gameId} location={game?.location || ""} /> :
-                <ActivityIndicator size="large" color={Colours.primary} style={{ marginTop: 20 }} />
-            }
+            <GameMap mapRegion={mapRegion} distance={distance} gameId={gameId} location={game?.location || ""} />
 
             <View style={styles.sideBySide}>
                 <View style={styles.playerSection}>
