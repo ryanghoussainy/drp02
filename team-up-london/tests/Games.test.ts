@@ -1,7 +1,7 @@
 import { db } from '../lib/supabase';
 import { joinGame, leaveGame } from '../operations/Games';
 
-const PLAYER_ID = "a27ce332-d44c-4f19-96a0-d39f2ef8b821";
+const PLAYER_ID = "95251326-b1d7-46c0-856d-39379a68ebd2";
 const GAME_ID = "94242c75-5bd8-4b55-81b0-693f01ce8d60";
 
 async function testInGame() {
