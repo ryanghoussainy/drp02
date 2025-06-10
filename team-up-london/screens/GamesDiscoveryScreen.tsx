@@ -123,13 +123,9 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 }
             }
 
-            // 5. Sports filter (if sports are selected, game must include at least one selected sport)
+            // 5. Sports filter (if sports are selected, game must match one of the selected sports)
             if (selectedSportIds.length > 0) {
-                const gameSportIds = game.sports_ids || [];
-                const hasMatchingSport = selectedSportIds.some(sportId => 
-                    gameSportIds.includes(sportId)
-                );
-                if (!hasMatchingSport) {
+                if (!selectedSportIds.includes(game.sport_id)) {
                     return false;
                 }
             }
@@ -208,9 +204,9 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 </TouchableOpacity>
                 {nearYouSectionOpen && (
                     <View style={styles.sectionContent}>
-                        <Text style={styles.contentText}>
-
-                        </Text>
+                        {applyAllFilters(nearYouGames).map((game) => (
+                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                        ))}
                     </View>
                 )}
             </View>
@@ -230,9 +226,9 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 </TouchableOpacity>
                 {trySomethingNewSectionOpen && (
                     <View style={styles.sectionContent}>
-                        <Text style={styles.contentText}>
-
-                        </Text>
+                        {applyAllFilters(trySomethingNewGames).map((game) => (
+                            <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                        ))}
                     </View>
                 )}
             </View>
