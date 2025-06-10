@@ -140,10 +140,12 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                 </View>
             ) : (
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: Colours.success }]}
+                    style={[styles.button, 
+                        game?.max_players && players.length >= game.max_players ? { backgroundColor: "grey" } : { backgroundColor: Colours.success }]}
                     onPress={handleJoin}
+                    disabled={(game?.max_players && players.length >= game.max_players) || true}
                 >
-                    <Text style={styles.buttonText}>Join</Text>
+                    <Text style={styles.buttonText}>{game?.max_players && players.length >= game.max_players ? 'Full' : 'Join'}</Text>
                 </TouchableOpacity>
             )}
 
