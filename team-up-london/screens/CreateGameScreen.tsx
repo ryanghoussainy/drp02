@@ -10,6 +10,7 @@ import {
     Platform,
     KeyboardAvoidingView,
     Modal,
+    Dimensions,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -24,6 +25,9 @@ import BackArrow from '../components/BackArrow';
 import Player from '../interfaces/Player';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
+
+const { width, height } = Dimensions.get('window');
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateGame'>;
 
@@ -50,6 +54,13 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
     const [sportId, setSportId] = useState<string | null>(null);
     const [cost, setCost] = useState<number>(0);
     const [communityId, setCommunityId] = useState<string | null>(null);
+    const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [mapRegion, setMapRegion] = useState({
+        latitude: 51.5074, // Default to London
+        longitude: -0.1278,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+    });
 
     // Date picker states
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -58,6 +69,33 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
     const [showEndTimePicker, setShowEndTimePicker] = useState(false);
 
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getUserLocation();
+    }, []);
+
+    const getUserLocation = async () => {
+        try {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            const userLoc = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            };
+            setUserLocation(userLoc);
+            setMapRegion({
+                ...userLoc,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            });
+        } catch (error) {
+            console.log('Error getting location:', error);
+        }
+    };
 
     const handleStartDateChange = (event: any, selectedDate?: Date) => {
         setShowStartDatePicker(false);
@@ -69,8 +107,6 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
             setStartTime(newStartTime);
         }
     };
-
-    const [keyboardVisible, setKeyboardVisible] = useState(false);
 
     const handleStartTimeChange = (event: any, selectedTime?: Date) => {
         setShowStartTimePicker(false);
@@ -197,6 +233,10 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
             Alert.alert('Error', 'Please select a sport.');
             return;
         }
+        if (!locationData) {
+            Alert.alert('Error', 'Please select a location on the map.');
+            return;
+        }
 
         setLoading(true);
         const game = await createGame(
@@ -211,6 +251,8 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
             sportId,
             cost,
             player.id,
+            locationData.latitude,
+            locationData.longitude,
             communityId,
         );
 
@@ -237,7 +279,44 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
             };
             setLocationData(locationInfo);
             setLocation(data.description);
+            
+            // Update map region to show the selected location
+            setMapRegion({
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            });
+        }
+    };
+
+    const handleMapPress = (event: any) => {
+        const { latitude, longitude } = event.nativeEvent.coordinate;
+        
+        if (locationData) {
+            // Update existing location data with new coordinates
+            setLocationData({
+                ...locationData,
+                latitude,
+                longitude,
+            });
+        } else {
+            // Create new location data if none exists
+            setLocationData({
+                name: 'Custom Location',
+                latitude,
+                longitude,
+                address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            });
+            setLocation('Custom Location');
+        }
+    };
+
+    const confirmLocationSelection = () => {
+        if (locationData) {
             setShowLocationModal(false);
+        } else {
+            Alert.alert('Error', 'Please select a location first.');
         }
     };
 
@@ -313,40 +392,20 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                     </View>
                 </View>
 
-                {/* <View style={styles.field}>
-                    <Text style={styles.label}>Location <Text style={{ color: 'red' }}>*</Text></Text>
-                    <TouchableOpacity
-                        style={[styles.input, { justifyContent: 'center' }]}
-                        onPress={() => setShowLocationModal(true)}
-                    >
-                        <Text style={[styles.dateTimeText, { color: location ? '#000' : '#888' }]}>
-                            {location || 'Select location from map...'}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {locationData && (
-                        <View style={styles.locationDetails}>
-                            <Text style={styles.locationDetailText}>
-                                📍 {locationData.address}
-                            </Text>
-                            <Text style={styles.locationCoords}>
-                                Lat: {locationData.latitude.toFixed(6)}, Lng: {locationData.longitude.toFixed(6)}
-                            </Text>
-                        </View>
-                    )}
-                </View> */}
-                {/* Location text box */}
                 <View style={styles.field}>
                     <Text style={styles.label}>Location <Text style={{ color: 'red' }}>*</Text></Text>
-                    <TextInput
-                        style={styles.input}
-                        value={location}
-                        onChangeText={setLocation}
-                        placeholder="e.g. Hyde Park"
-                        placeholderTextColor="#888"
-                    />
+                    <TouchableOpacity
+                        style={[styles.input, styles.locationButton]}
+                        onPress={() => setShowLocationModal(true)}
+                    >
+                        <View style={styles.locationButtonContent}>
+                            <Text style={[styles.locationButtonText, { color: location ? '#000' : '#888' }]}>
+                                {location || 'Select location from map...'}
+                            </Text>
+                            <Text style={styles.locationButtonIcon}>📍</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                
 
                 <Text style={[styles.label]}>Select Sport <Text style={{ color: 'red' }}>*</Text></Text>
                 <View style={styles.sportsContainer}>
@@ -536,8 +595,8 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                     />
                 )}
 
-                {/* Location Selection Modal */}
-                {/* <Modal
+                {/* Enhanced Location Selection Modal */}
+                <Modal
                     visible={showLocationModal}
                     animationType="slide"
                     presentationStyle="pageSheet"
@@ -551,44 +610,73 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                                 <Text style={styles.modalCloseText}>Cancel</Text>
                             </TouchableOpacity>
                             <Text style={styles.modalTitle}>Select Location</Text>
-                            <View style={{ width: 60 }} />
+                            <TouchableOpacity
+                                onPress={confirmLocationSelection}
+                                style={styles.modalConfirmButton}
+                            >
+                                <Text style={styles.modalConfirmText}>Done</Text>
+                            </TouchableOpacity>
                         </View>
 
-                        <GooglePlacesAutocomplete
-                            placeholder='Search'
-                            onPress={(data, details = null) => {
-                                // 'details' is provided when fetchDetails = true
-                                console.log(data, details);
-                            }}
-                            query={{
-                                key: 'YOUR API KEY',
-                                language: 'en',
-                            }}
-                            predefinedPlaces={[]}
-                            
-                        />
-                        {locationData && (
+                        <View style={styles.searchContainer}>
+                            <GooglePlacesAutocomplete
+                                placeholder='Search for places...'
+                                onPress={handleLocationSelect}
+                                query={{
+                                    key: process.env.GOOGLE_PLACES_API_KEY,
+                                    language: 'en',
+                                }}
+                                styles={{
+                                    container: styles.autocompleteContainer,
+                                    textInputContainer: styles.autocompleteTextInputContainer,
+                                    textInput: styles.autocompleteInput,
+                                    listView: styles.autocompleteList,
+                                    row: styles.autocompleteRow,
+                                    description: styles.autocompleteMainText,
+                                }}
+                                textInputProps={{
+                                    placeholderTextColor: '#888',
+                                }}
+                                renderDescription={(row) => row.description}
+                                enablePoweredByContainer={false}
+                                fetchDetails={true}
+                                debounce={300}
+                            />
+                        </View>
+
+                        <View style={styles.mapContainer}>
                             <MapView
                                 provider={PROVIDER_GOOGLE}
-                                style={styles.previewMap}
-                                region={{
-                                    latitude: locationData.latitude,
-                                    longitude: locationData.longitude,
-                                    latitudeDelta: 0.01,
-                                    longitudeDelta: 0.01,
-                                }}
+                                style={styles.map}
+                                region={mapRegion}
+                                onPress={handleMapPress}
+                                showsUserLocation={true}
+                                showsMyLocationButton={true}
                             >
-                                <Marker
-                                    coordinate={{
-                                        latitude: locationData.latitude,
-                                        longitude: locationData.longitude,
-                                    }}
-                                    title={locationData.name}
-                                />
+                                {locationData && (
+                                    <Marker
+                                        coordinate={{
+                                            latitude: locationData.latitude,
+                                            longitude: locationData.longitude,
+                                        }}
+                                        title={locationData.name}
+                                        description={locationData.address}
+                                        pinColor={Colours.primary}
+                                    />
+                                )}
                             </MapView>
-                        )}
+                            
+                            <View style={styles.mapInstructions}>
+                                <Text style={styles.mapInstructionsText}>
+                                    {locationData 
+                                        ? "Tap on the map to adjust the pin location" 
+                                        : "Search for a place above or tap on the map to set location"
+                                    }
+                                </Text>
+                            </View>
+                        </View>
                     </View>
-                </Modal> */}
+                </Modal>
 
             </ScrollView>
         </KeyboardAvoidingView>
@@ -630,6 +718,24 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         fontFamily: Fonts.main,
+    },
+    locationButton: {
+        justifyContent: 'center',
+        minHeight: 50,
+    },
+    locationButtonContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    locationButtonText: {
+        fontFamily: Fonts.main,
+        fontSize: 16,
+        flex: 1,
+    },
+    locationButtonIcon: {
+        fontSize: 18,
+        marginLeft: 10,
     },
     dateTimeContainer: {
         flexDirection: 'row',
@@ -729,12 +835,6 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         color: Colours.primary,
     },
-    explanation: {
-        marginTop: 8,
-        fontFamily: Fonts.main,
-        fontSize: 12,
-        color: '#555',
-    },
     button: {
         marginTop: 24,
         backgroundColor: Colours.primary,
@@ -754,20 +854,22 @@ const styles = StyleSheet.create({
     },
     locationDetails: {
         marginTop: 8,
-        padding: 8,
-        backgroundColor: '#f8f8f8',
-        borderRadius: 6,
+        padding: 12,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: Colours.primary,
     },
     locationDetailText: {
         fontSize: 14,
         fontFamily: Fonts.main,
         color: '#333',
+        marginBottom: 4,
     },
     locationCoords: {
         fontSize: 12,
         fontFamily: Fonts.main,
-        color: '#666',
-        marginTop: 2,
+        color: '#555',
     },
     modalContainer: {
         flex: 1,
@@ -775,62 +877,104 @@ const styles = StyleSheet.create({
     },
     modalHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingTop: Platform.OS === 'ios' ? 50 : 16,
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
+        borderColor: '#eee',
     },
     modalCloseButton: {
         padding: 8,
     },
     modalCloseText: {
-        color: Colours.primary,
         fontSize: 16,
         fontFamily: Fonts.main,
+        color: Colours.primary,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontFamily: Fonts.main,
+        fontWeight: 'bold',
+    },
+    modalConfirmButton: {
+        padding: 8,
+    },
+    modalConfirmText: {
+        fontSize: 16,
+        fontFamily: Fonts.main,
+        color: Colours.primary,
+    },
+    searchContainer: {
+        paddingHorizontal: 16,
+        marginBottom: 16,
     },
     autocompleteContainer: {
-        flex: 0,
-        margin: 16,
+        flex: 0, // allow map below to size properly
+    },
+    autocompleteTextInputContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        overflow: 'hidden',
     },
     autocompleteInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
         fontFamily: Fonts.main,
+        fontSize: 16,
+        padding: 10,
     },
     autocompleteList: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderTopWidth: 0,
-        borderBottomLeftRadius: 8,
-        borderBottomRightRadius: 8,
+        backgroundColor: '#fff',
     },
     autocompleteRow: {
-        padding: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
     },
     autocompleteMainText: {
-        fontSize: 16,
         fontFamily: Fonts.main,
-        color: '#333',
+        fontSize: 16,
     },
-    autocompleteSecondaryText: {
+    mapContainer: {
+        flex: 1,
+        height: height * 0.4,
+        marginHorizontal: 16,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    map: {
+        flex: 1,
+    },
+    mapInstructions: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        padding: 8,
+    },
+    mapInstructionsText: {
         fontSize: 14,
         fontFamily: Fonts.main,
-        color: '#666',
-        marginTop: 2,
+        textAlign: 'center',
     },
-    previewMap: {
-        flex: 1,
-        margin: 16,
-        borderRadius: 8,
+    selectedLocationInfo: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderColor: '#eee',
+    },
+    selectedLocationName: {
+        fontSize: 16,
+        fontFamily: Fonts.main,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    selectedLocationAddress: {
+        fontSize: 14,
+        fontFamily: Fonts.main,
+        color: '#555',
+        marginBottom: 4,
+    },
+    selectedLocationCoords: {
+        fontSize: 12,
+        fontFamily: Fonts.main,
+        color: '#555',
     },
 });

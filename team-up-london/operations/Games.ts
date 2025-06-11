@@ -99,6 +99,8 @@ export async function createGame(
     sport_id: string,
     cost: number,
     host_id: string,
+    latitude: number,
+    longitude: number,
     community_id?: string | null,
 ): Promise<Game> {
     const { data, error } = await db
@@ -115,6 +117,8 @@ export async function createGame(
             sport_id,
             cost,
             host_id,
+            latitude,
+            longitude,
             community_id,
         }])
         .select("*")

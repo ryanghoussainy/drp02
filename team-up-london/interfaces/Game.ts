@@ -11,7 +11,7 @@ export default interface Game {
     sport_id: string;
     cost: number;
     location_type: string;
-    community_id?: string; // Optional, for community games
     latitude: number;
     longitude: number;
+    community_id?: string; // Optional, for community games
 }

@@ -70,7 +70,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                     </Text>
                 </View>
                 <View style={[styles.detailBlock, styles.rightAligned]}>
-                    <Text style={styles.detailText}><Text style={styles.tagText}>Location: </Text>{game?.location}</Text>
+                    <Text style={styles.detailText}><Text style={styles.tagText} numberOfLines={2}>Location: </Text>{game?.location}</Text>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>{game?.location_type}</Text>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Cost: </Text>{game?.cost === 0 ? 'Free' : `£${game?.cost}`}</Text>
                 </View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { getGame } from '../operations/Games';
@@ -39,7 +39,7 @@ export default function GameMap({ mapRegion, distance, gameId, location }: GameM
 
   return (
     <View style={{ flex: 1 }}>
-      {mapRegion && (
+      {mapRegion ? (
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
@@ -60,6 +60,8 @@ export default function GameMap({ mapRegion, distance, gameId, location }: GameM
             />
           )}
         </MapView>
+      ) : (
+        <ActivityIndicator size="large" color="#0000ff" />
       )}
 
       {distance && (
