@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
@@ -135,7 +135,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     };
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
 
@@ -396,9 +396,9 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 onPress={() => navigation.navigate("CreateGame", { communityId: null })}
             >
                 <Feather name="plus" size={24} color={Colours.primary} />
-                <Text style={[styles.buttonText, { color: '#003366' }]}>Create Game</Text>
+                <Text style={[styles.buttonText, { fontWeight: 'bold', color: '#003366' }]}>Create Game</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -414,6 +414,7 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         textAlign: 'center',
         marginVertical: 12,
+        color: Colours.primary,
     },
     subTitle: {
         fontSize: 24,
@@ -425,6 +426,7 @@ const styles = StyleSheet.create({
     },
     subTitleText: {
         fontSize: 18,
+        fontWeight: '600',
         fontFamily: Fonts.main,
         textAlign: 'left',
         marginBottom: 8,
@@ -434,11 +436,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     button: {
-        backgroundColor: '#f0f0f0',
-        outlineColor: '#ccc',
-        borderWidth: 1,
+        backgroundColor: Colours.extraButtons,
+        outlineColor: Colours.primary,
+        borderWidth: 2,
         padding: 10,
-        borderRadius: 5,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 20,
-        backgroundColor: '#f8f8f8',
+        backgroundColor: 'white',
         borderRadius: 10,
         paddingHorizontal: 8,
         paddingVertical: 12,

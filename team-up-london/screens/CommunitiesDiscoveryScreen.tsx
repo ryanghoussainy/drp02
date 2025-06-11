@@ -108,9 +108,9 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.container}>
-                <Text style={styles.title}>TeamUp London</Text>
+                <Text style={styles.title}>Team Up London</Text>
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
                     <Text style={[styles.subTitle, {marginTop: 12, marginRight: 20, zIndex: 0, position: 'relative'}]}>Communities</Text>
                     {/* Group everything inside one row */}

@@ -1,5 +1,5 @@
 import Slider from '@react-native-community/slider';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import Fonts from '../config/Fonts';
 import { SKILL_MAPPING } from '../constants/skills';
 import useSports from '../hooks/useSports';
@@ -75,7 +75,7 @@ export default function PreferencesScreen(
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
                 <Text style={[styles.subTitle, { textAlign: 'center' }]}>Preferences</Text>
@@ -254,7 +254,7 @@ export default function PreferencesScreen(
                 <Text style={[styles.saveButtonText, { color: tempSelectedSports.length === 0 ? '#ccc' : 'black' }]}>Save</Text>
             </TouchableOpacity>
 
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -271,6 +271,7 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         textAlign: 'center',
         marginVertical: 12,
+        color: Colours.primary,
     },
     subTitle: {
         fontSize: 24,
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingHorizontal: 8,
         backgroundColor: '#f8f8f8',
-        borderRadius: 10,
+        borderRadius: 16,
         paddingVertical: 12,
         shadowColor: '#000',
         shadowOffset: {
@@ -324,8 +325,8 @@ const styles = StyleSheet.create({
     selectedSportContainer: {
         marginBottom: 12,
         padding: 8,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 8,
+        backgroundColor: Colours.accentBackground,
+        borderRadius: 16,
     },
     sideBySide: {
         flexDirection: 'row',
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colours.primary,
-        borderRadius: 20,
+        borderRadius: 16,
     },
     scollHint: {
         fontSize: 14,
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: '#f0f0f0',
         borderColor: Colours.primary,
-        borderRadius: 10,
+        borderRadius: 16,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
         marginBottom: 8,
         overflow: 'hidden',
-        borderRadius: 10,
+        borderRadius: 16,
     },
     preferredTimeText: {
         fontSize: 14,

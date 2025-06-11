@@ -11,6 +11,7 @@ import useSports from '../hooks/useSports';
 import Colours from '../config/Colours';
 import SportIcon from './SportIcon';
 import Player from '../interfaces/Player';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function CommunityCard({ player, community, onPress }: { player: Player, community: Community, onPress: () => void }) {
     const { sports: allSports } = useSports();
@@ -27,14 +28,8 @@ export default function CommunityCard({ player, community, onPress }: { player: 
             </View>
 
             <View style={styles.bodyContainer}>
-                {/* Primary Location */}
-                <View style={styles.sportText}>
-                    {/* <FontAwesome6 name="location-dot" size={18} color="black" /> */}
-                    <Text style={{ fontStyle: 'italic', textAlign: 'center', marginLeft: 5, color: 'grey' }} numberOfLines={1}>{community.primary_location}</Text>
-                </View>
-
                 {/* Sport Icon and Name */}
-                <View style={[styles.sideBySide, { justifyContent: 'center', alignItems: 'center', marginTop: 10 }]}>
+                <View style={[styles.sideBySide, { justifyContent: 'center', alignItems: 'center', marginTop: 6 }]}>
                     {sports.slice(0, 3).map(sport => (
                         <SportIcon
                             key={sport.id}
@@ -48,12 +43,28 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                         <Text style={{ marginLeft: 4, fontSize: 16, color: Colours.primary }}>...</Text>
                     )}
                 </View>
+                
+                {/* Primary Location */}
+                <View style={styles.sportText}>
+                    {/* <FontAwesome6 name="location-dot" size={18} color="black" /> */}
+                    <Text style={{ fontStyle: 'italic', textAlign: 'center', marginLeft: 5, color: 'grey' }} numberOfLines={1}>{community.primary_location}</Text>
+                </View>
 
                 {/* More Details with a right arrow */}
-                <View style={[styles.sideBySide, { justifyContent: 'center', gap: 10, marginTop: 10 }]}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name="people" size={24} color="black" style={{ marginLeft: 3 }} />
-                        <Text>{players.length}</Text>
+                <View style={[styles.sideBySide, { justifyContent: 'center', gap: 10, marginTop: 10, marginBottom: 10 }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {/* Public/Private Indicator */}
+                        {community.is_public ? (
+                            <View style={styles.publicCircle}>
+                                <Feather name="unlock" size={12} color="white" />
+                            </View>
+                        ) : (
+                            <View style={styles.lockCircle}>
+                                <Feather name="lock" size={12} color="white" />
+                            </View>
+                        )}
+                        <Ionicons name="people" size={24} color="black" />
+                        <Text style={{ marginLeft: 5 }}>{players.length}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -62,10 +73,6 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                     </View>
                 </View>
 
-                {/* Public/Private Indicator */}
-                {!community.is_public && (
-                    <FontAwesome5 style={styles.lockIcon} name="lock" size={24} color="red" />
-                )}
             </View>
 
         </TouchableOpacity>
@@ -116,15 +123,35 @@ const styles = StyleSheet.create({
         top: -10,
         right: 5,
     },
+    lockCircle: {
+        marginLeft: 8,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: Colours.error,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    publicCircle: {
+        marginLeft: 8,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: Colours.success,  // nice deep green for public
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
     headerContainer: {
-        backgroundColor: '#682BD7',  // vibrant purple you already use
+        backgroundColor: Colours.primary,
         borderTopLeftRadius: 14,
         borderTopRightRadius: 14,
         paddingHorizontal: 10,
         marginBottom: 10,
         height: 65,
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
         elevation: 2,
@@ -147,7 +174,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         borderColor: Colours.primary,
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
         elevation: 2,

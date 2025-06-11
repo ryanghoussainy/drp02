@@ -45,14 +45,14 @@ export default function GameCard({ player, game, onPress }: { player: Player, ga
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
 
-            {community && <Text style={styles.gameCommunity}>Community: {community.name}</Text> }
+            { community && <Text style={styles.gameCommunity}>Community: {community.name}</Text> }
 
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
-                    <Text>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
-                    <Text><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
+                    <Text style={{ fontWeight: '600' }}>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
+                    <Text style={{ color: Colours.primary }}><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
-                        <Ionicons name="person" size={16} color="black" />
+                        <Ionicons name="people" size={16} color="black" />
                         <Text> {players.length}/{game.max_players}</Text>
                     </View>
                 </View>
@@ -73,17 +73,17 @@ export default function GameCard({ player, game, onPress }: { player: Player, ga
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#f0f0f0',
+        backgroundColor: Colours.accentBackground,
         borderRadius: 16,
         padding: 10,
         margin: 10,
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
+        shadowRadius: 2,
         elevation: 2,
         width: '94%',
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: Colours.primary,
     },
     gameHeader: {
@@ -96,20 +96,21 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 4,
-        borderBottomWidth: 1,
         borderBottomColor: Colours.primary,
         borderRadius: 10,
-        marginLeft: 10,
+        textAlign: 'center',
+        flex: 1,
+        color: Colours.primary,
     },
     gameCommunity: {
         fontStyle: 'italic',
         marginTop: -5,
-        marginBottom: 3,
+        marginBottom: 5,
         textAlign: 'center',
     },
     tagText: {
         fontWeight: 'bold',
-        color: '#444',
+        color: '#555',
     },
     sideBySide: {
         flexDirection: 'row',
