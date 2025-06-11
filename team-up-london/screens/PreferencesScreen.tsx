@@ -247,7 +247,7 @@ export default function PreferencesScreen(
 
             {/* Save Preferences button */}
             <TouchableOpacity
-                style={[styles.savePreferencesButton, { borderWidth: tempSelectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
+                style={[styles.savePreferencesButton, { backgroundColor: Colours.extraButtons, borderWidth: tempSelectedSports.length === 0 ? 0 : 2 }]} // disable border if no sports selected
                 disabled={tempSelectedSports.length === 0} // disable if no sports selected
                 onPress={handleSavePreferences}
             >

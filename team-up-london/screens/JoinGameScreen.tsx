@@ -69,7 +69,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                         </Text>
                     </Text>
                 </View>
-                <View style={[styles.detailBlock, styles.rightAligned]}>
+                <View style={[styles.detailBlock, styles.leftAligned]}>
                     <Text style={styles.detailText}><Text style={styles.tagText} numberOfLines={2}>Location: </Text>{game?.location}</Text>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>{game?.location_type}</Text>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Cost: </Text>{game?.cost === 0 ? 'Free' : `£${game?.cost}`}</Text>
@@ -233,6 +233,9 @@ const styles = StyleSheet.create({
     },
     rightAligned: {
         alignItems: 'flex-end',
+    },
+    leftAligned: {
+        alignItems: 'flex-start',
     },
     notesBox: {
         backgroundColor: '#f8f8f8',
