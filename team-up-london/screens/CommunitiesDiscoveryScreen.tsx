@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Picker } from '@react-native-picker/picker';
@@ -13,6 +13,7 @@ import useSports from '../hooks/useSports';
 import { Text } from 'react-native';
 import Colours from '../config/Colours';
 import Player from '../interfaces/Player';
+import { Animated, Dimensions, SafeAreaView } from 'react-native';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -23,8 +24,44 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
 
     const { sports } = useSports();
 
-    // Search
+    // Search (+ animation)
+    const [searchActive, setSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const searchWidth = useRef(new Animated.Value(0)).current;
+
+    // Open/close
+    const toggleSearch = () => {
+        if (!searchActive) {
+          setSearchActive(true);
+          Animated.timing(searchWidth, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+          }).start();
+        } else {
+          Animated.timing(searchWidth, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+          }).start(() => {
+            setSearchActive(false);
+            setSearchQuery('');
+          });
+        }
+      };
+
+    const interpolatedWidth = searchWidth.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '52%'],
+    });
+
+    const screenWidth = Dimensions.get('window').width;
+    const maxSearchWidth = screenWidth * 0.3;
+
+    const interpolatedFilterShift = searchWidth.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -maxSearchWidth * 0.1],  // shift left as much as search bar expands
+    });
 
     // Filters
     const [locationFilter, setLocationFilter] = useState('');
@@ -71,35 +108,47 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     };
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.container}>
-                <Text style={styles.title}>Team Up London</Text>
+                <Text style={styles.title}>TeamUp London</Text>
+                <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
+                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 44, zIndex: 0, position: 'relative'}]}>Communities</Text>
+                    {/* Group everything inside one row */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        
+                        {/* Filter button */}
+                        <Animated.View style={{ transform: [{ translateX: interpolatedFilterShift }] }}>
+                            <TouchableOpacity
+                                style={[styles.button, { marginLeft: 0, height: 50, width: 100, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
+                                onPress={() => {
+                                    setTempLocationFilter(locationFilter);
+                                    setTempSportFilter(sportFilter);
+                                    setTempPrivacyFilter(privacyFilter);
+                                    setShowFilterModal(true);
+                                }}
+                            >
+                                <Feather name="filter" size={24} color={Colours.primary} />
+                                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Filter</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
 
-                <Text style={styles.subTitle}>Communities</Text>
+                        {/* Search bar */}
+                        <Animated.View style={[styles.animatedSearchContainer, { width: interpolatedWidth, marginLeft: 2 }]}>
+                            <TextInput
+                                placeholder="Search..."
+                                placeholderTextColor="#888"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                style={styles.searchInput}
+                                autoFocus={searchActive}
+                            />
+                        </Animated.View>
 
-                <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                    {/* Filter button */}
-                    <TouchableOpacity
-                        style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: "40%", flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
-                        onPress={() => {
-                            setTempLocationFilter(locationFilter);
-                            setTempSportFilter(sportFilter);
-                            setTempPrivacyFilter(privacyFilter);
-                            setShowFilterModal(true);
-                        }}
-                    >
-                        <Feather name="filter" size={24} color={Colours.primary} />
-                        <Text style={styles.buttonText}>Filter</Text>
-                    </TouchableOpacity>
-
-                    {/* Search input */}
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search..."
-                        placeholderTextColor="#888"
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                    />
+                        {/* Search icon */}
+                        <TouchableOpacity onPress={toggleSearch} style={[styles.searchButton, { marginLeft: 2 }]}>
+                            <Feather name={searchActive ? "x" : "search"} size={24} color={Colours.primary} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 <FlatList
@@ -211,13 +260,13 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
             <TouchableOpacity
                 style={[
                     styles.button,
-                    { backgroundColor: Colours.extraButtons, borderColor: Colours.primary, borderWidth: 2, position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
+                    { position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
                 onPress={() => navigation.navigate("CreateCommunity")}
             >
                 <Feather name="plus" size={24} color={Colours.primary} />
-                <Text style={[styles.buttonText, { color: '#003366' }]}>Create Community</Text>
+                <Text style={[styles.buttonText, { fontWeight: 'bold', color: '#003366' }]}>Create Community</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -233,6 +282,7 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         textAlign: 'center',
         marginVertical: 12,
+        color: Colours.primary,
     },
     subTitle: {
         fontSize: 24,
@@ -240,7 +290,8 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         marginBottom: 8,
         textAlign: 'left',
-        alignSelf: 'center',
+        alignSelf: 'left',
+        marginLeft: 10,
     },
     subTitleText: {
         fontSize: 18,
@@ -255,11 +306,13 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: '#f0f0f0',
         outlineColor: '#ccc',
-        borderWidth: 1,
         padding: 10,
-        borderRadius: 5,
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 16,
+        backgroundColor: Colours.extraButtons, 
+        borderColor: Colours.primary, 
+        borderWidth: 2,
     },
     buttonText: {
         fontSize: 16,
@@ -293,13 +346,36 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         height: 50,
-        width: '43%',
         borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
+        borderWidth: 0,
+        borderRadius: 8,
         paddingHorizontal: 10,
+        marginRight: 10,
         fontSize: 16,
         fontFamily: Fonts.main,
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        justifyContent: 'center',
+      },
+    animatedSearchContainer: {
+        height: 40,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 16,
+        marginRight: 15,
+        overflow: 'hidden',
+        paddingHorizontal: 0,
+        justifyContent: 'center',
+    },
+    searchButton: {
+        padding: 12,
+        backgroundColor: Colours.extraButtons,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: Colours.primary,
+        marginRight: 8
     },
     formGroup: {
         marginBottom: 24,

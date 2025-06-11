@@ -71,8 +71,8 @@ export default function CommunityCard({ player, community, onPress }: { player: 
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#f0f0f0',
-        borderRadius: 15,
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
         padding: 10,
         margin: 10,
         shadowColor: '#000',
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
         width: '45%',
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: Colours.primary,
     },
     title: {
