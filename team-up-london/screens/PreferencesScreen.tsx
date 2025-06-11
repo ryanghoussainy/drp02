@@ -78,7 +78,7 @@ export default function PreferencesScreen(
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
-                <Text style={styles.subTitle}>Preferences</Text>
+                <Text style={[styles.subTitle, { textAlign: 'center' }]}>Preferences</Text>
 
                 {/* Select sports section */}
                 <View style={styles.section}>
