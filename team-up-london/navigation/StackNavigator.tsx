@@ -13,7 +13,7 @@ export type RootStackParamList = {
     "Game": { gameId: string };
     "Community": { communityId: string };
     "CreateCommunity": undefined;
-    "CreateGame": undefined;
+    "CreateGame": { communityId: string | null };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

@@ -21,7 +21,7 @@ import usePlayer from "../hooks/usePlayer";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
-export default function CommunityScreen({ player, route }: { player: Player} & Props) {
+export default function CommunityScreen({ player, route }: { player: Player } & Props) {
     const { communityId } = route.params;
 
     const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
@@ -110,7 +110,7 @@ export default function CommunityScreen({ player, route }: { player: Player} & P
                 <View style={[styles.detailBlock, { flex: 1.6 }]}>
                     <View style={[styles.sideBySide, { justifyContent: "flex-start" }]}>
                         <Text style={[styles.detailText, { marginRight: 4 }]}><Text style={styles.tagText}>Sports: </Text></Text>
-                        {sports.map(sport => (
+                        {sports.slice(0,3).map(sport => (
                             <SportIcon
                                 key={sport.id}
                                 name={sport?.icon || 'default-icon'}
@@ -119,20 +119,34 @@ export default function CommunityScreen({ player, route }: { player: Player} & P
                                 color={Colours.primary}
                             />
                         ))}
+                        {sports.length > 3 && (
+                            <Text style={{ marginLeft: 4, fontSize: 16, color: Colours.primary }}>...</Text>
+                        )}
                     </View>
 
                     <Text style={styles.detailText}><Text style={styles.tagText}>Needs acceptance: </Text>{community?.is_public ? "No" : "Yes"}</Text>
 
                     <Text style={styles.detailText}><Text style={styles.tagText}>Creator: </Text>{creator?.name}</Text>
                 </View>
-                <View style={[styles.detailBlock, styles.rightAligned]}>
+                <View style={[styles.detailBlock, styles.leftAligned]}>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Primary Location: </Text>{community?.primary_location}</Text>
                     <Text style={styles.detailText}><Text style={styles.tagText}>Location Type: </Text>{community?.primary_location_type}</Text>
                 </View>
             </View>
 
             {/* Games coming up */}
-            <Text style={styles.subTitle}>Upcoming Games</Text>
+            <View style={styles.sideBySide}>
+                <Text style={styles.subTitle}>Upcoming Games</Text>
+
+                {/* Plus button to create game */}
+                {players.some(p => p.id === player.id) && community && <TouchableOpacity
+                    onPress={() => navigation.navigate("CreateGame", { communityId: community?.id })}
+                    style={styles.createGameButton}
+                >
+                    <Text style={styles.buttonText}>+</Text>
+                </TouchableOpacity>}
+            </View>
+
             {games.map((game, idx) => (
                 <GameCard key={idx} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
             ))}
@@ -160,7 +174,7 @@ export default function CommunityScreen({ player, route }: { player: Player} & P
                 <TouchableOpacity
                     onPress={community?.is_public ? handleJoin : () => setRequestedToJoin(true)}
                     disabled={requestedToJoin}
-                    style={[styles.button, { backgroundColor: requestedToJoin ? "#ccc" : "green" }]}
+                    style={[styles.button, { backgroundColor: requestedToJoin ? "#ccc" : Colours.secondary }]}
                 >
                     <Text style={styles.buttonText}>{community?.is_public ? "Join" : (requestedToJoin ? "Requested to Join" : "Request to Join")}</Text>
                 </TouchableOpacity>
@@ -210,21 +224,24 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     membersButton: {
-        backgroundColor: '#f0f0f0',
+        backgroundColor: Colours.extraButtons,
         padding: 8,
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: Colours.primary,
     },
     communityDetails: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#f8f8f8',
+        backgroundColor: Colours.accentBackground,
         padding: 12,
         marginBottom: 20,
         borderLeftWidth: 2,
+        borderLeftColor: Colours.primary,
+        borderTopRightRadius: 16,
+        borderBottomRightRadius: 16,
     },
     detailBlock: {
         flex: 1,
@@ -239,12 +256,15 @@ const styles = StyleSheet.create({
     rightAligned: {
         alignItems: 'flex-end',
     },
+    leftAligned: {
+        alignItems: 'flex-start',
+    },
     button: {
         borderRadius: 15,
         padding: 25,
         marginVertical: 5,
         marginBottom: 16,
-        backgroundColor: "green",
+        backgroundColor: Colours.secondary,
     },
     leaveIconContainer: {
         flexDirection: 'row',
@@ -305,5 +325,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
         textAlign: 'center',
+    },
+    createGameButton: {
+        backgroundColor: Colours.primary,
+        borderRadius: 16,
+        height: 34,
+        width: 50,
+        alignItems: 'center',
     },
 })

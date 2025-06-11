@@ -20,69 +20,66 @@ export default function CommunityCard({ player, community, onPress }: { player: 
 
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
-            {/* Community Name */}
-            <Text style={styles.title}>{community.name}</Text>
 
-            {/* Sport Icon and Name */}
-            <View style={[styles.sideBySide, { justifyContent: 'center' }]}>
-                {sports?.map(sport => (
-                    <SportIcon
-                        key={sport.id}
-                        name={sport?.icon || 'default-icon'}
-                        family={sport?.icon_family as ICON_FAMILIES}
-                        size={sport?.icon_size || 20}
-                        color={Colours.primary}
-                    />
-                ))}
+            {/* Purple header bar for community name */}
+            <View style={styles.headerContainer}>
+                <Text style={styles.headerText} numberOfLines={2}>{community.name}</Text>
             </View>
 
-            {/* Primary Location */}
-            <View style={styles.sportText}>
-                <FontAwesome6 name="location-dot" size={18} color="black" />
-                <Text style={{ marginLeft: 5 }} numberOfLines={1}>{community.primary_location}</Text>
-            </View>
-
-            {/* More Details with a right arrow */}
-            <View style={[styles.sideBySide, { justifyContent: 'space-between', marginTop: 10 }]}>
-                <View style={{ alignItems: 'center' }}>
-                    <Ionicons
-                        name="people"
-                        size={24}
-                        color="black"
-                        style={{ marginLeft: 5 }}
-                    />
-                    <Text>{players.length}</Text>
+            <View style={styles.bodyContainer}>
+                {/* Primary Location */}
+                <View style={styles.sportText}>
+                    {/* <FontAwesome6 name="location-dot" size={18} color="black" /> */}
+                    <Text style={{ fontStyle: 'italic', textAlign: 'center', marginLeft: 5, color: 'grey' }} numberOfLines={1}>{community.primary_location}</Text>
                 </View>
 
-                <Text style={styles.moreDetailsText}>
-                    Details
-                </Text>
+                {/* Sport Icon and Name */}
+                <View style={[styles.sideBySide, { justifyContent: 'center', alignItems: 'center', marginTop: 10 }]}>
+                    {sports.slice(0, 3).map(sport => (
+                        <SportIcon
+                            key={sport.id}
+                            name={sport?.icon || 'default-icon'}
+                            family={sport?.icon_family as ICON_FAMILIES}
+                            size={sport?.icon_size || 20}
+                            color={Colours.primary}
+                        />
+                    ))}
+                    {sports.length > 3 && (
+                        <Text style={{ marginLeft: 4, fontSize: 16, color: Colours.primary }}>...</Text>
+                    )}
+                </View>
 
-                <MaterialIcons name="chevron-right" size={24} color={Colours.primary} />
+                {/* More Details with a right arrow */}
+                <View style={[styles.sideBySide, { justifyContent: 'center', gap: 10, marginTop: 10 }]}>
+                    <View style={{ alignItems: 'center' }}>
+                        <Ionicons name="people" size={24} color="black" style={{ marginLeft: 3 }} />
+                        <Text>{players.length}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={styles.moreDetailsText}>Details</Text>
+                        <MaterialIcons name="chevron-right" size={24} color={Colours.primary} />
+                    </View>
+                </View>
+
+                {/* Public/Private Indicator */}
+                {!community.is_public && (
+                    <FontAwesome5 style={styles.lockIcon} name="lock" size={24} color="red" />
+                )}
             </View>
 
-            {/* Public/Private Indicator */}
-            {!community.is_public && (
-                <FontAwesome5 style={styles.lockIcon} name="lock" size={24} color="black" />
-            )}
         </TouchableOpacity>
+
     )
 }
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#ffffff',
+        backgroundColor: Colours.primary,
         borderRadius: 16,
-        padding: 10,
         margin: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
+        marginBottom: 110,
         width: '45%',
-        borderWidth: 0,
-        borderColor: Colours.primary,
     },
     title: {
         fontSize: 16,
@@ -99,6 +96,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontStyle: 'italic',
         flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
     },
     sideBySide: {
         flexDirection: 'row',
@@ -116,4 +116,40 @@ const styles = StyleSheet.create({
         top: -10,
         right: 5,
     },
+    headerContainer: {
+        backgroundColor: '#682BD7',  // vibrant purple you already use
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
+        paddingHorizontal: 10,
+        marginBottom: 10,
+        height: 65,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 2,
+        justifyContent: "center"
+    },
+    headerText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: -5,
+    },
+    bodyContainer: {
+        position: "absolute",
+        width: '100%',
+        top: 55,
+        backgroundColor: '#ffffff',
+        borderRadius: 14,
+        paddingVertical: 4,
+        borderWidth: 0,
+        borderColor: Colours.primary,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 2,
+    }
 });

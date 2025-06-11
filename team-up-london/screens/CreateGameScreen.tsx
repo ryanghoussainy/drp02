@@ -38,7 +38,7 @@ interface LocationData {
     address: string;
 }
 
-export default function CreateGameScreen({ player, navigation }: { player: Player } & Props) {
+export default function CreateGameScreen({ player, navigation, route }: { player: Player } & Props) {
     const { sports } = useSports();
 
     const [name, setName] = useState('');
@@ -53,7 +53,6 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
     const [minPlayers, setMinPlayers] = useState<number | null>(null);
     const [sportId, setSportId] = useState<string | null>(null);
     const [cost, setCost] = useState<number>(0);
-    const [communityId, setCommunityId] = useState<string | null>(null);
     const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [mapRegion, setMapRegion] = useState({
         latitude: 51.5074, // Default to London
@@ -61,6 +60,8 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
     });
+
+    const { communityId } = route.params || null;
 
     // Date picker states
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -292,7 +293,15 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
 
     const handleMapPress = (event: any) => {
         const { latitude, longitude } = event.nativeEvent.coordinate;
-        
+
+        // Update map region to center on the new coordinates
+        setMapRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+        });
+
         if (locationData) {
             // Update existing location data with new coordinates
             setLocationData({

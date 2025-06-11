@@ -393,7 +393,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
             <TouchableOpacity
                 style={[styles.button, 
                     { backgroundColor: Colours.extraButtons, borderColor: Colours.primary, borderWidth: 2, position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
-                onPress={() => navigation.navigate("CreateGame")}
+                onPress={() => navigation.navigate("CreateGame", { communityId: null })}
             >
                 <Feather name="plus" size={24} color={Colours.primary} />
                 <Text style={[styles.buttonText, { color: '#003366' }]}>Create Game</Text>

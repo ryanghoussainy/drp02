@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Picker } from '@react-native-picker/picker';
@@ -112,7 +112,7 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
             <View style={styles.container}>
                 <Text style={styles.title}>TeamUp London</Text>
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
-                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 44, zIndex: 0, position: 'relative'}]}>Communities</Text>
+                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 20, zIndex: 0, position: 'relative'}]}>Communities</Text>
                     {/* Group everything inside one row */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         
@@ -290,7 +290,6 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         marginBottom: 8,
         textAlign: 'left',
-        alignSelf: 'left',
         marginLeft: 10,
     },
     subTitleText: {
@@ -304,7 +303,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     button: {
-        backgroundColor: '#f0f0f0',
         outlineColor: '#ccc',
         padding: 10,
         justifyContent: 'center',

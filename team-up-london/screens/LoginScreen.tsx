@@ -26,6 +26,7 @@ export default function LoginScreen({ setPlayer }: { setPlayer: (player: Player)
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
+                placeholderTextColor="grey"
             />
 
            <TouchableOpacity

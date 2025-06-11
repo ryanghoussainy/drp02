@@ -192,6 +192,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderLeftWidth: 2,
         borderLeftColor: Colours.primary,
+        borderTopRightRadius: 16,
+        borderBottomRightRadius: 16,
     },
     detailBlock: {
         flex: 1,

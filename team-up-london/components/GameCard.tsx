@@ -74,7 +74,7 @@ export default function GameCard({ player, game, onPress }: { player: Player, ga
 const styles = StyleSheet.create({
     card: {
         backgroundColor: '#f0f0f0',
-        borderRadius: 15,
+        borderRadius: 16,
         padding: 10,
         margin: 10,
         shadowColor: '#000',
