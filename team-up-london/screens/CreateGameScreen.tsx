@@ -407,6 +407,32 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                     </TouchableOpacity>
                 </View>
 
+                {/* Location Type Boxes */}
+                <View style={styles.field}>
+                    <Text style={styles.label}>Location Type <Text style={{ color: 'red' }}>*</Text></Text>
+                    <View style={styles.optionContainer}>
+                        {['Sports Venue', 'Park'].map((type) => (
+                            <TouchableOpacity
+                                key={type}
+                                style={[
+                                    styles.optionBox,
+                                    locationType === type && styles.optionSelected,
+                                ]}
+                                onPress={() => setLocationType(type as 'Sports Venue' | 'Park')}
+                            >
+                                <Text
+                                    style={[
+                                        styles.optionLabel,
+                                        locationType === type && { color: 'white' },
+                                    ]}
+                                >
+                                    {type}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+
                 <Text style={[styles.label]}>Select Sport <Text style={{ color: 'red' }}>*</Text></Text>
                 <View style={styles.sportsContainer}>
                     {sports && sports.length > 0 && sports.map((s) => (
@@ -436,35 +462,9 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                     ))}
                 </View>
 
-                {/* Location Type Boxes */}
-                <View style={styles.field}>
-                    <Text style={styles.label}>Location Type <Text style={{ color: 'red' }}>*</Text></Text>
-                    <View style={styles.optionContainer}>
-                        {['Sports Venue', 'Park'].map((type) => (
-                            <TouchableOpacity
-                                key={type}
-                                style={[
-                                    styles.optionBox,
-                                    locationType === type && styles.optionSelected,
-                                ]}
-                                onPress={() => setLocationType(type as 'Sports Venue' | 'Park')}
-                            >
-                                <Text
-                                    style={[
-                                        styles.optionLabel,
-                                        locationType === type && { color: 'white' },
-                                    ]}
-                                >
-                                    {type}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
-
                 {/* Player Count Fields */}
                 <View style={styles.fieldRow}>
-                    <View style={styles.halfField}>
+                    <View style={[styles.halfField, { paddingTop: 10 }]}>
                         <Text style={styles.label}>Min Players <Text style={{ color: 'red' }}>*</Text></Text>
                         <View style={styles.numberInputContainer}>
                             <TouchableOpacity
@@ -490,7 +490,7 @@ export default function CreateGameScreen({ player, navigation }: { player: Playe
                         </View>
                     </View>
 
-                    <View style={styles.halfField}>
+                    <View style={[styles.halfField, { paddingTop: 10 }]}>
                         <Text style={styles.label}>Max Players <Text style={{ color: 'red' }}>*</Text></Text>
                         <View style={styles.numberInputContainer}>
                             <TouchableOpacity
