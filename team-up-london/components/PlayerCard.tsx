@@ -1,41 +1,41 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Player from '../interfaces/Player';
 import { SKILL_MAPPING } from '../constants/skills';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colours from '../config/Colours';
 
-interface PlayerCardProps {
+export default function PlayerCard({ player, cardPlayer, isHost, sportId, onPress }: {
   player: Player;
-  isYou: boolean;
+  cardPlayer: Player;
   isHost: boolean;
   sportId: string;
-}
-
-export default function PlayerCard({ player, isYou, isHost, sportId }: PlayerCardProps) {
-  // Get index of sport in player's preferred sports
-  const sportIndex = player.preferred_sports_ids.indexOf(sportId);
+  onPress: () => void;
+}) {
+  // Get index of sport in cardPlayer's preferred sports
+  const sportIndex = cardPlayer.preferred_sports_ids.indexOf(sportId);
   // Get skill level for the sport, default to 0 if not found
-  const skillLevel = sportIndex !== -1 ? player.preferred_sports_skill_levels[sportIndex] : 0;
+  const skillLevel = sportIndex !== -1 ? cardPlayer.preferred_sports_skill_levels[sportIndex] : 0;
   const skillLabel = SKILL_MAPPING[skillLevel] || '';
   return (
-    <View
+    <TouchableOpacity
       style={[
         styles.card,
-        isYou ? { borderWidth: 2, borderColor: 'green' } : { borderWidth: 2, borderColor: '#eee' },
+        player.id === cardPlayer.id ? { borderWidth: 2, borderColor: 'green' } : { borderWidth: 2, borderColor: '#eee' },
       ]}
+      onPress={player.id !== cardPlayer.id ? onPress : undefined}
     >
       <Ionicons name="person" size={24} color="black" />
-      <Text style={styles.name}>{player.name}</Text>
+      <Text style={styles.name}>{cardPlayer.name}</Text>
       <Text style={styles.role}>
         {isHost ? <Text style={styles.hostRole}>Host</Text> : 'Player'}
       </Text>
-      <Text>Age: {player.age}</Text>
-      <Text>{player.gender ? 'Male' : 'Female'}</Text>
+      <Text>Age: {cardPlayer.age}</Text>
+      <Text>{cardPlayer.gender ? 'Male' : 'Female'}</Text>
       <View style={styles.skillContainer}>
         <Text style={styles.skillText}>{skillLabel}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

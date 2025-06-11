@@ -94,10 +94,11 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                             {players.map((p, idx) => (
                                 <PlayerCard
                                     key={idx}
-                                    player={p}
-                                    isYou={p.id === player.id}
+                                    player={player}
+                                    cardPlayer={p}
                                     isHost={p.id === hostId}
                                     sportId={game?.sport_id || ''}
+                                    onPress={() => navigation.navigate('PlayerChat', { player: p })}
                                 />
                             ))}
                         </ScrollView>
