@@ -1,12 +1,12 @@
 import Community from "../interfaces/Community";
 import Game from "../interfaces/Game";
 import Player from "../interfaces/Player";
-import { db } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { Alert } from "react-native";
 
 // Get all communities
 export async function getCommunities(): Promise<Community[]> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("communities")
         .select("*");
 
@@ -20,7 +20,7 @@ export async function getCommunities(): Promise<Community[]> {
 
 // Get a community by ID
 export async function getCommunity(communityId: string): Promise<Community> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("communities")
         .select("*")
         .eq("id", communityId)
@@ -36,7 +36,7 @@ export async function getCommunity(communityId: string): Promise<Community> {
 // Get players in a community
 export async function getPlayersInCommunity(communityId: string): Promise<Player[]> {
     // 1. Get the player IDs in that community
-    const { data: playerIds, error: playerIdsError } = await db
+    const { data: playerIds, error: playerIdsError } = await supabase
         .from("community_players")
         .select("player_id")
         .eq("community_id", communityId);
@@ -47,7 +47,7 @@ export async function getPlayersInCommunity(communityId: string): Promise<Player
     }
 
     // 2. Get the player details for those IDs
-    const { data: players, error: playersError } = await db
+    const { data: players, error: playersError } = await supabase
         .from("players")
         .select("*")
         .in("id", playerIds.map(p => p.player_id));
@@ -62,7 +62,7 @@ export async function getPlayersInCommunity(communityId: string): Promise<Player
 
 // Get games in a community
 export async function getGamesInCommunity(communityId: string): Promise<Game[]> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("games")
         .select("*")
         .eq("community_id", communityId);
@@ -77,7 +77,7 @@ export async function getGamesInCommunity(communityId: string): Promise<Game[]> 
 
 // Join a community
 export async function joinCommunity(playerId: string, communityId: string) {
-    const { error } = await db
+    const { error } = await supabase
         .from("community_players")
         .upsert({
             player_id: playerId,
@@ -90,7 +90,7 @@ export async function joinCommunity(playerId: string, communityId: string) {
 
 // Leave a community
 export async function leaveCommunity(playerId: string, communityId: string) {
-    const { error } = await db
+    const { error } = await supabase
         .from("community_players")
         .delete()
         .eq("player_id", playerId)
@@ -103,7 +103,7 @@ export async function leaveCommunity(playerId: string, communityId: string) {
 
 // Get a game community if the game has a community
 export async function getGameCommunity(gameId: string): Promise<Community | null> {
-    const { data: community_id, error: gameError } = await db
+    const { data: community_id, error: gameError } = await supabase
         .from("games")
         .select("community_id")
         .eq("id", gameId)
@@ -117,7 +117,7 @@ export async function getGameCommunity(gameId: string): Promise<Community | null
         return null; // No community associated with this game
     }
 
-    const { data: community, error: communityError } = await db
+    const { data: community, error: communityError } = await supabase
         .from("communities")
         .select("*")
         .eq("id", community_id?.community_id)
@@ -140,7 +140,7 @@ export async function createCommunity(
     sports_ids: string[],
     creator_id: string,
 ): Promise<Community | null> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("communities")
         .insert({
             name,

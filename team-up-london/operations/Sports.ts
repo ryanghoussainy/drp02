@@ -1,10 +1,10 @@
 import Sport from "../interfaces/Sport";
-import { db } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { Alert } from "react-native";
 
 // Get a sport by id
 export async function getSportById(sportId: string): Promise<Sport> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("sports")
         .select("*")
         .eq("id", sportId)
@@ -19,7 +19,7 @@ export async function getSportById(sportId: string): Promise<Sport> {
 
 // Get all sports
 export async function getSports(): Promise<Sport[]> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("sports")
         .select("*");
 
@@ -33,7 +33,7 @@ export async function getSports(): Promise<Sport[]> {
 
 // Get a sport by ID
 export async function getSport(sportId: string): Promise<Sport> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("sports")
         .select("*")
         .eq("id", sportId)

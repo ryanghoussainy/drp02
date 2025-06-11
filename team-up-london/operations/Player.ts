@@ -1,10 +1,10 @@
-import { db } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { Alert } from "react-native";
 import Player from "../interfaces/Player";
 
 // Get a player by ID
 export async function getPlayer(playerId: string): Promise<Player> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("players")
         .select("*")
         .eq("id", playerId)
@@ -24,7 +24,7 @@ export async function registerPreferences(
     preferredSportsIds: string[],
     preferredSportsSkillLevels: number[],
 ) {
-    const { error } = await db
+    const { error } = await supabase
         .from("players")
         .update({
             preferred_times: preferredTimes,
@@ -44,7 +44,7 @@ export async function getPlayerPreferences(playerId: string): Promise<{
     preferred_sports_ids: string[];
     preferred_sports_skill_levels: number[];
 }> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("players")
         .select("preferred_times, preferred_sports_ids, preferred_sports_skill_levels")
         .eq("id", playerId)
@@ -63,7 +63,7 @@ export async function getPlayerPreferences(playerId: string): Promise<{
 
 // Get player by name
 export async function getPlayerByName(name: string): Promise<Player> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("players")
         .select("*")
         .eq("name", name)

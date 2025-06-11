@@ -1,11 +1,11 @@
 import Game from "../interfaces/Game";
 import Player from "../interfaces/Player";
-import { db } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { Alert } from "react-native";
 
 // Get a game by ID
 export async function getGame(gameId: string): Promise<Game> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("games")
         .select("*")
         .eq("id", gameId)
@@ -20,7 +20,7 @@ export async function getGame(gameId: string): Promise<Game> {
 
 // User joins a game
 export async function joinGame(playerId: string, gameId: string) {
-    const { error } = await db
+    const { error } = await supabase
         .from("game_players")
         .upsert([{
             player_id: playerId,
@@ -34,7 +34,7 @@ export async function joinGame(playerId: string, gameId: string) {
 
 // User leaves a game
 export async function leaveGame(playerId: string, gameId: string) {
-    const { error } = await db
+    const { error } = await supabase
         .from("game_players")
         .delete()
         .eq("player_id", playerId)
@@ -48,7 +48,7 @@ export async function leaveGame(playerId: string, gameId: string) {
 // Get players in the game
 export async function getPlayersInGame(game_id: string): Promise<Player[]> {
     // 1. get the player ids in that game
-    const { data: playerIds, error: playerIdsError } = await db
+    const { data: playerIds, error: playerIdsError } = await supabase
         .from("game_players")
         .select("player_id")
         .eq("game_id", game_id);
@@ -59,7 +59,7 @@ export async function getPlayersInGame(game_id: string): Promise<Player[]> {
     }
 
     // 2. get the players
-    const { data: players, error: playersError } = await db
+    const { data: players, error: playersError } = await supabase
         .from("players")
         .select("*")
         .in("id", playerIds.map(player => player.player_id));
@@ -74,7 +74,7 @@ export async function getPlayersInGame(game_id: string): Promise<Player[]> {
 
 // For you games
 export async function getForYouGames(playerId: string): Promise<Game[]> {
-    const { data: games, error } = await db
+    const { data: games, error } = await supabase
         .from("games")
         .select("*")
 
@@ -103,7 +103,7 @@ export async function createGame(
     longitude: number,
     community_id?: string | null,
 ): Promise<Game> {
-    const { data, error } = await db
+    const { data, error } = await supabase
         .from("games")
         .insert([{
             name,

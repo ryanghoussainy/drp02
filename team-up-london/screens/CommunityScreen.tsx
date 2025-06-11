@@ -18,6 +18,7 @@ import Colours from "../config/Colours";
 import BackArrow from "../components/BackArrow";
 import Player from "../interfaces/Player";
 import usePlayer from "../hooks/usePlayer";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
@@ -53,6 +54,11 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                 <Text style={styles.title}>{community?.name}</Text>
             </View>
 
+            {/* Community description */}
+            <Text style={{ fontSize: 16, fontFamily: Fonts.main, marginVertical: 8 }}>
+                {community?.description}
+            </Text>
+
             <View style={styles.sideBySide}>
 
                 <TouchableOpacity
@@ -76,21 +82,28 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                     {players.length > 0 ? (
                         players.map((p) => (
                             <View key={p.id} style={styles.memberRow}>
-                                {/* Avatar with first letter of name */}
-                                <View style={styles.avatar}>
-                                    <Text style={styles.avatarText}>{p.name.charAt(0)}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    {/* Avatar with first letter of name */}
+                                    <View style={styles.avatar}>
+                                        <Text style={styles.avatarText}>{p.name.charAt(0)}</Text>
+                                    </View>
+
+                                    {/* Host indicator */}
+                                    {p.id === creator?.id && (
+                                        <MaterialCommunityIcons
+                                            name="crown"
+                                            size={24}
+                                            color="gold"
+                                        />
+                                    )}
+
+                                    <Text style={styles.memberName}>{p.name}</Text>
                                 </View>
 
-                                {/* Host indicator */}
-                                {p.id === creator?.id && (
-                                    <MaterialCommunityIcons
-                                        name="crown"
-                                        size={26}
-                                        color="gold"
-                                    />
-                                )}
-
-                                <Text style={styles.memberName}>{p.name}</Text>
+                                {/* Message button */}
+                                {p.id !== player.id && <TouchableOpacity style={styles.messageButton} onPress={() => navigation.navigate("PlayerChat", { player: p })}>
+                                    <MaterialIcons name="message" size={24} color="black" />
+                                </TouchableOpacity>}
                             </View>
                         ))
                     ) : (
@@ -100,11 +113,6 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                     )}
                 </View>
             )}
-
-            {/* Community description */}
-            <Text style={{ fontSize: 16, fontFamily: Fonts.main, marginVertical: 8 }}>
-                {community?.description}
-            </Text>
 
             <View style={styles.communityDetails}>
                 <View style={[styles.detailBlock, { flex: 1.6 }]}>
@@ -231,6 +239,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 2,
         borderColor: Colours.primary,
+        marginBottom: 8,
     },
     communityDetails: {
         flexDirection: 'row',
@@ -295,6 +304,7 @@ const styles = StyleSheet.create({
     memberRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingVertical: 6,
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
@@ -332,5 +342,12 @@ const styles = StyleSheet.create({
         height: 34,
         width: 50,
         alignItems: 'center',
+    },
+    messageButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colours.extraButtons,
+        padding: 6,
+        borderRadius: 8,
     },
 })

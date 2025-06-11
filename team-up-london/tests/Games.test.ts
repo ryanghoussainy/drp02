@@ -1,4 +1,4 @@
-import { db } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { joinGame, leaveGame } from '../operations/Games';
 
 const PLAYER_ID = "95251326-b1d7-46c0-856d-39379a68ebd2";
@@ -7,7 +7,7 @@ const GAME_ID = "94242c75-5bd8-4b55-81b0-693f01ce8d60";
 async function testInGame() {
   await joinGame(PLAYER_ID, GAME_ID);
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('game_players')
     .select('*')
     .eq('game_id', GAME_ID)
@@ -25,7 +25,7 @@ async function testInGame() {
 async function testNotInGame() {
   await leaveGame(PLAYER_ID, GAME_ID);
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('game_players')
     .select('*')
     .eq('game_id', GAME_ID)

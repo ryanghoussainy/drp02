@@ -1,12 +1,12 @@
-import { PostgrestClient } from "@supabase/postgrest-js";
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
 
-export const db: PostgrestClient = new PostgrestClient(`${supabaseUrl}/rest/v1`, {
-  headers: {
-    apikey: supabaseAnonKey,
-    Authorization: `Bearer ${supabaseAnonKey}`,
-  },
-  fetch,  // Use native fetch API
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    realtime: {
+        params: {
+            eventsPerSecond: 10,
+        },
+    },
 });

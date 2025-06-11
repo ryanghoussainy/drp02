@@ -94,7 +94,7 @@ export default function CreateGameScreen({ player, navigation, route }: { player
                 longitudeDelta: 0.01,
             });
         } catch (error) {
-            console.log('Error getting location:', error);
+            Alert.alert('Error getting location:');
         }
     };
 
@@ -632,7 +632,7 @@ export default function CreateGameScreen({ player, navigation, route }: { player
                                 placeholder='Search for places...'
                                 onPress={handleLocationSelect}
                                 query={{
-                                    key: process.env.GOOGLE_PLACES_API_KEY,
+                                    key: process.env.GOOGLE_PLACES_API_KEY!,
                                     language: 'en',
                                 }}
                                 styles={{

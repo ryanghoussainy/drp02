@@ -5,8 +5,6 @@ import { ICON_FAMILIES } from '../constants/iconFamilies';
 import useCommunityPlayers from '../hooks/useCommunityPlayers';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import useSports from '../hooks/useSports';
 import Colours from '../config/Colours';
 import SportIcon from './SportIcon';
@@ -27,7 +25,7 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                 <Text style={styles.headerText} numberOfLines={2}>{community.name}</Text>
             </View>
 
-            <View style={styles.bodyContainer}>
+            <TouchableOpacity style={styles.bodyContainer} onPress={onPress}>
                 {/* Sport Icon and Name */}
                 <View style={[styles.sideBySide, { justifyContent: 'center', alignItems: 'center', marginTop: 6 }]}>
                     {sports.slice(0, 3).map(sport => (
@@ -73,7 +71,7 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                     </View>
                 </View>
 
-            </View>
+            </TouchableOpacity>
 
         </TouchableOpacity>
 
