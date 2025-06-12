@@ -45,11 +45,11 @@ export default function GameCard({ player, game, onPress }: { player: Player, ga
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
 
-            { community && <Text style={styles.gameCommunity}>Community: {community.name}</Text> }
+            {community && <Text style={styles.gameCommunity}>Community: {community.name}</Text>}
 
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: '600' }}>{formatDate(new Date(game.start_time), "PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
+                    <Text style={{ fontWeight: '600' }}>{formatDate(new Date(game.start_time), "EEEE, PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
                     <Text style={{ color: Colours.primary }}><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
                         <Ionicons name="people" size={16} color="black" />

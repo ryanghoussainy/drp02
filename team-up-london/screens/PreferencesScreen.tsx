@@ -16,6 +16,7 @@ import usePreferences from '../hooks/usePreferences';
 import Sport from '../interfaces/Sport';
 import { useEffect, useState } from 'react';
 import Player from '../interfaces/Player';
+import BackArrow from '../components/BackArrow';
 
 export default function PreferencesScreen(
     { player, preferences }: { player: Player, preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
@@ -77,7 +78,13 @@ export default function PreferencesScreen(
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.title}>Team Up London</Text>
+                <View>
+                    {/* Only render back arrow if parentSelectedSports is not empty */}
+                    {parentSelectedSports.length > 0 && (
+                        <BackArrow style={{ position: "absolute", top: 20, zIndex: 1 }} />
+                    )}
+                    <Text style={styles.title}>Team Up London</Text>
+                </View>
                 <Text style={[styles.subTitle, { textAlign: 'center' }]}>Preferences</Text>
 
                 {/* Select sports section */}

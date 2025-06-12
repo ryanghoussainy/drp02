@@ -7,6 +7,8 @@ import CreateCommunityScreen from "../screens/CreateCommunityScreen";
 import Player from "../interfaces/Player";
 import CreateGameScreen from "../screens/CreateGameScreen";
 import PlayerChatScreen from "../screens/PlayerChatScreen";
+import PreferencesScreen from "../screens/PreferencesScreen";
+import OtherPlayerProfileScreen from "../screens/OtherPlayerProfileScreen";
 
 export type RootStackParamList = {
     "Main": undefined;
@@ -15,44 +17,54 @@ export type RootStackParamList = {
     "CreateCommunity": undefined;
     "CreateGame": { communityId: string | null };
     "PlayerChat": { player: Player };
+    "OtherPlayerProfile": { player: Player };
+    "Preferences": undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function Navigator ({ player }: { player: Player }) {
-  return (
-    <NavigationContainer>
-        <Stack.Navigator
-            screenOptions={{
-                headerShown: false,
-                animation: "slide_from_right"
-            }}
-        >
-            <Stack.Screen name="Main">
-                {() => <MainTabNavigator player={player} />}
-            </Stack.Screen>
+export default function Navigator({ player }: { player: Player }) {
+    return (
+        <NavigationContainer>
+            <Stack.Navigator
+                screenOptions={{
+                    headerShown: false,
+                    animation: "slide_from_right"
+                }}
+            >
+                <Stack.Screen name="Main">
+                    {() => <MainTabNavigator player={player} />}
+                </Stack.Screen>
 
-            <Stack.Screen name="Game">
-                {(props) => <JoinGameScreen {...props} player={player} />}
-            </Stack.Screen>
+                <Stack.Screen name="Game">
+                    {(props) => <JoinGameScreen {...props} player={player} />}
+                </Stack.Screen>
 
-            <Stack.Screen name="Community">
-                {(props) => <CommunityScreen {...props} player={player} />}
-            </Stack.Screen>
+                <Stack.Screen name="Community">
+                    {(props) => <CommunityScreen {...props} player={player} />}
+                </Stack.Screen>
 
-            <Stack.Screen name="CreateCommunity">
-                {(props) => <CreateCommunityScreen {...props} player={player} />}
-            </Stack.Screen>
+                <Stack.Screen name="CreateCommunity">
+                    {(props) => <CreateCommunityScreen {...props} player={player} />}
+                </Stack.Screen>
 
-            <Stack.Screen name="CreateGame">
-                {(props) => <CreateGameScreen {...props} player={player} />}
-            </Stack.Screen>
+                <Stack.Screen name="CreateGame">
+                    {(props) => <CreateGameScreen {...props} player={player} />}
+                </Stack.Screen>
 
-            <Stack.Screen name="PlayerChat">
-                {(props) => <PlayerChatScreen {...props} player={player} />}
-            </Stack.Screen>
+                <Stack.Screen name="PlayerChat">
+                    {(props) => <PlayerChatScreen {...props} player={player} />}
+                </Stack.Screen>
 
-        </Stack.Navigator>
-    </NavigationContainer>
-  );
+                <Stack.Screen name="OtherPlayerProfile">
+                    {(props) => <OtherPlayerProfileScreen {...props} player={player} />}
+                </Stack.Screen>
+
+                <Stack.Screen name="Preferences">
+                    {() => <PreferencesScreen player={player} />}
+                </Stack.Screen>
+
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 };

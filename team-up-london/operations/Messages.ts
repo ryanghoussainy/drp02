@@ -75,7 +75,6 @@ export function subscribeToMessages(
                 event: "INSERT",
                 schema: "public",
                 table: "messages",
-                filter: `sender_id=eq.${playerId}`
             },
             (payload) => {
                 onNewMessage(payload.new as Message);

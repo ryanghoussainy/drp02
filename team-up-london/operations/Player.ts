@@ -75,3 +75,22 @@ export async function getPlayerByName(name: string): Promise<Player> {
 
     return data as Player;
 }
+
+// Set personal goal
+export async function setPersonalGoal(
+    playerId: string,
+    targetGames: number,
+    targetTimeframe: string,
+): Promise<void> {
+    const { error } = await supabase
+        .from("players")
+        .update({
+            target_games: targetGames,
+            target_timeframe: targetTimeframe,
+        })
+        .eq("id", playerId);
+
+    if (error) {
+        Alert.alert(error.message);
+    }
+}
