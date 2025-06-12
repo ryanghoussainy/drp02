@@ -9,6 +9,6 @@ export default function OtherPlayerProfileScreen({ player, route }: { player: Pl
     const { player: otherPlayer } = route.params;
 
     return (
-        <ProfileScreen player={otherPlayer} />
+        <ProfileScreen player={player} profilePlayer={otherPlayer} />
     )
 }

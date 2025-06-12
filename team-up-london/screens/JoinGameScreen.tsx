@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
@@ -19,6 +19,7 @@ import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
 import BackArrow from '../components/BackArrow';
 import Player from '../interfaces/Player';
+import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
@@ -112,6 +113,18 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                     <View style={styles.notesBox}>
                         <Text>{game?.notes_from_host}</Text>
                     </View>
+
+                    {/* Game chat */}
+                    {players.some(p => p.id === player.id) && <View>
+                        <Text style={styles.sectionTitle}>Any questions?</Text>
+                        <TouchableOpacity
+                            style={styles.chatButton}
+                            onPress={() => navigation.navigate('GameChat', { gameId })}
+                        >
+                            <Text style={styles.chatButtonText}>Game Chat </Text>
+                            <MaterialIcons name="message" size={20} color="black" />
+                        </TouchableOpacity>
+                    </View>}
                 </View>
             </View>
 
@@ -224,6 +237,7 @@ const styles = StyleSheet.create({
     notesSection: {
         flex: 1,
         marginLeft: 16,
+        justifyContent: "space-between"
     },
     sectionTitle: {
         fontSize: 16,
@@ -290,5 +304,21 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginTop: -10,
         marginLeft: 25
-    }
+    },
+    chatButton: {
+        backgroundColor: Colours.extraButtons,
+        padding: 8,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: Colours.primary,
+        marginBottom: 8,
+        flexDirection: 'row',
+    },
+    chatButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: Fonts.main,
+    },
 });

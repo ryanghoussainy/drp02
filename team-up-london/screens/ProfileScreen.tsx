@@ -11,13 +11,23 @@ import Challenge from "../interfaces/Challenge";
 import { availableChallenges } from "../constants/challenges";
 import { setPersonalGoal } from "../operations/Player";
 import usePersonalGoal from "../hooks/usePersonalGoal";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { RootStackParamList } from "../navigation/StackNavigator";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
 
-export default function ProfileScreen({ player, onPress }: { player: Player, onPress?: () => void }) {
+type OtherNavProp = NativeStackNavigationProp<RootStackParamList, "OtherPlayerProfile">;
+
+export default function ProfileScreen({ player, profilePlayer }: { player?: Player, profilePlayer: Player }) {
+    const navigation = useNavigation<OtherNavProp>();
+
+    const isOwn = !player;
+
     const [personalGoalModalVisible, setPersonalGoalModalVisible] = useState(false);
     const [challengesModalVisible, setChallengesModalVisible] = useState(false);
     const [selectedChallenges, setSelectedChallenges] = useState<Challenge[]>([]);
 
-    const { goalGames, goalTimeframe, setGoalGames, setGoalTimeframe } = usePersonalGoal(player.id);
+    const { goalGames, goalTimeframe, setGoalGames, setGoalTimeframe } = usePersonalGoal(profilePlayer.id);
 
     const handleSetPersonalGoal = async () => {
         if (!goalGames || !goalTimeframe) {
@@ -31,7 +41,7 @@ export default function ProfileScreen({ player, onPress }: { player: Player, onP
         }
 
         // Save goal to backend
-        await setPersonalGoal(player.id, goalGames, goalTimeframe);
+        await setPersonalGoal(profilePlayer.id, goalGames, goalTimeframe);
 
         Alert.alert('Goal Set!', `Your goal of ${goalGames} games per ${goalTimeframe} has been set.`);
         setPersonalGoalModalVisible(false);
@@ -60,7 +70,7 @@ export default function ProfileScreen({ player, onPress }: { player: Player, onP
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                {!onPress && <BackArrow style={styles.backArrow} />}
+                {!isOwn && <BackArrow style={styles.backArrow} />}
                 <Text style={styles.title}>Team Up London</Text>
             </View>
 
@@ -74,14 +84,22 @@ export default function ProfileScreen({ player, onPress }: { player: Player, onP
 
                 {/* Player Details */}
                 <View style={styles.playerDetails}>
-                    <Text style={styles.playerName}>{player.name}</Text>
-                    <Text style={styles.playerAge}>Age: {player.age}</Text>
-                    <Text style={styles.playerGender}>Gender: {player.gender ? "Male" : "Female"}</Text>
+                    <Text style={styles.playerName}>{profilePlayer.name}</Text>
+                    <Text style={styles.playerAge}>Age: {profilePlayer.age}</Text>
+                    <Text style={styles.playerGender}>Gender: {profilePlayer.gender ? "Male" : "Female"}</Text>
                 </View>
+
+                {/* Message button */}
+                {!isOwn && <TouchableOpacity
+                    style={styles.messageButton}
+                    onPress={() => navigation.navigate('PlayerChat', { player: profilePlayer })}
+                >
+                    <MaterialCommunityIcons name="message-text" size={35} color={Colours.primary} />
+                </TouchableOpacity>}
             </View>
 
             {/* Choose preferences button */}
-            {onPress && <TouchableOpacity
+            {isOwn && <TouchableOpacity
                 style={{
                     backgroundColor: Colours.primary,
                     padding: 12,
@@ -89,7 +107,7 @@ export default function ProfileScreen({ player, onPress }: { player: Player, onP
                     margin: 16,
                     alignItems: 'center',
                 }}
-                onPress={onPress}
+                onPress={() => navigation.navigate('Preferences')}
             >
                 <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Choose Preferences</Text>
             </TouchableOpacity>}
@@ -116,7 +134,7 @@ export default function ProfileScreen({ player, onPress }: { player: Player, onP
                 />
 
                 {/* Set your goals */}
-                {onPress && <View style={styles.setGoalsContainer}>
+                {isOwn && <View style={styles.setGoalsContainer}>
                     {/* Set your own goal button */}
                     <TouchableOpacity style={styles.goalButton} onPress={() => setPersonalGoalModalVisible(true)}>
                         <Text style={styles.goalButtonText}>Set Your Own Goal</Text>
@@ -501,5 +519,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: Fonts.main,
         color: Colours.primary,
+    },
+    messageButton: {
+        alignSelf: "center",
+        marginRight: 50,
     },
 });

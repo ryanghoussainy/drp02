@@ -74,6 +74,15 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                         color="black"
                     />
                 </TouchableOpacity>
+
+                {/* Community Message button */}
+                {players.some(p => p.id === player.id) && community && <TouchableOpacity
+                    onPress={() => navigation.navigate("CommunityChat", { communityId: community.id })}
+                    style={styles.membersButton}
+                >
+                    <Text style={styles.membersButtonText}>Community Chat</Text>
+                    <MaterialIcons name="message" size={20} color="black" />
+                </TouchableOpacity>}
             </View>
 
             {/* Expandable member list */}

@@ -9,6 +9,8 @@ import CreateGameScreen from "../screens/CreateGameScreen";
 import PlayerChatScreen from "../screens/PlayerChatScreen";
 import PreferencesScreen from "../screens/PreferencesScreen";
 import OtherPlayerProfileScreen from "../screens/OtherPlayerProfileScreen";
+import CommunityChatScreen from "../screens/CommunityChatScreen";
+import GameChatScreen from "../screens/GameChat";
 
 export type RootStackParamList = {
     "Main": undefined;
@@ -19,6 +21,8 @@ export type RootStackParamList = {
     "PlayerChat": { player: Player };
     "OtherPlayerProfile": { player: Player };
     "Preferences": undefined;
+    "CommunityChat": { communityId: string };
+    "GameChat": { gameId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -62,6 +66,14 @@ export default function Navigator({ player }: { player: Player }) {
 
                 <Stack.Screen name="Preferences">
                     {() => <PreferencesScreen player={player} />}
+                </Stack.Screen>
+
+                <Stack.Screen name="CommunityChat">
+                    {(props) => <CommunityChatScreen {...props} player={player} />}
+                </Stack.Screen>
+
+                <Stack.Screen name="GameChat">
+                    {(props) => <GameChatScreen {...props} player={player} />}
                 </Stack.Screen>
 
             </Stack.Navigator>

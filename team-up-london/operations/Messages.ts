@@ -35,14 +35,14 @@ export async function getMessages(
         .from("messages")
         .select("*")
         .or(`and(sender_id.eq.${playerId},receiver_id.eq.${otherPlayerId}),and(sender_id.eq.${otherPlayerId},receiver_id.eq.${playerId})`)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: true })
 
     if (error) {
         Alert.alert("Error", "Failed to fetch messages");
         return [];
     }
 
-    return (data as Message[]).reverse();
+    return data as Message[]
 }
 
 // Mark messages as read
