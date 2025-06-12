@@ -267,7 +267,7 @@ export default function CreateGameScreen({ player, navigation, route }: { player
         await joinGame(player.id, game.id);
 
         setLoading(false);
-        navigation.replace('Game', { gameId: game.id });
+        navigation.replace('Game', { game });
     };
 
     const handleLocationSelect = (data: any, details: any) => {

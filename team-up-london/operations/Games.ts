@@ -72,8 +72,8 @@ export async function getPlayersInGame(game_id: string): Promise<Player[]> {
     return players as Player[];
 }
 
-// For you games
-export async function getForYouGames(playerId: string): Promise<Game[]> {
+// Get games
+export async function getGames(): Promise<Game[]> {
     const { data: games, error } = await supabase
         .from("games")
         .select("*")

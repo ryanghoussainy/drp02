@@ -2,13 +2,11 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 import PlayerCard from '../components/PlayerCard';
 import GameMap from '../components/GameMap';
 import useGamePlayers from '../hooks/useGamePlayers';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
-import useGame from '../hooks/useGame';
 import SportIcon from '../components/SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
 import { formatDate } from 'date-fns';
@@ -20,21 +18,24 @@ import Colours from '../config/Colours';
 import BackArrow from '../components/BackArrow';
 import Player from '../interfaces/Player';
 import { MaterialIcons } from '@expo/vector-icons';
+import useSport from '../hooks/useSport';
+import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
 export default function JoinGameScreen({ player, route }: { player: Player } & Props) {
     const navigation = useNavigation<NativeStackScreenProps<RootStackParamList>['navigation']>();
 
-    const { gameId } = route.params;
+    const { game, distance, mapRegion } = route.params;
 
-    const { distance, mapRegion } = useDistanceAndRegion({ gameId });
+    // This is only if we just created a game and need to manually get distance and region
+    const { distance: newDistance, mapRegion: newMapRegion } = useDistanceAndRegion(game.id);
 
-    const { players, handleJoin, handleLeave, hostId } = useGamePlayers(player.id, gameId);
+    const { players, handleJoin, handleLeave, hostId } = useGamePlayers(player.id, game.id);
 
-    const { game, sport } = useGame(gameId);
+    const { sport } = useSport(game.sport_id);
 
-    const { community } = useGameCommunity(gameId);
+    const { community } = useGameCommunity(game.id);
 
     // Modal for confirmation when leaving
     const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -77,7 +78,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                 </View>
             </View>
 
-            <GameMap mapRegion={mapRegion} distance={distance} gameId={gameId} location={game?.location || ""} />
+            <GameMap mapRegion={mapRegion || newMapRegion} distance={distance || newDistance} gameId={game.id} location={game?.location || ""} />
 
             <View style={styles.sideBySide}>
                 <View style={styles.playerSection}>
@@ -119,7 +120,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                         <Text style={styles.sectionTitle}>Any questions?</Text>
                         <TouchableOpacity
                             style={styles.chatButton}
-                            onPress={() => navigation.navigate('GameChat', { gameId })}
+                            onPress={() => navigation.navigate('GameChat', { gameId: game.id })}
                         >
                             <Text style={styles.chatButtonText}>Game Chat </Text>
                             <MaterialIcons name="message" size={20} color="black" />

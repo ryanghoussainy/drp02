@@ -11,10 +11,12 @@ import PreferencesScreen from "../screens/PreferencesScreen";
 import OtherPlayerProfileScreen from "../screens/OtherPlayerProfileScreen";
 import CommunityChatScreen from "../screens/CommunityChatScreen";
 import GameChatScreen from "../screens/GameChat";
+import { Region } from "react-native-maps";
+import Game from "../interfaces/Game";
 
 export type RootStackParamList = {
     "Main": undefined;
-    "Game": { gameId: string };
+    "Game": { game: Game, distance?: { km: number, miles: number }, mapRegion?: Region };
     "Community": { communityId: string };
     "CreateCommunity": undefined;
     "CreateGame": { communityId: string | null };

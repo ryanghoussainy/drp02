@@ -14,8 +14,17 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
 import Colours from '../config/Colours';
+import useDistancesAndRegions from '../hooks/useDistancesAndRegions';
+import Game from '../interfaces/Game';
+import { Region } from 'react-native-maps';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
+
+interface GameWithDistanceAndRegion {
+    game: Game;
+    distance: { km: number; miles: number };
+    mapRegion: Region;
+}
 
 export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const navigation = useNavigation<GamesNavProp>();
@@ -36,7 +45,40 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         trySomethingNewSectionOpen,
         setTrySomethingNewSectionOpen,
         trySomethingNewGames,
-    } = useGamesDiscoverySections(player.id);
+    } = useGamesDiscoverySections(player);
+
+    const { distances: forYouDistances, mapRegions: forYouMapRegions } = useDistancesAndRegions(forYouGames);
+    const { distances: nearYouDistances, mapRegions: nearYouMapRegions } = useDistancesAndRegions(nearYouGames);
+    const { distances: trySomethingNewDistances, mapRegions: trySomethingNewMapRegions } = useDistancesAndRegions(trySomethingNewGames);
+
+    // States for sorted games by distance
+    const [forYouSortedGames, setForYouSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
+    const [nearYouSortedGames, setNearYouSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
+    const [trySomethingNewSortedGames, setTrySomethingNewSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
+    useEffect(() => {
+        // Combine games with their distances and regions
+        setForYouSortedGames(forYouGames.map((game, idx) => ({
+            game,
+            distance: forYouDistances[idx],
+            mapRegion: forYouMapRegions[idx],
+        })).sort((a, b) => (a.distance || { km: 0 }).km - (b.distance || { km: 0 }).km));
+
+        setNearYouSortedGames(nearYouGames.map((game, idx) => ({
+            game,
+            distance: nearYouDistances[idx],
+            mapRegion: nearYouMapRegions[idx],
+        })).sort((a, b) => (a.distance || { km: 0 }).km - (b.distance || { km: 0 }).km));
+
+        setTrySomethingNewSortedGames(trySomethingNewGames.map((game, idx) => ({
+            game,
+            distance: trySomethingNewDistances[idx],
+            mapRegion: trySomethingNewMapRegions[idx],
+        })).sort((a, b) => (a.distance || { km: 0 }).km - (b.distance || { km: 0 }).km));
+    }, [
+        forYouGames, forYouDistances, forYouMapRegions,
+        nearYouGames, nearYouDistances, nearYouMapRegions,
+        trySomethingNewGames, trySomethingNewDistances, trySomethingNewMapRegions
+    ]);
 
     // Search
     const [searchQuery, setSearchQuery] = useState('');
@@ -90,19 +132,16 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         }
     };
 
-    const applyAllFilters = (games: Array<any>) => {
-        return games.filter((game) => {
+    const applyAllFilters = (games: Array<GameWithDistanceAndRegion>) => {
+        return games.filter((gameWithDistanceAndRegion) => {
+            const game = gameWithDistanceAndRegion.game;
             // 1. Name search (case-insensitive substring)
             if (!game.name.toLowerCase().includes(searchQuery.toLowerCase())) {
                 return false;
             }
 
             // 2. Skill-level filter
-            const averageSkillRaw = AVERAGE_SKILL_LEVEL(playersByGame[game.id] || [], game.sport);
-            const averageSkillLevel =
-                typeof averageSkillRaw === 'string'
-                    ? averageSkillRaw.toLowerCase()
-                    : '';
+            const averageSkillLevel = AVERAGE_SKILL_LEVEL(playersByGame[game.id] || [], game.sport_id);
             if (skillFilter !== 'all' && averageSkillLevel !== skillFilter) {
                 return false;
             }
@@ -183,8 +222,14 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                     {forYouSectionOpen && (
                         <View style={styles.sectionContent}>
                             {/* Games list */}
-                            {applyAllFilters(forYouGames).map((game) => (
-                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            {applyAllFilters(forYouSortedGames).map((game, idx) => (
+                                <GameCard
+                                    key={idx}
+                                    player={player}
+                                    game={game.game}
+                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
+                                    distance={game.distance}
+                                />
                             ))}
                         </View>
                     )}
@@ -205,8 +250,14 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                     </TouchableOpacity>
                     {nearYouSectionOpen && (
                         <View style={styles.sectionContent}>
-                            {applyAllFilters(nearYouGames).map((game) => (
-                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            {applyAllFilters(nearYouSortedGames).map((game, idx) => (
+                                <GameCard
+                                    key={idx}
+                                    player={player}
+                                    game={game.game}
+                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
+                                    distance={game.distance}
+                                />
                             ))}
                         </View>
                     )}
@@ -227,8 +278,14 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                     </TouchableOpacity>
                     {trySomethingNewSectionOpen && (
                         <View style={styles.sectionContent}>
-                            {applyAllFilters(trySomethingNewGames).map((game) => (
-                                <GameCard key={game.id} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                            {applyAllFilters(trySomethingNewSortedGames).map((game, idx) => (
+                                <GameCard
+                                    key={idx}
+                                    player={player}
+                                    game={game.game}
+                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
+                                    distance={game.distance}
+                                />
                             ))}
                         </View>
                     )}

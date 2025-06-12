@@ -4,7 +4,6 @@ import Game from '../interfaces/Game';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { formatDate } from 'date-fns';
 import useGamePlayers from '../hooks/useGamePlayers';
-import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
 import useSports from '../hooks/useSports';
 import SportIcon from './SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
@@ -15,17 +14,15 @@ import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
 import Player from '../interfaces/Player';
 
-export default function GameCard({ player, game, onPress }: { player: Player, game: Game, onPress?: () => void }) {
+export default function GameCard({ player, game, onPress, distance }: { player: Player, game: Game, onPress?: () => void, distance: { km: number, miles: number } }) {
     const { players } = useGamePlayers(player.id, game.id);
     const { sports } = useSports();
-
-    const { distance } = useDistanceAndRegion({ gameId: game.id });
 
     const sport = sports.find(s => s.id === game.sport_id);
 
     const renderDistance = () => {
         if (distance) {
-            return `(${distance?.km.toFixed(1)} km / ${distance?.miles.toFixed(1)} mi)`
+            return `(${distance.km.toFixed(1)} km / ${distance.miles.toFixed(1)} mi)`
         } else {
             return '(Getting distance...)';
         }

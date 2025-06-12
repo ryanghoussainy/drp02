@@ -19,6 +19,7 @@ import BackArrow from "../components/BackArrow";
 import Player from "../interfaces/Player";
 import usePlayer from "../hooks/usePlayer";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import useDistancesAndRegions from "../hooks/useDistancesAndRegions";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
@@ -34,6 +35,8 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
 
     const { games } = useCommunityGames(communityId);
     const { players, handleJoin, handleLeave } = useCommunityPlayers(player.id, communityId);
+
+    const { distances, mapRegions } = useDistancesAndRegions(games);
 
     // Modal for confirmation when leaving
     const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -165,7 +168,13 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
             </View>
 
             {games.map((game, idx) => (
-                <GameCard key={idx} player={player} game={game} onPress={() => navigation.navigate("Game", { gameId: game.id })} />
+                <GameCard
+                    key={idx}
+                    player={player}
+                    game={game}
+                    onPress={() => navigation.navigate("Game", { game, distance: distances[idx], mapRegion: mapRegions[idx] })}
+                    distance={distances[idx]}
+                />
             ))}
 
             {players.some(p => p.id === player.id) ? (
