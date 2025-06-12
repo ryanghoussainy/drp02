@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import CommunitiesScreen from "../screens/CommunitiesDiscoveryScreen";
 import GamesDiscoveryScreen from "../screens/GamesDiscoveryScreen";
 import Colours from "../config/Colours";
@@ -28,6 +28,27 @@ export default function MainTabNavigator({ player }: { player: Player }) {
             </Tab.Screen>
 
             <Tab.Screen
+                name="Discover Games"
+                options={() => ({
+                    tabBarIcon: ({ focused }) => (
+                        <View style={[styles.emphasizedTab, { backgroundColor: focused ? Colours.primary : Colours.primary }]}>
+                            <Ionicons
+                                name="football"
+                                size={36}
+                                color="white"
+                            />
+                        </View>
+                    ),
+                    headerShown: false,
+                    tabBarInactiveTintColor: Colours.inactive,
+                    tabBarActiveTintColor: Colours.inactive,
+                    tabBarLabelStyle: [styles.tabBarLabel, { color: Colours.primary, fontWeight: 'bold' }],
+                })}
+            >
+                {() => <GamesDiscoveryScreen player={player} />}
+            </Tab.Screen>
+
+            <Tab.Screen
                 name="Communities"
                 options={() => ({
                     tabBarIcon: ({ color }) => (
@@ -41,21 +62,6 @@ export default function MainTabNavigator({ player }: { player: Player }) {
             >
                 {() => <CommunitiesScreen player={player} />}
             </Tab.Screen>
-
-            <Tab.Screen
-                name="Discover Games"
-                options={() => ({
-                    tabBarIcon: ({ color }) => (
-                        <Ionicons name="football" size={30} color={color} />
-                    ),
-                    headerShown: false,
-                    tabBarInactiveTintColor: Colours.inactive,
-                    tabBarActiveTintColor: Colours.active,
-                    tabBarLabelStyle: styles.tabBarLabel,
-                })}
-            >
-                {() => <GamesDiscoveryScreen player={player} />}
-            </Tab.Screen>
         </Tab.Navigator>
     );
 };
@@ -63,9 +69,26 @@ export default function MainTabNavigator({ player }: { player: Player }) {
 const styles = StyleSheet.create({
     tabBar: {
         borderTopWidth: 0,
+        height: 90, // Increased height to accommodate the emphasized button
     },
     tabBarLabel: {
         fontSize: 13,
         fontWeight: "bold",
+    },
+    emphasizedTab: {
+        width: 50,
+        height: 50,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20, // This makes it go above the tab bar
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
 });
