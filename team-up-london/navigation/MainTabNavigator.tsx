@@ -31,7 +31,7 @@ export default function MainTabNavigator({ player }: { player: Player }) {
                 name="Discover Games"
                 options={() => ({
                     tabBarIcon: ({ focused }) => (
-                        <View style={[styles.emphasizedTab, { backgroundColor: focused ? Colours.primary : Colours.primary }]}>
+                        <View style={[styles.emphasizedTab, { backgroundColor: focused ? Colours.primary : Colours.inactive }]}>
                             <Ionicons
                                 name="football"
                                 size={36}
@@ -41,8 +41,8 @@ export default function MainTabNavigator({ player }: { player: Player }) {
                     ),
                     headerShown: false,
                     tabBarInactiveTintColor: Colours.inactive,
-                    tabBarActiveTintColor: Colours.inactive,
-                    tabBarLabelStyle: [styles.tabBarLabel, { color: Colours.primary, fontWeight: 'bold' }],
+                    tabBarActiveTintColor: Colours.active,
+                    tabBarLabelStyle: styles.tabBarLabel,
                 })}
             >
                 {() => <GamesDiscoveryScreen player={player} />}
