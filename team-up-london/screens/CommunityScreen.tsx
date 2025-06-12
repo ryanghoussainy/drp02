@@ -8,7 +8,7 @@ import useCommunityGames from "../hooks/useCommunityGames";
 import GameCard from "../components/GameCard";
 import useCommunityPlayers from "../hooks/useCommunityPlayers";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import React, { useState } from "react";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { RootStackParamList } from "../navigation/StackNavigator";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";

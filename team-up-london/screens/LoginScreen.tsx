@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { getPlayerByName } from "../operations/Player";
-import { useState } from "react";
+import React, { useState } from "react";
 import Colours from "../config/Colours";
 import Player from "../interfaces/Player";
 

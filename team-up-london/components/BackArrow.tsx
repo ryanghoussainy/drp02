@@ -1,3 +1,4 @@
+import React from 'react';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { StyleProp, TextStyle } from 'react-native';

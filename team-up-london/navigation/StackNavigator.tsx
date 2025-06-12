@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainTabNavigator from "./MainTabNavigator";
@@ -13,6 +14,7 @@ import CommunityChatScreen from "../screens/CommunityChatScreen";
 import GameChatScreen from "../screens/GameChat";
 import { Region } from "react-native-maps";
 import Game from "../interfaces/Game";
+import Push from "../components/Push";
 
 export type RootStackParamList = {
     "Main": undefined;
@@ -79,6 +81,8 @@ export default function Navigator({ player }: { player: Player }) {
                 </Stack.Screen>
 
             </Stack.Navigator>
+
+            <Push playerId={player.id} />
         </NavigationContainer>
     );
 };
