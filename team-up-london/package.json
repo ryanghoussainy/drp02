@@ -46,6 +46,5 @@
     "ts-jest": "^29.3.4",
     "typescript": "~5.8.3"
   },
-  "private": true,
-  "eas-build-pre-install": "echo $GOOGLE_SERVICES_BASE64 | base64 --decode > ./google-services.json"
+  "private": true
 }
