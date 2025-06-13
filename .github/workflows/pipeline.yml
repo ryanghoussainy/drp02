@@ -35,20 +35,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Decode google‑services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          mkdir -p ${{ env.APP_DIR }}/android/app
-          echo "$GOOGLE_SERVICES_JSON" | base64 -di > ${{ env.APP_DIR }}/android/app/google-services.json
-
-
       - name: Set up JDK
         id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $DATA | base64 -di > app/google-services.json
 
       - uses: actions/setup-node@v4.0.2
         with: 
