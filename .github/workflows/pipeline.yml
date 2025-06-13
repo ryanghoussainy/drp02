@@ -35,11 +35,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use google-services.json secret
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > google-services.json
-          cat google-services.json
-        working-directory: ${{ env.APP_DIR }}
+      # - name: Use google-services.json secret
+        # run: |
+          
+        #   cat google-services.json
+        # working-directory: ${{ env.APP_DIR }}
 
       - name: Set up JDK
         id: setup-java
@@ -59,7 +59,9 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
       - name: Local Android build
-        run: eas build --local -p android --profile preview --non-interactive --output team-up-london.apk
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > google-services.json
+          eas build --local -p android --profile preview --non-interactive --output team-up-london.apk
         working-directory: ${{ env.APP_DIR }}
 
       - name: Upload APK artifact
