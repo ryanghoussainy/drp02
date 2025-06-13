@@ -38,3 +38,6 @@ yarn-error.*
 
 # env files
 .env
+
+# Google services file
+google-services.json
