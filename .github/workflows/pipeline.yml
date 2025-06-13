@@ -45,7 +45,8 @@ jobs:
       - name: Load Google Service file
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $DATA | base64 -di > app/google-services.json
+        run: echo $DATA | base64 -di > google-services.json
+        working-directory: ${{ env.APP_DIR }}
 
       - uses: actions/setup-node@v4.0.2
         with: 
