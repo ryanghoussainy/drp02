@@ -35,6 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Use google-services.json secret
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ env.APP_DIR }}/google-services.json
+
       - name: Set up JDK
         id: setup-java
         uses: actions/setup-java@v4
