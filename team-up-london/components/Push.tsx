@@ -25,7 +25,10 @@ export default function Push({ playerId }: { playerId: string }) {
     registerForPushNotificationsAsync().then(async token => {
       token && setExpoPushToken(token);
 
-      await supabase.from("players").upsert({ id: playerId, expo_push_token: token })
+      await supabase
+        .from("players")
+        .update({ expo_push_token: token })
+        .eq("id", playerId);
     });
 
     if (Platform.OS === 'android') {
@@ -115,7 +118,7 @@ async function registerForPushNotificationsAsync() {
     // EAS projectId is used here.
     try {
       const projectId =
-        Constants?.default?.expoConfig?.extra?.eas?.projectId ?? Constants?.default?.easConfig?.projectId;
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
       if (!projectId) {
         throw new Error('Project ID not found');
       }
