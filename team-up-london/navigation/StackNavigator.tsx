@@ -82,7 +82,7 @@ export default function Navigator({ player }: { player: Player }) {
 
             </Stack.Navigator>
 
-            <Push playerId={player.id} />
+            {/* <Push playerId={player.id} /> */}
         </NavigationContainer>
     );
 };

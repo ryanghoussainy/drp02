@@ -16,5 +16,5 @@ export default function usePlayer(playerId: string) {
         }
     }, [playerId]);
 
-    return { player };
+    return { player } as { player: Player };
 }

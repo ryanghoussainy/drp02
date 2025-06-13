@@ -5,8 +5,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import Player from '../interfaces/Player';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { getPlayersInCommunity } from '../operations/Communities';
+import usePlayer from './usePlayer';
+import { getPlayer } from '../operations/Player';
 
-export default function useGamesDiscoverySections(player: Player) {
+export default function useGamesDiscoverySections(playerId: string) {
     // For you section
     const [forYouSectionOpen, setForYouSectionOpen] = useState<boolean>(true);
     const [forYouGames, setForYouGames] = useState<Game[]>([]);
@@ -23,6 +25,8 @@ export default function useGamesDiscoverySections(player: Player) {
     useFocusEffect(
         useCallback(() => {
             const fetchGames = async () => {
+                const player = await getPlayer(playerId);
+
                 const games = await getGames();
                 /**
                  * For you section:
@@ -67,7 +71,7 @@ export default function useGamesDiscoverySections(player: Player) {
                     const gamePlayers = gamePlayersMap.get(game.id) || [];
                     const avgLevel = AVERAGE_SKILL_LEVEL(gamePlayers, game.sport_id);
                     
-                    if (playerSkillLevel === avgLevel && !forYouGameIds.has(game.id)) {
+                    if (playerSkillLevel === avgLevel && !forYouGameIds.has(game.id) && player.preferred_sports_ids.includes(game.sport_id)) {
                         forYouGameIds.add(game.id);
                         forYouGamesArray.push(game);
                     }

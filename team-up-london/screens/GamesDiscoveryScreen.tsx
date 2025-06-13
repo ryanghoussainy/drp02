@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Animated, Dimensions } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
@@ -26,6 +26,8 @@ interface GameWithDistanceAndRegion {
     mapRegion: Region;
 }
 
+type TabType = 'forYou' | 'nearYou' | 'trySomethingNew';
+
 export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const navigation = useNavigation<GamesNavProp>();
     const { sports } = useSports();
@@ -45,7 +47,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         trySomethingNewSectionOpen,
         setTrySomethingNewSectionOpen,
         trySomethingNewGames,
-    } = useGamesDiscoverySections(player);
+    } = useGamesDiscoverySections(player.id);
 
     const { distances: forYouDistances, mapRegions: forYouMapRegions } = useDistancesAndRegions(forYouGames);
     const { distances: nearYouDistances, mapRegions: nearYouMapRegions } = useDistancesAndRegions(nearYouGames);
@@ -55,6 +57,10 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const [forYouSortedGames, setForYouSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
     const [nearYouSortedGames, setNearYouSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
     const [trySomethingNewSortedGames, setTrySomethingNewSortedGames] = useState<GameWithDistanceAndRegion[]>([]);
+
+    // Active tab state
+    const [activeTab, setActiveTab] = useState<TabType>('forYou');
+
     useEffect(() => {
         // Combine games with their distances and regions
         setForYouSortedGames(forYouGames.map((game, idx) => ({
@@ -173,122 +179,162 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         });
     };
 
+    const getCurrentGames = () => {
+        switch (activeTab) {
+            case 'forYou':
+                return applyAllFilters(forYouSortedGames);
+            case 'nearYou':
+                return applyAllFilters(nearYouSortedGames);
+            case 'trySomethingNew':
+                return applyAllFilters(trySomethingNewSortedGames);
+            default:
+                return [];
+        }
+    };
+
+    const getTabTitle = () => {
+        switch (activeTab) {
+            case 'forYou':
+                return 'For You';
+            case 'nearYou':
+                return 'Near You';
+            case 'trySomethingNew':
+                return 'Try Something New';
+            default:
+                return '';
+        }
+    };
+
+    // Search (+ animation)
+    const [searchActive, setSearchActive] = useState(false);
+    const searchWidth = useRef(new Animated.Value(0)).current;
+
+    // Open/close
+    const toggleSearch = () => {
+        if (!searchActive) {
+        setSearchActive(true);
+        Animated.timing(searchWidth, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+        } else {
+        Animated.timing(searchWidth, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+        }).start(() => {
+            setSearchActive(false);
+            setSearchQuery('');
+        });
+        }
+    };
+
+    const interpolatedWidth = searchWidth.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '52%'],
+    });
+
+    const screenWidth = Dimensions.get('window').width;
+    const maxSearchWidth = screenWidth * 0.3;
+
+    const interpolatedFilterShift = searchWidth.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -maxSearchWidth * 0.1],  // shift left as much as search bar expands
+    });
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
+                <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
+                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 60, zIndex: 0, position: 'relative'}]}>Discovery</Text>
+                    {/* Group everything inside one row */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        
+                        {/* Filter button */}
+                        <Animated.View style={{ transform: [{ translateX: interpolatedFilterShift }] }}>
+                            <TouchableOpacity
+                                style={[styles.button, { marginLeft: 0, height: 50, width: 100, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
+                                onPress={() => {
+                                    setTempLocationFilter(locationFilter);
+                                    setTempSkillFilter(skillFilter);
+                                    setTempSelectedDate(selectedDate);
+                                    setTempSelectedSportIds(selectedSportIds);
+                                    setShowFilterModal(true);
+                                }}
+                            >
+                                <Feather name="filter" size={24} color={Colours.primary} />
+                                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Filter</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
 
-                <Text style={styles.subTitle}>Discovery</Text>
+                        {/* Search bar */}
+                        <Animated.View style={[styles.animatedSearchContainer, { width: interpolatedWidth, marginLeft: 2 }]}>
+                            <TextInput
+                                placeholder="Search..."
+                                placeholderTextColor="#888"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                style={styles.searchInput}
+                                autoFocus={searchActive}
+                            />
+                        </Animated.View>
 
-                <View style={[styles.sideBySide, { marginBottom: 16 }]}>
-                    {/* Filter button */}
-                    <TouchableOpacity
-                        style={[styles.button, { marginLeft: 8, paddingVertical: 12, width: '40%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}
-                        onPress={() => {
-                            setTempSkillFilter(skillFilter);
-                            setTempLocationFilter(locationFilter);
-                            setTempSelectedDate(selectedDate);
-                            setTempSelectedSportIds([...selectedSportIds]);
-                            setShowFilterModal(true);
-                        }}
-                    >
-                        <Feather name="filter" size={24} color={Colours.primary} />
-                        <Text style={styles.buttonText}>Filter</Text>
-                    </TouchableOpacity>
-
-                    {/* Search input */}
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholderTextColor='#888'
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                    />
+                        {/* Search icon */}
+                        <TouchableOpacity onPress={toggleSearch} style={[styles.searchButton, { marginLeft: 2 }]}>
+                            <Feather name={searchActive ? "x" : "search"} size={24} color={Colours.primary} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                {/* For you section */}
-                <View style={styles.section}>
+                {/* Tab Navigation */}
+                <View style={styles.tabContainer}>
                     <TouchableOpacity
-                        style={styles.sectionHeader}
-                        onPress={() => setForYouSectionOpen(!forYouSectionOpen)}
+                        style={[styles.tab, activeTab === 'forYou' && styles.activeTab]}
+                        onPress={() => setActiveTab('forYou')}
                     >
-                        <Text style={styles.subTitleText}>For You</Text>
-                        <Feather
-                            name={forYouSectionOpen ? 'chevron-up' : 'chevron-down'}
-                            size={20}
-                            color={Colours.primary}
-                        />
+                        <Text style={[styles.tabText, activeTab === 'forYou' && styles.activeTabText]}>
+                            For You
+                        </Text>
                     </TouchableOpacity>
-                    {forYouSectionOpen && (
-                        <View style={styles.sectionContent}>
-                            {/* Games list */}
-                            {applyAllFilters(forYouSortedGames).map((game, idx) => (
-                                <GameCard
-                                    key={idx}
-                                    player={player}
-                                    game={game.game}
-                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
-                                    distance={game.distance}
-                                />
-                            ))}
-                        </View>
-                    )}
+                    <TouchableOpacity
+                        style={[styles.tab, activeTab === 'nearYou' && styles.activeTab]}
+                        onPress={() => setActiveTab('nearYou')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'nearYou' && styles.activeTabText]}>
+                            Near You
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.tab, activeTab === 'trySomethingNew' && styles.activeTab]}
+                        onPress={() => setActiveTab('trySomethingNew')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'trySomethingNew' && styles.activeTabText]}>
+                            Try New
+                        </Text>
+                    </TouchableOpacity>
                 </View>
 
-                {/* Near You section */}
-                <View style={styles.section}>
-                    <TouchableOpacity
-                        style={styles.sectionHeader}
-                        onPress={() => setNearYouSectionOpen(!nearYouSectionOpen)}
-                    >
-                        <Text style={styles.subTitleText}>Near You</Text>
-                        <Feather
-                            name={nearYouSectionOpen ? 'chevron-up' : 'chevron-down'}
-                            size={20}
-                            color={Colours.primary}
-                        />
-                    </TouchableOpacity>
-                    {nearYouSectionOpen && (
-                        <View style={styles.sectionContent}>
-                            {applyAllFilters(nearYouSortedGames).map((game, idx) => (
-                                <GameCard
-                                    key={idx}
-                                    player={player}
-                                    game={game.game}
-                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
-                                    distance={game.distance}
-                                />
-                            ))}
-                        </View>
-                    )}
-                </View>
-
-                {/* Try Something New section */}
-                <View style={styles.section}>
-                    <TouchableOpacity
-                        style={styles.sectionHeader}
-                        onPress={() => setTrySomethingNewSectionOpen(!trySomethingNewSectionOpen)}
-                    >
-                        <Text style={styles.subTitleText}>Try Something New</Text>
-                        <Feather
-                            name={trySomethingNewSectionOpen ? 'chevron-up' : 'chevron-down'}
-                            size={20}
-                            color={Colours.primary}
-                        />
-                    </TouchableOpacity>
-                    {trySomethingNewSectionOpen && (
-                        <View style={styles.sectionContent}>
-                            {applyAllFilters(trySomethingNewSortedGames).map((game, idx) => (
-                                <GameCard
-                                    key={idx}
-                                    player={player}
-                                    game={game.game}
-                                    onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
-                                    distance={game.distance}
-                                />
-                            ))}
-                        </View>
-                    )}
+                {/* Games Content */}
+                <View style={styles.contentSection}>
+                    <Text style={styles.sectionTitle}>{getTabTitle()}</Text>
+                    <View style={styles.gamesContainer}>
+                        {getCurrentGames().map((game, idx) => (
+                            <GameCard
+                                key={idx}
+                                player={player}
+                                game={game.game}
+                                onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
+                                distance={game.distance}
+                            />
+                        ))}
+                        {getCurrentGames().length === 0 && (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyStateText}>No games found</Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
 
                 {/* Filter Modal */}
@@ -506,38 +552,72 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         marginLeft: 8,
     },
-    section: {
-        marginBottom: 20,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        paddingHorizontal: 8,
+    // New tab styles
+    tabContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#f5f5f5',
+        borderRadius: 12,
+        padding: 4,
+        marginBottom: 16,
+    },
+    tab: {
+        flex: 1,
         paddingVertical: 12,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    activeTab: {
+        backgroundColor: Colours.primary,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 1.41,
+        shadowRadius: 2,
         elevation: 2,
     },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    tabText: {
+        fontSize: 14,
+        fontFamily: Fonts.main,
+        fontWeight: '500',
+        color: '#666',
+        textAlign: 'center',
+    },
+    activeTabText: {
+        color: 'white',
+        fontWeight: '600',
+    },
+    contentSection: {
+        flex: 1,
+        marginBottom: 80, // Space for create game button
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        fontFamily: Fonts.main,
+        marginBottom: 16,
+        color: Colours.primary,
+    },
+    gamesContainer: {
+        flex: 1,
+    },
+    emptyState: {
         alignItems: 'center',
+        justifyContent: 'center',
+        padding: 40,
     },
-    sectionContent: {
-        marginTop: 10,
-        paddingHorizontal: 4,
-    },
-    contentText: {
+    emptyStateText: {
         fontSize: 16,
         fontFamily: Fonts.main,
+        color: '#666',
     },
     searchInput: {
         height: 50,
-        width: '43%',
         borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
+        borderWidth: 0,
+        borderRadius: 8,
         paddingHorizontal: 10,
+        marginRight: 10,
         fontSize: 16,
         fontFamily: Fonts.main,
     },
@@ -609,5 +689,22 @@ const styles = StyleSheet.create({
     sportChipTextSelected: {
         color: 'white',
         fontWeight: '600',
+    },
+    animatedSearchContainer: {
+        height: 40,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 16,
+        marginRight: 15,
+        overflow: 'hidden',
+        paddingHorizontal: 0,
+        justifyContent: 'center',
+    },
+    searchButton: {
+        padding: 12,
+        backgroundColor: Colours.extraButtons,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: Colours.primary,
+        marginRight: 8
     },
 });
