@@ -59,7 +59,9 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
 
       - name: Local Android build
-        run: eas build --local -p android --profile preview --non-interactive --output team-up-london.apk
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > google-services.json
+          eas build --local -p android --profile preview --non-interactive --output team-up-london.apk
         working-directory: ${{ env.APP_DIR }}
 
       - name: Upload APK artifact
