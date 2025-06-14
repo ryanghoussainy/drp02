@@ -30,7 +30,8 @@ export default {
         "googleMaps": {
           "apiKey": process.env.GOOGLE_MAPS_API_KEY
         }
-      }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,14 +41,9 @@ export default {
         "projectId": "6e26b843-3289-4f78-adb6-9f8f3b5fc71b"
       }
     },
-    "owner": "drp02"
-  },
-  "hooks": {
-    "postPublish": [
-      {
-        file: "./scripts/create-google-services-json.ts",
-        config: {}
-      }
+    "owner": "drp02",
+    "plugins": [
+      "expo-notifications"
     ]
   }
 }
