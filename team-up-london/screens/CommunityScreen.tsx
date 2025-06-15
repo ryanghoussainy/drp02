@@ -174,6 +174,8 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                     game={game}
                     onPress={() => navigation.navigate("Game", { game, distance: distances[idx], mapRegion: mapRegions[idx] })}
                     distance={distances[idx]}
+                    isCommunityMember={false}
+                    numPlayers={players.length}
                 />
             ))}
 

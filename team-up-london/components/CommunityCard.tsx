@@ -11,11 +11,21 @@ import SportIcon from './SportIcon';
 import Player from '../interfaces/Player';
 import Feather from '@expo/vector-icons/Feather';
 
-export default function CommunityCard({ player, community, onPress }: { player: Player, community: Community, onPress: () => void }) {
+export default function CommunityCard({
+    player,
+    community,
+    onPress,
+    numMembers,
+}: {
+    player: Player,
+    community: Community,
+    onPress: () => void,
+    numMembers: number,
+}) {
     const { sports: allSports } = useSports();
     const sports = allSports.filter(s => community.sports_ids.includes(s.id));
 
-    const { players, creatorId } = useCommunityPlayers(player.id, community.id);
+    const { players } = useCommunityPlayers(player.id, community.id);
 
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
@@ -44,7 +54,6 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                 
                 {/* Primary Location */}
                 <View style={styles.sportText}>
-                    {/* <FontAwesome6 name="location-dot" size={18} color="black" /> */}
                     <Text style={{ fontStyle: 'italic', textAlign: 'center', marginLeft: 5, color: 'grey' }} numberOfLines={1}>{community.primary_location}</Text>
                 </View>
 
@@ -62,7 +71,7 @@ export default function CommunityCard({ player, community, onPress }: { player: 
                             </View>
                         )}
                         <Ionicons name="people" size={24} color="black" />
-                        <Text style={{ marginLeft: 5 }}>{players.length}</Text>
+                        <Text style={{ marginLeft: 5 }}>{numMembers}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>

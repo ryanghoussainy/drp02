@@ -94,3 +94,17 @@ export async function setPersonalGoal(
         Alert.alert(error.message);
     }
 }
+
+// Get player communities
+export async function getPlayerCommunities(playerId: string): Promise<string[]> {
+    const { data, error } = await supabase
+        .from("community_players")
+        .select("community_id")
+        .eq("player_id", playerId);
+
+    if (error) {
+        Alert.alert(error.message);
+    }
+
+    return data ? data.map(item => item.community_id) : [];
+}

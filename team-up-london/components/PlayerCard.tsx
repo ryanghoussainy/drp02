@@ -41,16 +41,16 @@ export default function PlayerCard({ player, cardPlayer, isHost, sportId, onPres
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colours.accentBackground,
     borderRadius: 15,
     paddingVertical: 4,
     alignItems: 'center',
     marginHorizontal: 4,
     width: 90,
-    shadowColor: '#000',
+    shadowColor: Colours.primary,
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 2,
   },
   name: {
@@ -60,12 +60,13 @@ const styles = StyleSheet.create({
   },
   role: {
     fontSize: 14,
-    color: '#888',
     marginBottom: 4,
     fontStyle: 'italic',
+    color: Colours.success,
   },
   hostRole: {
     fontWeight: 'bold',
+    color: Colours.accent,
   },
   skillContainer: {
     flexDirection: 'row',

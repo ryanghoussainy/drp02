@@ -17,6 +17,7 @@ import Colours from '../config/Colours';
 import useDistancesAndRegions from '../hooks/useDistancesAndRegions';
 import Game from '../interfaces/Game';
 import { Region } from 'react-native-maps';
+import usePlayerCommunities from '../hooks/usePlayerCommunities';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -31,22 +32,13 @@ type TabType = 'forYou' | 'nearYou' | 'trySomethingNew';
 export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const navigation = useNavigation<GamesNavProp>();
     const { sports } = useSports();
+    const { communityIds } = usePlayerCommunities(player.id);
 
     const {
-        // For you section
-        forYouSectionOpen,
-        setForYouSectionOpen,
         forYouGames,
-
-        // Near you section
-        nearYouSectionOpen,
-        setNearYouSectionOpen,
         nearYouGames,
-
-        // Try something new section
-        trySomethingNewSectionOpen,
-        setTrySomethingNewSectionOpen,
         trySomethingNewGames,
+        gamePlayers,
     } = useGamesDiscoverySections(player.id);
 
     const { distances: forYouDistances, mapRegions: forYouMapRegions } = useDistancesAndRegions(forYouGames);
@@ -130,7 +122,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     const toggleSportSelection = (sportId: string, isTemp: boolean = false) => {
         const currentSelection = isTemp ? tempSelectedSportIds : selectedSportIds;
         const setSelection = isTemp ? setTempSelectedSportIds : setSelectedSportIds;
-        
+
         if (currentSelection.includes(sportId)) {
             setSelection(currentSelection.filter(id => id !== sportId));
         } else {
@@ -212,21 +204,21 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     // Open/close
     const toggleSearch = () => {
         if (!searchActive) {
-        setSearchActive(true);
-        Animated.timing(searchWidth, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: false,
-        }).start();
+            setSearchActive(true);
+            Animated.timing(searchWidth, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: false,
+            }).start();
         } else {
-        Animated.timing(searchWidth, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: false,
-        }).start(() => {
-            setSearchActive(false);
-            setSearchQuery('');
-        });
+            Animated.timing(searchWidth, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false,
+            }).start(() => {
+                setSearchActive(false);
+                setSearchQuery('');
+            });
         }
     };
 
@@ -243,15 +235,35 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
         outputRange: [0, -maxSearchWidth * 0.1],  // shift left as much as search bar expands
     });
 
+    // Tab navigation animation
+    const tabTranslateX = useRef(new Animated.Value(0)).current;
+
+    const switchTab = (tab: TabType) => {
+        setActiveTab(tab);
+        let toValue = 0;
+        const tabWidth = (screenWidth - 16) / 3; // Assuming equal width tabs
+
+        if (tab === 'forYou') toValue = 0;
+        else if (tab === 'nearYou') toValue = tabWidth - 8; // Account for container padding
+        else if (tab === 'trySomethingNew') toValue = (tabWidth * 2) - 16;
+
+        Animated.spring(tabTranslateX, {
+            toValue,
+            useNativeDriver: true,
+            tension: 60,
+            friction: 8,
+        }).start();
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
-                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 60, zIndex: 0, position: 'relative'}]}>Discovery</Text>
+                    <Text style={[styles.subTitle, { marginTop: 12, marginRight: 60, zIndex: 0, position: 'relative' }]}>Discovery</Text>
                     {/* Group everything inside one row */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        
+
                         {/* Filter button */}
                         <Animated.View style={{ transform: [{ translateX: interpolatedFilterShift }] }}>
                             <TouchableOpacity
@@ -265,7 +277,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                 }}
                             >
                                 <Feather name="filter" size={24} color={Colours.primary} />
-                                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Filter</Text>
+                                <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Filter</Text>
                             </TouchableOpacity>
                         </Animated.View>
 
@@ -289,26 +301,34 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 </View>
 
                 {/* Tab Navigation */}
-                <View style={styles.tabContainer}>
+                <View style={[styles.tabContainer, { marginTop: 15 }]}>
+                    <Animated.View
+                        style={[
+                            styles.tabIndicator,
+                            {
+                                transform: [{ translateX: tabTranslateX }]
+                            }
+                        ]}
+                    />
                     <TouchableOpacity
-                        style={[styles.tab, activeTab === 'forYou' && styles.activeTab]}
-                        onPress={() => setActiveTab('forYou')}
+                        style={styles.tab}
+                        onPress={() => switchTab('forYou')}
                     >
                         <Text style={[styles.tabText, activeTab === 'forYou' && styles.activeTabText]}>
                             For You
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.tab, activeTab === 'nearYou' && styles.activeTab]}
-                        onPress={() => setActiveTab('nearYou')}
+                        style={styles.tab}
+                        onPress={() => switchTab('nearYou')}
                     >
                         <Text style={[styles.tabText, activeTab === 'nearYou' && styles.activeTabText]}>
                             Near You
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.tab, activeTab === 'trySomethingNew' && styles.activeTab]}
-                        onPress={() => setActiveTab('trySomethingNew')}
+                        style={styles.tab}
+                        onPress={() => switchTab('trySomethingNew')}
                     >
                         <Text style={[styles.tabText, activeTab === 'trySomethingNew' && styles.activeTabText]}>
                             Try New
@@ -327,6 +347,8 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                 game={game.game}
                                 onPress={() => navigation.navigate("Game", { game: game.game, distance: game.distance, mapRegion: game.mapRegion })}
                                 distance={game.distance}
+                                isCommunityMember={communityIds.includes(game.game.community_id || "")}
+                                numPlayers={gamePlayers.get(game.game.id)?.length || 0}
                             />
                         ))}
                         {getCurrentGames().length === 0 && (
@@ -359,13 +381,13 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                             maxHeight: '80%',
                         }}>
                             <Text style={[styles.subTitle, { textAlign: 'center', marginBottom: 16 }]}>Filter Games</Text>
-                            
+
                             <ScrollView showsVerticalScrollIndicator={false}>
                                 {/* Sports Filter */}
                                 <View style={styles.formGroup}>
                                     <Text style={styles.subTitleText}>Sports</Text>
-                                    <ScrollView 
-                                        horizontal 
+                                    <ScrollView
+                                        horizontal
                                         showsHorizontalScrollIndicator={false}
                                         style={styles.sportsContainer}
                                         contentContainerStyle={styles.sportsContentContainer}
@@ -417,7 +439,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                         </Picker>
                                     </View>
                                 </View>
-                                
+
                                 {/* Location Filter Input */}
                                 <View style={styles.formGroup}>
                                     <Text style={styles.subTitleText}>Location</Text>
@@ -429,7 +451,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                         onChangeText={setTempLocationFilter}
                                     />
                                 </View>
-                                
+
                                 {/* Date Filter */}
                                 <View style={styles.formGroup}>
                                     <Text style={styles.subTitleText}>Date</Text>
@@ -465,7 +487,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                     )}
                                 </View>
                             </ScrollView>
-                            
+
                             {/* Modal Actions */}
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
                                 <TouchableOpacity
@@ -494,14 +516,14 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
 
             {/* Create Game Button */}
             <TouchableOpacity
-                style={[styles.button, 
-                    { backgroundColor: Colours.extraButtons, borderColor: Colours.primary, borderWidth: 2, position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
+                style={[styles.button,
+                { backgroundColor: Colours.primary, borderColor: Colours.highlightButton, borderWidth: 0, position: "absolute", bottom: 20, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
                 onPress={() => navigation.navigate("CreateGame", { communityId: null })}
             >
-                <Feather name="plus" size={24} color={Colours.primary} />
-                <Text style={[styles.buttonText, { fontWeight: 'bold', color: '#003366' }]}>Create Game</Text>
+                <Feather name="plus" size={24} color={Colours.success} />
+                <Text style={[styles.buttonText, { fontWeight: 'bold', color: 'white' }]}>Create Game</Text>
             </TouchableOpacity>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
@@ -541,7 +563,8 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: Colours.extraButtons,
         outlineColor: Colours.primary,
-        borderWidth: 2,
+        borderWidth: 0,
+        borderColor: Colours.primary,
         padding: 10,
         borderRadius: 16,
         justifyContent: 'center',
@@ -556,7 +579,7 @@ const styles = StyleSheet.create({
     tabContainer: {
         flexDirection: 'row',
         backgroundColor: '#f5f5f5',
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 4,
         marginBottom: 16,
     },
@@ -564,9 +587,11 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         paddingHorizontal: 8,
-        borderRadius: 8,
+        borderRadius: 999,
         alignItems: 'center',
         justifyContent: 'center',
+        display: 'flex',
+        zIndex: 2, // Ensure text appears above the sliding indicator
     },
     activeTab: {
         backgroundColor: Colours.primary,
@@ -582,6 +607,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#666',
         textAlign: 'center',
+        width: '100%',
     },
     activeTabText: {
         color: 'white',
@@ -703,8 +729,23 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: Colours.extraButtons,
         borderRadius: 12,
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: Colours.primary,
         marginRight: 8
+    },
+    tabIndicator: {
+        position: 'absolute',
+        top: 4,
+        left: 4,
+        width: `${100 / 3}%`, // One third of the container
+        height: '100%',
+        backgroundColor: Colours.primary,
+        borderRadius: 999,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+        zIndex: 1,
     },
 });

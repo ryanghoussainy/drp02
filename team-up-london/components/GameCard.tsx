@@ -14,7 +14,21 @@ import useGameCommunity from '../hooks/useGameCommunity';
 import Colours from '../config/Colours';
 import Player from '../interfaces/Player';
 
-export default function GameCard({ player, game, onPress, distance }: { player: Player, game: Game, onPress?: () => void, distance: { km: number, miles: number } }) {
+export default function GameCard({
+    player,
+    game,
+    onPress,
+    distance,
+    isCommunityMember,
+    numPlayers,
+}: {
+    player: Player,
+    game: Game,
+    onPress?: () => void,
+    distance: { km: number, miles: number },
+    isCommunityMember: boolean,
+    numPlayers: number,
+}) {
     const { players } = useGamePlayers(player.id, game.id);
     const { sports } = useSports();
 
@@ -42,7 +56,7 @@ export default function GameCard({ player, game, onPress, distance }: { player: 
                 <Text style={styles.gameTitle}>{game.name}</Text>
             </View>
 
-            {community && <Text style={styles.gameCommunity}>Community: {community.name}</Text>}
+            {community && <Text style={styles.gameCommunity}>Community: {community.name} {isCommunityMember && <Text style={{ color: Colours.success }}>(Member)</Text>}</Text>}
 
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
@@ -50,7 +64,7 @@ export default function GameCard({ player, game, onPress, distance }: { player: 
                     <Text style={{ color: Colours.primary }}><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
                         <Ionicons name="people" size={16} color="black" />
-                        <Text> {players.length}/{game.max_players}</Text>
+                        <Text> {numPlayers}/{game.max_players}</Text>
                     </View>
                 </View>
 
@@ -104,6 +118,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         marginBottom: 5,
         textAlign: 'center',
+        color: Colours.primary,
     },
     tagText: {
         fontWeight: 'bold',

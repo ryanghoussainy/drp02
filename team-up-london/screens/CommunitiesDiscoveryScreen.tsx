@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FlatList, Modal, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Picker } from '@react-native-picker/picker';
@@ -14,15 +14,63 @@ import { Text } from 'react-native';
 import Colours from '../config/Colours';
 import Player from '../interfaces/Player';
 import { Animated, Dimensions, SafeAreaView } from 'react-native';
+import Community from '../interfaces/Community';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
+type TabType = 'Your Communities' | 'Discover';
+
 export default function CommunitiesScreen({ player }: { player: Player }) {
-    const { communities } = useCommunities();
+    const { communities, communityPlayers } = useCommunities();
+
+    const [yourCommunities, setYourCommunities] = useState<Community[]>([]);
+    const [discoverCommunities, setDiscoverCommunities] = useState<Community[]>([]);
+
+    useEffect(() => {
+        setYourCommunities(
+            communities.filter(community => communityPlayers.get(community.id)?.includes(player.id))
+        )
+        setDiscoverCommunities(
+            communities.filter(community => !communityPlayers.get(community.id)?.includes(player.id))
+        );
+    }, [communities, communityPlayers]);
+
+    const getCurrentCommunities = () => {
+        switch (activeTab) {
+            case 'Your Communities':
+                return applyAllFilters(yourCommunities);
+            case 'Discover':
+                return applyAllFilters(discoverCommunities);
+            default:
+                return [];
+        }
+    }
+
+    // Tab navigation animation
+    const tabTranslateX = useRef(new Animated.Value(0)).current;
+
+    const switchTab = (tab: TabType) => {
+        setActiveTab(tab);
+        let toValue = 0;
+        const tabWidth = (screenWidth - 16) / 2; // Assuming equal width tabs
+
+        if (tab === 'Your Communities') toValue = 0;
+        else if (tab === 'Discover') toValue = tabWidth - 12; // Account for container padding
+
+        Animated.spring(tabTranslateX, {
+            toValue,
+            useNativeDriver: true,
+            tension: 60,
+            friction: 8,
+        }).start();
+    };
 
     const navigation = useNavigation<GamesNavProp>();
 
     const { sports } = useSports();
+
+    // Active tab state
+    const [activeTab, setActiveTab] = useState<TabType>('Your Communities');
 
     // Search (+ animation)
     const [searchActive, setSearchActive] = useState(false);
@@ -32,23 +80,23 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     // Open/close
     const toggleSearch = () => {
         if (!searchActive) {
-          setSearchActive(true);
-          Animated.timing(searchWidth, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: false,
-          }).start();
+            setSearchActive(true);
+            Animated.timing(searchWidth, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: false,
+            }).start();
         } else {
-          Animated.timing(searchWidth, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: false,
-          }).start(() => {
-            setSearchActive(false);
-            setSearchQuery('');
-          });
+            Animated.timing(searchWidth, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false,
+            }).start(() => {
+                setSearchActive(false);
+                setSearchQuery('');
+            });
         }
-      };
+    };
 
     const interpolatedWidth = searchWidth.interpolate({
         inputRange: [0, 1],
@@ -74,7 +122,7 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     const [tempSportFilter, setTempSportFilter] = useState(sportFilter);
     const [tempPrivacyFilter, setTempPrivacyFilter] = useState(privacyFilter);
 
-    const applyAllFilters = (communities: Array<any>) => {
+    const applyAllFilters = (communities: Array<Community>) => {
         return communities.filter((community) => {
             // 1. Name search (case-insensitive substring)
             if (!community.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -102,7 +150,6 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
                 return false;
             }
 
-
             return true;
         });
     };
@@ -112,10 +159,10 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
             <View style={styles.container}>
                 <Text style={styles.title}>Team Up London</Text>
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
-                    <Text style={[styles.subTitle, {marginTop: 12, marginRight: 20, zIndex: 0, position: 'relative'}]}>Communities</Text>
+                    <Text style={[styles.subTitle, { marginTop: 12, marginRight: 20, zIndex: 0, position: 'relative' }]}>Communities</Text>
                     {/* Group everything inside one row */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        
+
                         {/* Filter button */}
                         <Animated.View style={{ transform: [{ translateX: interpolatedFilterShift }] }}>
                             <TouchableOpacity
@@ -128,7 +175,7 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
                                 }}
                             >
                                 <Feather name="filter" size={24} color={Colours.primary} />
-                                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Filter</Text>
+                                <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Filter</Text>
                             </TouchableOpacity>
                         </Animated.View>
 
@@ -151,12 +198,45 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
                     </View>
                 </View>
 
+                {/* Tab Navigation */}
+                <View style={[styles.tabContainer, { marginTop: 15 }]}>
+                    <Animated.View
+                        style={[
+                            styles.tabIndicator,
+                            {
+                                transform: [{ translateX: tabTranslateX }]
+                            }
+                        ]}
+                    />
+                    <TouchableOpacity
+                        style={styles.tab}
+                        onPress={() => switchTab('Your Communities')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'Your Communities' && styles.activeTabText]}>
+                            Your Communities
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.tab}
+                        onPress={() => switchTab('Discover')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'Discover' && styles.activeTabText]}>
+                            Discover
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
                 <FlatList
-                    data={applyAllFilters(communities)}
+                    data={getCurrentCommunities()}
                     keyExtractor={(item) => item.id.toString()}
                     numColumns={2}
                     renderItem={({ item }) => (
-                        <CommunityCard community={item} player={player} onPress={() => navigation.navigate("Community", { communityId: item.id })} />
+                        <CommunityCard
+                            community={item}
+                            player={player}
+                            onPress={() => navigation.navigate("Community", { communityId: item.id })}
+                            numMembers={communityPlayers.get(item.id)?.length || 0}
+                        />
                     )}
                 />
 
@@ -258,13 +338,12 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
 
             {/* Create Community Button */}
             <TouchableOpacity
-                style={[
-                    styles.button,
-                    { position: "absolute", bottom: 10, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
+                style={[styles.button,
+                { backgroundColor: Colours.primary, borderColor: Colours.highlightButton, borderWidth: 0, position: "absolute", bottom: 20, width: "90%", alignSelf: "center", paddingVertical: 12, flexDirection: 'row' }]}
                 onPress={() => navigation.navigate("CreateCommunity")}
             >
-                <Feather name="plus" size={24} color={Colours.primary} />
-                <Text style={[styles.buttonText, { fontWeight: 'bold', color: '#003366' }]}>Create Community</Text>
+                <Feather name="plus" size={24} color={Colours.success} />
+                <Text style={[styles.buttonText, { fontWeight: 'bold', color: 'white' }]}>Create Community</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );
@@ -308,9 +387,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        backgroundColor: Colours.extraButtons, 
-        borderColor: Colours.primary, 
-        borderWidth: 2,
+        backgroundColor: Colours.extraButtons,
+        borderColor: Colours.primary,
+        borderWidth: 0,
     },
     buttonText: {
         fontSize: 16,
@@ -357,7 +436,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
         justifyContent: 'center',
-      },
+    },
     animatedSearchContainer: {
         height: 40,
         backgroundColor: '#f0f0f0',
@@ -371,7 +450,7 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: Colours.extraButtons,
         borderRadius: 12,
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: Colours.primary,
         marginRight: 8
     },
@@ -413,5 +492,57 @@ const styles = StyleSheet.create({
     datePicker: {
         alignSelf: 'center',
         marginTop: 10,
+    },
+    tabContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#f5f5f5',
+        borderRadius: 16,
+        padding: 4,
+        marginBottom: 16,
+    },
+    tab: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 8,
+        alignItems: 'center',
+        borderRadius: 999,
+        justifyContent: 'center',
+        display: 'flex',
+        zIndex: 2, // Ensure text appears above the sliding indicator
+    },
+    activeTab: {
+        backgroundColor: Colours.primary,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    tabText: {
+        fontSize: 14,
+        fontFamily: Fonts.main,
+        fontWeight: '500',
+        color: '#666',
+        textAlign: 'center',
+        width: '100%',
+    },
+    activeTabText: {
+        color: 'white',
+        fontWeight: '600',
+    },
+    tabIndicator: {
+        position: 'absolute',
+        top: 4,
+        left: 4,
+        width: `${100 / 2}%`, // One third of the container
+        height: '100%',
+        backgroundColor: Colours.primary,
+        borderRadius: 999,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+        zIndex: 1,
     },
 });

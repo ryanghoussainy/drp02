@@ -5,21 +5,19 @@ import { useFocusEffect } from '@react-navigation/native';
 import Player from '../interfaces/Player';
 import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { getPlayersInCommunity } from '../operations/Communities';
-import usePlayer from './usePlayer';
 import { getPlayer } from '../operations/Player';
 
 export default function useGamesDiscoverySections(playerId: string) {
     // For you section
-    const [forYouSectionOpen, setForYouSectionOpen] = useState<boolean>(true);
     const [forYouGames, setForYouGames] = useState<Game[]>([]);
 
     // Near you section
-    const [nearYouSectionOpen, setNearYouSectionOpen] = useState<boolean>(true);
     const [nearYouGames, setNearYouGames] = useState<Game[]>([]);
 
     // Try something new section
-    const [trySomethingNewSectionOpen, setTrySomethingNewSectionOpen] = useState<boolean>(true);
     const [trySomethingNewGames, setTrySomethingNewGames] = useState<Game[]>([]);
+
+    const [gamePlayers, setGamePlayers] = useState<Map<string, Player[]>>(new Map());
 
     // Fetch games for each section
     useFocusEffect(
@@ -111,6 +109,9 @@ export default function useGamesDiscoverySections(playerId: string) {
                 });
 
                 setTrySomethingNewGames(trySomethingNewGamesArray);
+
+                // Update game players map
+                setGamePlayers(gamePlayersMap);
             };
 
             fetchGames();
@@ -118,16 +119,9 @@ export default function useGamesDiscoverySections(playerId: string) {
     );
 
     return {
-        forYouSectionOpen,
-        setForYouSectionOpen,
         forYouGames,
-
-        nearYouSectionOpen,
-        setNearYouSectionOpen,
         nearYouGames,
-
-        trySomethingNewSectionOpen,
-        setTrySomethingNewSectionOpen,
         trySomethingNewGames,
+        gamePlayers,
     };
 }

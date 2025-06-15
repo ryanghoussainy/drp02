@@ -56,7 +56,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                     name={sport?.icon || 'default-icon'}
                     family={sport?.icon_family as ICON_FAMILIES}
                     size={(sport?.icon_size || 20) * 1.5}
-                    color="black"
+                    color= {Colours.primary}
                 />
             </View>
 
@@ -152,8 +152,8 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                 </View>
             ) : (
                 <TouchableOpacity
-                    style={[styles.button, 
-                        game?.max_players && players.length >= game.max_players ? { backgroundColor: "grey" } : { backgroundColor: Colours.success }]}
+                    style={[styles.button,
+                    game?.max_players && players.length >= game.max_players ? { backgroundColor: "grey" } : { backgroundColor: Colours.success }]}
                     onPress={handleJoin}
                     disabled={(game?.max_players && players.length >= game.max_players) || false}
                 >
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: Fonts.main,
         marginBottom: 16,
+        color: Colours.primary,
     },
     gameDetails: {
         flexDirection: 'row',
@@ -304,7 +305,8 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.main,
         marginBottom: 5,
         marginTop: -10,
-        marginLeft: 25
+        marginLeft: 25,
+        fontWeight: 'bold',
     },
     chatButton: {
         backgroundColor: Colours.extraButtons,

@@ -13,5 +13,6 @@ export default {
     active: '#682BD7',         // Reuse Primary Purple for Active Elements
     mainBar: '#F8F9FD',        // Soft Light Gray/Blue for Bottom/Top Nav Bars
     accentBackground: '#F4EEFF',
-    extraButtons: '#D0E8FF'    // Blue for Extra Buttons or Special Actions
+    extraButtons: '#E4F2FF',    // Blue for Extra Buttons or Special Actions
+    highlightButton: '#2B1B47'
 };

@@ -13,7 +13,10 @@ const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator({ player }: { player: Player }) {
     return (
-        <Tab.Navigator screenOptions={{ tabBarStyle: [styles.tabBar, { backgroundColor: Colours.mainBar }] }}>
+        <Tab.Navigator
+            screenOptions={{ tabBarStyle: [styles.tabBar, { backgroundColor: Colours.mainBar }] }}
+            initialRouteName="Discover Games"
+        >
             <Tab.Screen
                 name="Profile"
                 options={() => ({
