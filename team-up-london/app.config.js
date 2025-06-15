@@ -31,7 +31,7 @@ export default {
           "apiKey": process.env.GOOGLE_MAPS_API_KEY
         }
       },
-      "googleServicesFile": process.env.GOOGLE_SERVICES_FILE
+      "googleServicesFile": process.env.GOOGLE_SERVICES_JSON
     },
     "web": {
       "favicon": "./assets/favicon.png"
