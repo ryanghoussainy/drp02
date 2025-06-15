@@ -19,7 +19,7 @@ export default function useGame(gameId: string) {
     };
 
     fetchGame();
-  }, [gameId]);
+  }, []);
 
   return { game, sport };
 }

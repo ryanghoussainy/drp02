@@ -25,15 +25,11 @@ export default function useGamePlayers(playerId: string, gameId: string) {
     setPlayers(sorted);
   };
 
-  // useEffect(() => {
-  //   refreshPlayers();
-  // }, []);
-
   useFocusEffect(
     useCallback(() => {
       refreshPlayers();
-    }, [players])
-  )
+    }, [])
+  );
 
   const handleJoin = async () => {
     if (players.some((p) => p.id === playerId)) return;
