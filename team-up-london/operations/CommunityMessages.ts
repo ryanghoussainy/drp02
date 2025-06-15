@@ -43,6 +43,44 @@ export async function sendCommunityMessage(senderId: string, communityId: string
         return null;
     }
 
+    // Get sender name
+    const { data: senderData, error: senderError } = await supabase
+        .from("players")
+        .select("name")
+        .eq("id", senderId)
+        .single();
+    
+    if (senderError) {
+        console.error("Failed to fetch sender name:", senderError);
+        return null;
+    }
+
+    // Get all players in the community to notify them
+    const { data: communityMembers, error: membersError } = await supabase
+        .from('community_players')
+        .select('player_id')
+        .eq('community_id', communityId);
+
+    if (membersError) {
+        console.error("Failed to fetch community members:", membersError);
+        return null;
+    }
+
+    // Insert into notifications table to notify the receiver
+    const { error: notificationError } = await supabase
+        .from("notifications")
+        .insert(
+            communityMembers.map(member => ({
+                player_id: member.player_id,
+                title:  `New message from ${senderData.name}`,
+                body: content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim(),
+            }))
+        );
+
+    if (notificationError) {
+        console.error("Failed to create notification:", notificationError);
+    }
+
     return data as CommunityMessage;
 }
 

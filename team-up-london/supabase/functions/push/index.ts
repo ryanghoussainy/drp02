@@ -4,7 +4,7 @@ console.log('Hello from Functions!')
 
 interface Notification {
   id: string
-  user_id: string
+  player_id: string
   title: string
   body: string
 }
@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   const { data } = await supabase
     .from('players')
     .select('expo_push_token')
-    .eq('id', payload.record.user_id)
+    .eq('id', payload.record.player_id)
     .single()
 
   const res = await fetch('https://exp.host/--/api/v2/push/send', {

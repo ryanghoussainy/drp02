@@ -23,6 +23,31 @@ export async function sendMessage(
         return null;
     }
 
+    // Get sender name
+    const { data: senderData, error: senderError } = await supabase
+        .from("players")
+        .select("name")
+        .eq("id", senderId)
+        .single();
+    
+    if (senderError) {
+        console.error("Failed to fetch sender name:", senderError);
+        return null;
+    }
+
+    // Insert into notifications table to notify the receiver
+    const { error: notificationError } = await supabase
+        .from("notifications")
+        .insert({
+            player_id: receivedId,
+            title:  `New message from ${senderData.name}`,
+            body: content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim(),
+        });
+
+    if (notificationError) {
+        console.error("Failed to create notification:", notificationError);
+    }
+
     return data as Message;
 }
 
