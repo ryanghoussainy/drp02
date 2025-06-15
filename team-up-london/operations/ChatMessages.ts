@@ -55,6 +55,18 @@ export async function sendgameMessage(senderId: string, gameId: string, content:
         return null;
     }
 
+    // Get game name
+    const { data: gameData, error: gameError } = await supabase
+        .from("games")
+        .select("name")
+        .eq("id", gameId)
+        .single();
+    
+    if (gameError) {
+        console.error("Failed to fetch game name:", gameError);
+        return null;
+    }
+
     // Get all players in the game to notify them
     const { data: gameMembers, error: membersError } = await supabase
         .from('game_players')
@@ -72,8 +84,8 @@ export async function sendgameMessage(senderId: string, gameId: string, content:
         .insert(
             gameMembers.map(member => ({
                 player_id: member.player_id,
-                title:  `New message from ${senderData.name}`,
-                body: content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim(),
+                title: gameData.name,
+                body: senderData.name + ": " + (content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim()),
             }))
         );
 

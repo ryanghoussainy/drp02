@@ -40,7 +40,7 @@ export async function sendMessage(
         .from("notifications")
         .insert({
             player_id: receivedId,
-            title:  `New message from ${senderData.name}`,
+            title:  senderData.name,
             body: content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim(),
         });
 

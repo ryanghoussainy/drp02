@@ -55,6 +55,18 @@ export async function sendCommunityMessage(senderId: string, communityId: string
         return null;
     }
 
+    // get community name
+    const { data: communityData, error: communityError } = await supabase
+        .from("communities")
+        .select("name")
+        .eq("id", communityId)
+        .single();
+
+    if (communityError) {
+        console.error("Failed to fetch community name:", communityError);
+        return null;
+    }
+
     // Get all players in the community to notify them
     const { data: communityMembers, error: membersError } = await supabase
         .from('community_players')
@@ -72,8 +84,8 @@ export async function sendCommunityMessage(senderId: string, communityId: string
         .insert(
             communityMembers.map(member => ({
                 player_id: member.player_id,
-                title:  `New message from ${senderData.name}`,
-                body: content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim(),
+                title:  communityData.name,
+                body: senderData.name + ": " + (content.trim().length > 50 ? content.trim().substring(0, 50) + "..." : content.trim()),
             }))
         );
 
