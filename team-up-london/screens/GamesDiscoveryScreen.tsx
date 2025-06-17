@@ -341,8 +341,11 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                 <View style={styles.contentSection}>
                     <Text style={styles.sectionTitle}>{getTabTitle()}</Text>
                     <View style={styles.gamesContainer}>
-                        {getCurrentGames().map((game, idx) => (
-                            <GameCard
+                        {getCurrentGames().map((game, idx) => {
+                            const players = playersByGame[game.game.id] || [];
+                            const avgSkillLevel = AVERAGE_SKILL_LEVEL(players, game.game.sport_id);
+
+                            return <GameCard
                                 key={idx}
                                 player={player}
                                 game={game.game}
@@ -350,8 +353,10 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
                                 distance={game.distance}
                                 isCommunityMember={communityIds.includes(game.game.community_id || "")}
                                 numPlayers={gamePlayers.get(game.game.id)?.length || 0}
+                                averageSkillLevel={avgSkillLevel}
                             />
-                        ))}
+                        }
+                        )}
                         {getCurrentGames().length === 0 && (
                             <View style={styles.emptyState}>
                                 <Text style={styles.emptyStateText}>No games found</Text>

@@ -20,6 +20,7 @@ import Player from "../interfaces/Player";
 import usePlayer from "../hooks/usePlayer";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import useDistancesAndRegions from "../hooks/useDistancesAndRegions";
+import { AVERAGE_SKILL_LEVEL } from "../constants/averageSkillLevel";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Community">;
 
@@ -167,8 +168,10 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                 </TouchableOpacity>}
             </View>
 
-            {games.map((game, idx) => (
-                <GameCard
+            {games.map((game, idx) => {
+                const avgSkillLevel = AVERAGE_SKILL_LEVEL(players, game.sport_id); // THIS players is wrong. It's the community players, not the game players
+
+                return <GameCard
                     key={idx}
                     player={player}
                     game={game}
@@ -176,8 +179,9 @@ export default function CommunityScreen({ player, route }: { player: Player } & 
                     distance={distances[idx]}
                     isCommunityMember={false}
                     numPlayers={players.length}
+                    averageSkillLevel={avgSkillLevel}
                 />
-            ))}
+            })}
 
             {players.some(p => p.id === player.id) ? (
                 <View style={styles.sideBySide}>

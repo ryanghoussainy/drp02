@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import Game from '../interfaces/Game';
-import { AVERAGE_SKILL_LEVEL } from '../constants/averageSkillLevel';
 import { formatDate } from 'date-fns';
-import useGamePlayers from '../hooks/useGamePlayers';
 import useSports from '../hooks/useSports';
 import SportIcon from './SportIcon';
 import { ICON_FAMILIES } from '../constants/iconFamilies';
@@ -21,6 +19,7 @@ export default function GameCard({
     distance,
     isCommunityMember,
     numPlayers,
+    averageSkillLevel,
 }: {
     player: Player,
     game: Game,
@@ -28,8 +27,8 @@ export default function GameCard({
     distance: { km: number, miles: number },
     isCommunityMember: boolean,
     numPlayers: number,
+    averageSkillLevel: string,
 }) {
-    const { players } = useGamePlayers(player.id, game.id);
     const { sports } = useSports();
 
     const sport = sports.find(s => s.id === game.sport_id);
@@ -61,7 +60,7 @@ export default function GameCard({
             <View style={styles.sideBySide}>
                 <View style={{ flex: 1 }}>
                     <Text style={{ fontWeight: '600' }}>{formatDate(new Date(game.start_time), "EEEE, PP'\n'p")} — {formatDate(new Date(game.end_time), "p")}</Text>
-                    <Text style={{ color: Colours.primary }}><Text style={styles.tagText}>Skill: </Text>{AVERAGE_SKILL_LEVEL(players, game.sport_id)}</Text>
+                    <Text style={{ color: Colours.primary }}><Text style={styles.tagText}>Skill: </Text>{averageSkillLevel}</Text>
                     <View style={[styles.sideBySide, { marginTop: 2, justifyContent: 'flex-start' }]}>
                         <Ionicons name="people" size={16} color="black" />
                         <Text> {numPlayers}/{game.max_players}</Text>
