@@ -129,7 +129,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
                 </View>
             </View>
 
-            <Text style={styles.requiredPlayersSection}>{(game?.min_players || 0) - players.length} more players required to start</Text>
+            <Text style={styles.requiredPlayersSection}>{Math.max(0, (game?.min_players || 0) - players.length)} more players required to start</Text>
 
             {players.some(p => p.id === player.id) ? (
                 <View style={styles.sideBySide}>
