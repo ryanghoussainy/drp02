@@ -79,6 +79,18 @@ export default function GameCard({
                             game.location.toLowerCase().includes("brixton") ? require("../assets/images/brixtonrecreationcentre.png") :
                             game.location.toLowerCase().includes("wandsworth") ? require("../assets/images/wandsworthcommon.png") :
                             game.location.toLowerCase().includes("barn") ? require("../assets/images/barnelmssportscentre.png") :
+                            game.location.toLowerCase().includes("islington") ? require("../assets/images/islingtontenniscentre.jpg") :
+                            game.location.toLowerCase().includes("swiss") ? require("../assets/images/swisscottageleisurecentre.jpg") :
+                            game.location.toLowerCase().includes("finsbury") ? require("../assets/images/finsburyleisurecentre.jpg") :
+                            game.location.toLowerCase().includes("lee") ? require("../assets/images/leevalley.jpg") :
+                            game.location.toLowerCase().includes("lord") ? require("../assets/images/lordscricket.jpg") :
+                            game.location.toLowerCase().includes("ethos") ? require("../assets/images/ethos.jpg") :
+                            game.location.toLowerCase().includes("battersea") ? require("../assets/images/battersea.jpg") :
+                            game.location.toLowerCase().includes("clapham") ? require("../assets/images/clapham.jpg") :
+                            game.location.toLowerCase().includes("crystal palace") ? require("../assets/images/crystalpalace.jpg") :
+                            game.location.toLowerCase().includes("wimbledon") ? require("../assets/images/wimbledon.jpg") :
+                            game.location.toLowerCase().includes("paddington") ? require("../assets/images/paddington.jpg") :
+                            game.location.toLowerCase().includes("victoria") ? require("../assets/images/victoria.jpg") :
                             require("../assets/images/hydepark.jpg")}
                         style={styles.gameImage}
                     />
