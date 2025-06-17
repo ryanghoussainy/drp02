@@ -15,6 +15,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RootStackParamList } from "../navigation/StackNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import Logo from "../components/Logo";
 
 type OtherNavProp = NativeStackNavigationProp<RootStackParamList, "OtherPlayerProfile">;
 
@@ -71,7 +72,7 @@ export default function ProfileScreen({ player, profilePlayer }: { player?: Play
         <View style={styles.container}>
             <View style={styles.header}>
                 {!isOwn && <BackArrow style={styles.backArrow} />}
-                <Text style={styles.title}>Team Up London</Text>
+                <Logo />
             </View>
 
             <Text style={styles.subTitle}>Profile</Text>
@@ -295,15 +296,6 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         justifyContent: "center",
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
-        paddingTop: 16,
     },
     subTitle: {
         fontSize: 24,

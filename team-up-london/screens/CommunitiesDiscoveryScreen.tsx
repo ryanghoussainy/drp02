@@ -15,6 +15,7 @@ import Colours from '../config/Colours';
 import Player from '../interfaces/Player';
 import { Animated, Dimensions, SafeAreaView } from 'react-native';
 import Community from '../interfaces/Community';
+import Logo from '../components/Logo';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -157,7 +158,7 @@ export default function CommunitiesScreen({ player }: { player: Player }) {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.container}>
-                <Text style={styles.title}>Team Up London</Text>
+                <Logo />
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
                     <Text style={[styles.subTitle, { marginTop: 12, marginRight: 20, zIndex: 0, position: 'relative' }]}>Communities</Text>
                     {/* Group everything inside one row */}
@@ -354,14 +355,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         padding: 16,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
     },
     subTitle: {
         fontSize: 24,

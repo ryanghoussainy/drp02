@@ -20,6 +20,7 @@ import { Feather } from '@expo/vector-icons';
 import useMessages from "../hooks/useMessages";
 import MessageBubble from "../components/MessageBubble";
 import { sendMessage } from "../operations/Messages";
+import Logo from '../components/Logo';
 
 type Props = NativeStackScreenProps<RootStackParamList, "PlayerChat">;
 
@@ -70,7 +71,7 @@ export default function PlayerChatScreen({ player, route }: { player: Player } &
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            <Text style={styles.title}>Team Up London</Text>
+            <Logo />
 
             <View style={styles.otherPlayerContainer}>
                 <BackArrow style={{ zIndex: 1 }}/>
@@ -118,19 +119,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingTop: 16,
     },
     centered: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
-        paddingTop: 16,
     },
     otherPlayerContainer: {
         flexDirection: 'row',

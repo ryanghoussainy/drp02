@@ -17,6 +17,7 @@ import Sport from '../interfaces/Sport';
 import { useEffect, useState } from 'react';
 import Player from '../interfaces/Player';
 import BackArrow from '../components/BackArrow';
+import Logo from '../components/Logo';
 
 export default function PreferencesScreen(
     { player, preferences }: { player: Player, preferences?: { preferredTimes: string[], selectedSports: Sport[], skillLevels: { [key: string]: number },
@@ -81,9 +82,9 @@ export default function PreferencesScreen(
                 <View>
                     {/* Only render back arrow if parentSelectedSports is not empty */}
                     {parentSelectedSports.length > 0 && (
-                        <BackArrow style={{ position: "absolute", top: 20, zIndex: 1 }} />
+                        <BackArrow style={{ position: "absolute", top: 80, zIndex: 1 }} />
                     )}
-                    <Text style={styles.title}>Team Up London</Text>
+                    <Logo />
                 </View>
                 <Text style={[styles.subTitle, { textAlign: 'center' }]}>Preferences</Text>
 

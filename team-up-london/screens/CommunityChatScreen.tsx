@@ -21,6 +21,7 @@ import useCommunity from "../hooks/useCommunity";
 import useCommunityMessages from '../hooks/useCommunityMessages';
 import { sendCommunityMessage } from "../operations/CommunityMessages";
 import CommunityMessageBubble from '../components/CommunityMessageBubble';
+import Logo from '../components/Logo';
 
 type Props = NativeStackScreenProps<RootStackParamList, "CommunityChat">;
 
@@ -72,7 +73,7 @@ export default function CommunityChatScreen({ player, route }: { player: Player 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            <Text style={styles.title}>Team Up London</Text>
+            <Logo />
 
             <View style={styles.communityHeaderContainer}>
                 <BackArrow style={{ zIndex: 1 }} />
@@ -120,19 +121,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingTop: 16,
     },
     centered: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
-        paddingTop: 16,
     },
     communityHeaderContainer: {
         flexDirection: 'row',

@@ -3,6 +3,7 @@ import { getPlayerByName } from "../operations/Player";
 import React, { useState } from "react";
 import Colours from "../config/Colours";
 import Player from "../interfaces/Player";
+import Logo from "../components/Logo";
 
 export default function LoginScreen({ setPlayer }: { setPlayer: (player: Player) => void }) {
     const findPlayerByName = async (): Promise<Player> => {
@@ -20,6 +21,7 @@ export default function LoginScreen({ setPlayer }: { setPlayer: (player: Player)
 
     return (
         <View style={styles.container}>
+            <Logo />
             <Text style={styles.title}>Login to Team Up London</Text>
             <TextInput
                 placeholder="Enter name"

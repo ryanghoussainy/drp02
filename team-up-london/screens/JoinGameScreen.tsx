@@ -20,6 +20,7 @@ import Player from '../interfaces/Player';
 import { MaterialIcons } from '@expo/vector-icons';
 import useSport from '../hooks/useSport';
 import useDistanceAndRegion from '../hooks/useDistanceAndRegion';
+import Logo from '../components/Logo';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Game">;
 
@@ -42,7 +43,7 @@ export default function JoinGameScreen({ player, route }: { player: Player } & P
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Team Up London</Text>
+            <Logo />
 
             {/* Back button */}
             <BackArrow
@@ -185,14 +186,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 16,
     },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        marginTop: 20,
-    },
     gameTitle: {
         fontSize: 22,
         fontWeight: 'bold',
@@ -239,7 +232,6 @@ const styles = StyleSheet.create({
     notesSection: {
         flex: 1,
         marginLeft: 16,
-        justifyContent: "space-between"
     },
     sectionTitle: {
         fontSize: 16,

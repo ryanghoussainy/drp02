@@ -21,6 +21,7 @@ import useGame from '../hooks/useGame';
 import GameMessageBubble from '../components/GameMessageBubble';
 import useGameMessages from '../hooks/useGameMessages';
 import { sendgameMessage } from '../operations/ChatMessages';
+import Logo from '../components/Logo';
 
 type Props = NativeStackScreenProps<RootStackParamList, "GameChat">;
 
@@ -72,7 +73,7 @@ export default function GameChatScreen({ player, route }: { player: Player } & P
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            <Text style={styles.title}>Team Up London</Text>
+            <Logo />
 
             <View style={styles.gameHeaderContainer}>
                 <BackArrow style={{ zIndex: 1 }} />
@@ -120,19 +121,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingTop: 16,
     },
     centered: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
-        paddingTop: 16,
     },
     gameHeaderContainer: {
         flexDirection: 'row',

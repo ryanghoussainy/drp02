@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Animated, Dimensions } from 'react-native';
+import { Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Animated, Dimensions, Image } from 'react-native';
 import Fonts from '../config/Fonts';
 import { Feather } from '@expo/vector-icons';
 import useGamesDiscoverySections from '../hooks/useGamesDiscoverySections';
@@ -18,6 +18,7 @@ import useDistancesAndRegions from '../hooks/useDistancesAndRegions';
 import Game from '../interfaces/Game';
 import { Region } from 'react-native-maps';
 import usePlayerCommunities from '../hooks/usePlayerCommunities';
+import Logo from '../components/Logo';
 
 type GamesNavProp = NativeStackNavigationProp<RootStackParamList, "Main">;
 
@@ -258,7 +259,7 @@ export default function GamesDiscoveryScreen({ player }: { player: Player }) {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView style={styles.container}>
-                <Text style={styles.title}>Team Up London</Text>
+                <Logo />
                 <View style={[styles.sideBySide, { marginLeft: 24, marginBottom: 4, justifyContent: 'flex-end', alignItems: 'center' }]}>
                     <Text style={[styles.subTitle, { marginTop: 12, marginRight: 60, zIndex: 0, position: 'relative' }]}>Discovery</Text>
                     {/* Group everything inside one row */}
@@ -532,14 +533,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         padding: 16,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: Fonts.main,
-        textAlign: 'center',
-        marginVertical: 12,
-        color: Colours.primary,
     },
     subTitle: {
         fontSize: 24,
