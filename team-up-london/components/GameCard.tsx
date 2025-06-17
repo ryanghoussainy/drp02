@@ -70,9 +70,16 @@ export default function GameCard({
 
                 <View style={styles.imageContainer}>
                     <Image
-                        source={game.location === "Hyde Park" ? require("../assets/images/hydepark.jpg") :
-                            require("../assets/images/regentspark.png")
-                        }
+                        source={game.location.toLowerCase().includes("hyde") ? require("../assets/images/hydepark.jpg") :
+                            game.location.toLowerCase().includes("regent's") ? require("../assets/images/regentspark.png") :
+                            game.location.toLowerCase().includes("hackney") ? require("../assets/images/hackneydownscourts.png") :
+                            game.location.toLowerCase().includes("westway") ? require("../assets/images/westwaysportscentre.png") :
+                            game.location.toLowerCase().includes("huxley") ? require("../assets/images/huxleybuilding.png") :
+                            game.location.toLowerCase().includes("wormwood") ? require("../assets/images/wormwoodscrubspark.png") :
+                            game.location.toLowerCase().includes("brixton") ? require("../assets/images/brixtonrecreationcentre.png") :
+                            game.location.toLowerCase().includes("wandsworth") ? require("../assets/images/wandsworthcommon.png") :
+                            game.location.toLowerCase().includes("barn") ? require("../assets/images/barnelmssportscentre.png") :
+                            require("../assets/images/hydepark.jpg")}
                         style={styles.gameImage}
                     />
                 </View>
